@@ -1,0 +1,32 @@
+name: bey_catalog
+description: 239 parts catalog, JSON seeder, CDN updater, local datasource and CatalogBloc for BeyScore.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.29.0"
+
+dependencies:
+  bey_domain:
+    path: ../bey_domain
+  bey_data:
+    path: ../bey_data
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  rxdart: ^0.28.0
+  equatable: ^2.0.7
+  crypto: ^3.0.6
+  http: ^1.3.0
+  drift: ^2.22.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.2.0
+
+flutter:
+  assets:
+    - assets/data/

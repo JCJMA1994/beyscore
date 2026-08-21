@@ -1,0 +1,46 @@
+name: app_organizer
+description: BeyScore Organizer App for Beyblade X judges and tournament runners (Tournaments, LAN Hub, Combos, Decks, Stats).
+version: 1.0.0+1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.29.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  get_it: ^8.0.3
+  go_router: ^14.8.1
+  equatable: ^2.0.7
+  rxdart: ^0.28.0
+  uuid: ^4.5.1
+  qr_flutter: ^4.1.0
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  bey_domain:
+    path: ../../packages/bey_domain
+  bey_data:
+    path: ../../packages/bey_data
+  bey_ui:
+    path: ../../packages/bey_ui
+  bey_catalog:
+    path: ../../packages/bey_catalog
+  bey_tournament:
+    path: ../../packages/bey_tournament
+  bey_hub:
+    path: ../../packages/bey_hub
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.2.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/
+    - assets/images/
+    - assets/audio/

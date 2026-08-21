@@ -1,0 +1,35 @@
+name: app_table
+description: BeyScore Stadium Tablet App (Fixed landscape, zero identity, paired to organizer LAN hub).
+version: 1.0.0+1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.29.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get_it: ^8.0.3
+  equatable: ^2.0.7
+  wakelock_plus: ^1.2.8
+  http: ^1.2.2
+  bey_domain:
+    path: ../../packages/bey_domain
+  bey_data:
+    path: ../../packages/bey_data
+  bey_ui:
+    path: ../../packages/bey_ui
+  bey_hub:
+    path: ../../packages/bey_hub
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.2.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/audio/

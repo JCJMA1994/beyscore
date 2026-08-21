@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeyScore — Flujos de creación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#06070C; --steel:#0E1220; --panel:#151B29; --panel2:#1C2434;
+  --line:#28324A; --line2:#3A4762; --text:#EEF1F7; --mute:#78859D;
+  --dragoon:#2B6BFF; --dranzer:#FF3B2F; --pegasus:#FFC400;
+  --burst:#A855F7; --x:#00E5D0;
+  --ch:polygon(0 8px,8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);
+  --ch-lg:polygon(0 16px,16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--void);color:var(--text);font-family:'Inter Tight',system-ui,sans-serif;
+-webkit-font-smoothing:antialiased;padding:0 0 90px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(120% 55% at 50% -8%,rgba(43,107,255,.20),transparent 62%),
+radial-gradient(90% 45% at 100% 102%,rgba(255,59,47,.13),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:0 16px}
+.jp{font-family:'Noto Sans JP',sans-serif}
+
+header{padding:46px 0 8px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;
+text-transform:uppercase;color:var(--x)}
+h1{font-family:'Archivo Black',sans-serif;font-size:52px;line-height:.84;letter-spacing:-.035em;
+margin:14px 0 2px;text-transform:uppercase;transform:skewX(-8deg);transform-origin:left}
+h1 .g{background:linear-gradient(105deg,var(--dragoon),var(--x));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--mute);margin-top:10px}
+.lede{color:var(--mute);font-size:14px;line-height:1.62;margin-top:16px}
+.teeth{height:9px;margin:24px 0 4px;
+background:repeating-linear-gradient(90deg,var(--line2) 0 3px,transparent 3px 9px);
+-webkit-mask-image:linear-gradient(90deg,#000 0 62%,transparent);
+mask-image:linear-gradient(90deg,#000 0 62%,transparent)}
+
+.sec{display:flex;align-items:center;gap:10px;margin:48px 0 13px;position:sticky;top:0;z-index:8;
+padding:13px 0 11px;background:linear-gradient(var(--void) 74%,transparent)}
+.sec .n{font-family:'Archivo Black',sans-serif;font-size:23px;line-height:1;color:transparent;
+-webkit-text-stroke:1px var(--line2);transform:skewX(-8deg)}
+.sec .t{font-family:'Archivo Black',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:-.015em}
+.sec .role{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;
+padding:3px 7px;border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch)}
+.sec .role.admin{color:var(--dranzer);border-color:rgba(255,59,47,.5)}
+
+.phone{width:100%;aspect-ratio:390/844;background:var(--steel);clip-path:var(--ch-lg);
+border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.phone::after{content:'';position:absolute;inset:0;pointer-events:none;
+background:linear-gradient(158deg,rgba(255,255,255,.055),transparent 30%)}
+.status{flex:0 0 27px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;
+font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mute)}
+.sync{display:flex;align-items:center;gap:5px;color:var(--pegasus);font-weight:700}
+.dot{width:5px;height:5px;background:var(--pegasus);border-radius:50%;box-shadow:0 0 8px currentColor}
+.sync.ok{color:var(--x)}.sync.ok .dot{background:var(--x)}
+.appbar{flex:0 0 auto;padding:5px 15px 12px;display:flex;align-items:center;gap:9px;
+border-bottom:1px solid var(--line)}
+.appbar .back{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--mute)}
+.appbar h2{font-family:'Archivo Black',sans-serif;font-size:15px;text-transform:uppercase;
+letter-spacing:-.018em;transform:skewX(-8deg)}
+.appbar .side{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mute)}
+.body{flex:1;overflow:hidden;padding:13px 15px;display:flex;flex-direction:column;gap:10px}
+
+.label{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.18em;
+text-transform:uppercase;color:var(--mute)}
+.card{background:var(--panel);border:1px solid var(--line);padding:11px 13px;clip-path:var(--ch)}
+.card.sel{border-color:var(--line2);background:var(--panel2)}
+.card.hot{border-color:rgba(0,229,208,.45);box-shadow:inset 3px 0 0 var(--x)}
+.code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mute)}
+.btn{text-align:center;padding:13px;font-weight:700;font-size:12px;letter-spacing:.09em;
+text-transform:uppercase;clip-path:var(--ch);border:1px solid var(--line2);color:var(--text)}
+.btn.go{background:linear-gradient(100deg,var(--dragoon),var(--x));border:0;color:#04121A;
+box-shadow:0 0 26px rgba(0,229,208,.3)}
+.btn.hot{background:linear-gradient(100deg,var(--dranzer),#FF7A3D);border:0;color:#1A0603}
+.btn.ghost{background:transparent}
+.btn.dis{color:var(--mute);border-color:var(--line)}
+.row{display:flex;gap:8px}.grow{flex:1}.spacer{flex:1}
+.chip{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;padding:4px 8px;
+border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch);white-space:nowrap}
+.chip.on{background:var(--text);color:var(--void);border-color:var(--text);font-weight:700}
+.chip.x{border-color:var(--x);color:var(--x)}
+.chip.r{border-color:var(--dranzer);color:var(--dranzer)}
+.chip.p{border-color:var(--burst);color:var(--burst)}
+
+.bey{width:100%;aspect-ratio:1;border-radius:50%;position:relative}
+.bey::before{content:'';position:absolute;inset:0;border-radius:50%;opacity:.9}
+.bey::after{content:'';position:absolute;inset:27%;border-radius:50%;background:var(--panel);
+border:2px solid currentColor}
+.bey.atk::before{background:conic-gradient(from 0deg,currentColor 0 9%,transparent 9% 25%,
+currentColor 25% 34%,transparent 34% 50%,currentColor 50% 59%,transparent 59% 75%,
+currentColor 75% 84%,transparent 84%)}
+.bey.def::before{background:conic-gradient(from 15deg,currentColor 0 14%,transparent 14% 16.6%,
+currentColor 16.6% 30%,transparent 30% 33.3%,currentColor 33.3% 47%,transparent 47% 50%,
+currentColor 50% 64%,transparent 64% 66.6%,currentColor 66.6% 80%,transparent 80% 83.3%,
+currentColor 83.3% 97%,transparent 97%)}
+.bey.sta::before{background:radial-gradient(circle,transparent 52%,currentColor 53% 96%,transparent 97%)}
+.bey.bal::before{background:conic-gradient(from 0deg,currentColor 0 18%,transparent 18% 33%,
+currentColor 33% 44%,transparent 44% 66%,currentColor 66% 84%,transparent 84%)}
+
+/* ====== STACK: el bey como corte vertical ====== */
+.stack{position:relative;padding-left:22px}
+.stack::before{content:'';position:absolute;left:8px;top:12px;bottom:12px;width:1px;
+background:repeating-linear-gradient(180deg,var(--line2) 0 4px,transparent 4px 9px)}
+.sl{position:relative;background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);
+padding:9px 11px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sl::before{content:'';position:absolute;left:-14px;top:50%;width:12px;height:1px;background:var(--line2)}
+.sl::after{content:'';position:absolute;left:-17px;top:50%;transform:translateY(-50%);
+width:7px;height:7px;background:var(--line2);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.sl.done{border-color:var(--line2);background:var(--panel2)}
+.sl.done::after{background:var(--x);box-shadow:0 0 8px var(--x)}
+.sl.empty{border-style:dashed;background:transparent}
+.sl .th{width:34px;flex:0 0 34px}
+.sl .kind{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.14em;
+text-transform:uppercase;color:var(--mute);display:block;margin-bottom:2px}
+.sl b{font-size:12px;line-height:1.15;display:block}
+.sl .meta{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mute);margin-top:2px}
+.sl .go{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--mute)}
+
+/* hoja inferior */
+.sheet{position:absolute;left:0;right:0;bottom:0;top:78px;background:var(--steel);
+border-top:1px solid var(--line2);clip-path:var(--ch-lg);display:flex;flex-direction:column;
+padding:12px 15px;gap:9px;box-shadow:0 -18px 40px rgba(0,0,0,.55)}
+.grab{width:38px;height:3px;background:var(--line2);margin:0 auto 4px}
+.search{background:var(--panel);border:1px solid var(--line2);clip-path:var(--ch);
+padding:10px 12px;display:flex;align-items:center;gap:8px}
+.search .ph{font-size:12px;color:var(--mute)}
+.search .ic{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mute)}
+.scroll{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:5px}
+.pl{background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);padding:8px 10px;
+display:flex;align-items:center;gap:9px}
+.pl.pick{border-color:var(--x);box-shadow:inset 3px 0 0 var(--x)}
+.pl.owned{opacity:1}
+.pl.no{opacity:.42}
+.pl .th{width:30px;flex:0 0 30px}
+.pl b{font-size:11.5px;display:block;line-height:1.1}
+.pl .kana{font-family:'Noto Sans JP',sans-serif;font-size:7.5px;color:var(--mute)}
+.pl .st{margin-left:auto;text-align:right}
+.pl .st .w{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700}
+.pl .st .t{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--mute)}
+.tierdot{width:14px;height:14px;display:grid;place-items:center;clip-path:var(--ch);
+font-family:'Archivo Black',sans-serif;font-size:7.5px;flex:0 0 14px}
+.tierdot.S{background:var(--dranzer);color:#1A0603}
+.tierdot.A{background:var(--pegasus);color:#1A1203}
+
+/* deck 3on3 */
+.deck{display:flex;flex-direction:column;gap:6px}
+.dk{background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);padding:10px 11px;
+display:flex;align-items:center;gap:10px;position:relative}
+.dk.bad{border-color:var(--dranzer);box-shadow:inset 3px 0 0 var(--dranzer)}
+.dk.ok{border-color:var(--line2)}
+.dk .ord{font-family:'Archivo Black',sans-serif;font-size:17px;color:var(--line2);
+transform:skewX(-8deg);width:20px;flex:0 0 20px;text-align:center}
+.dk .th{width:32px;flex:0 0 32px}
+.dk b{font-size:12px;display:block;line-height:1.15}
+.dk .meta{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mute);margin-top:2px}
+.dk .drag{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--line2)}
+.linkbad{position:relative;height:20px;margin:-4px 0}
+.linkbad::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:var(--dranzer)}
+.linkbad span{position:absolute;left:22px;top:3px;font-family:'JetBrains Mono',monospace;
+font-size:8px;color:var(--dranzer);letter-spacing:.1em}
+
+/* stepper */
+.steps{display:flex;gap:4px;align-items:center;margin-bottom:2px}
+.steps i{flex:1;height:3px;background:var(--line2)}
+.steps i.on{background:var(--x);box-shadow:0 0 8px var(--x)}
+.steps i.done{background:var(--dragoon)}
+
+/* filas de ajuste */
+.opt{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--line)}
+.opt:last-child{border-bottom:0}
+.opt .tx{font-size:12px}
+.opt .hint{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--mute);margin-top:2px}
+.sw{width:36px;height:20px;background:var(--line);clip-path:var(--ch);position:relative;flex:0 0 36px}
+.sw i{position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--mute);clip-path:var(--ch)}
+.sw.on{background:rgba(0,229,208,.25)} .sw.on i{left:19px;background:var(--x);box-shadow:0 0 8px var(--x)}
+
+.field{background:var(--panel);border:1px solid var(--line2);clip-path:var(--ch);padding:10px 12px}
+.field .lb{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.14em;
+text-transform:uppercase;color:var(--mute);display:block;margin-bottom:4px}
+.field .vl{font-size:13px;font-weight:600}
+.field .vl.ph{color:var(--mute);font-weight:400}
+
+.banner{padding:10px 12px;font-size:11.5px;line-height:1.5;clip-path:var(--ch);border:1px solid}
+.banner b{display:block;margin-bottom:2px}
+.banner.warn{border-color:rgba(255,196,0,.45);background:rgba(255,196,0,.09);color:#FFE49A}
+.banner.warn b{color:var(--pegasus)}
+.banner.info{border-color:rgba(0,229,208,.4);background:rgba(0,229,208,.08);color:#A8F2EA}
+.banner.info b{color:var(--x)}
+.banner.bad{border-color:rgba(255,59,47,.45);background:rgba(255,59,47,.1);color:#FFC0BB}
+.banner.bad b{color:var(--dranzer)}
+.err{border-left:3px solid var(--dranzer);background:rgba(255,59,47,.09);padding:10px 12px;
+font-size:11.5px;line-height:1.5;color:#FFC0BB}
+.err b{display:block;color:var(--dranzer);margin-bottom:3px}
+.okline{border-left:3px solid var(--x);background:rgba(0,229,208,.08);padding:10px 12px;
+font-size:11.5px;line-height:1.5;color:#A8F2EA}
+.okline b{display:block;color:var(--x);margin-bottom:3px}
+
+.qr{width:120px;height:120px;margin:0 auto;background:
+repeating-conic-gradient(var(--text) 0 25%,transparent 0 50%) 0 0/14px 14px,
+var(--void);border:6px solid var(--text);clip-path:var(--ch)}
+
+.notes{margin-top:56px;display:flex;flex-direction:column;gap:2px}
+.note{background:var(--panel);border:1px solid var(--line);padding:15px 16px;clip-path:var(--ch)}
+.note h3{font-size:13px;margin-bottom:6px}
+.note p{font-size:13px;line-height:1.62;color:var(--mute)}
+.note .k{width:26px;height:3px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">BeyScore · flujos de creación</div>
+  <h1>Armar<br><span class="g">y crear</span></h1>
+  <div class="sub">COMBO · DECK 3ON3 · TORNEO</div>
+  <p class="lede">Once pantallas para las tres cosas que un usuario construye. Cada decisión sale de los datos reales del catálogo y del reglamento oficial v12.</p>
+  <div class="teeth"></div>
+</header>
+
+<!-- ============ COMBO ============ -->
+
+<!-- 01 -->
+<div class="sec"><span class="n">01</span><span class="t">Armar combo · BX</span><span class="role">USER</span></div>
+<div class="phone">
+  <div class="status"><span>8:14</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo bey</h2><span class="side">BX</span></div>
+  <div class="body">
+    <div class="row"><span class="chip on">BX</span><span class="chip">UX</span><span class="chip">CX</span></div>
+    <div class="code" style="line-height:1.5">El sistema decide cuántas piezas lleva. CX divide el blade en tres.</div>
+
+    <div class="stack" style="margin-top:4px">
+      <div class="sl done">
+        <div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><span class="kind">Blade</span><b>DranSword</b><span class="meta">34.8 g · ataque · giro R</span></div>
+        <span class="go">›</span>
+      </div>
+      <div class="sl done">
+        <div class="th"><div class="bey def" style="color:var(--mute)"></div></div>
+        <div><span class="kind">Ratchet</span><b>3-60</b><span class="meta">3 contactos · 6.0 mm · clase 6+</span></div>
+        <span class="go">›</span>
+      </div>
+      <div class="sl empty">
+        <div class="th"><div class="bey sta" style="color:var(--line2)"></div></div>
+        <div><span class="kind">Bit</span><b style="color:var(--mute)">Elegir bit</b><span class="meta">52 disponibles</span></div>
+        <span class="go">›</span>
+      </div>
+    </div>
+
+    <div class="label">Cómo va quedando</div>
+    <div class="card">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;letter-spacing:-.02em">DranSword 3-60<span style="color:var(--mute)">_</span></div>
+      <div class="code" style="margin-top:6px;line-height:1.5">La notación se arma sola con la abreviatura del bit.</div>
+    </div>
+
+    <div class="banner info"><b>Giro derecha</b>Sirve tu lanzador normal. Si el blade girara a la izquierda, harían falta el BX-40 o el BX-47.</div>
+    <div class="spacer"></div>
+    <div class="btn dis">Falta el bit</div>
+  </div>
+</div>
+
+<!-- 02 -->
+<div class="sec"><span class="n">02</span><span class="t">Elegir pieza</span><span class="role">USER</span></div>
+<div class="phone">
+  <div class="status"><span>8:15</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo bey</h2><span class="side">BX</span></div>
+  <div class="body" style="opacity:.32">
+    <div class="row"><span class="chip on">BX</span><span class="chip">UX</span><span class="chip">CX</span></div>
+    <div class="stack"><div class="sl done"><div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div><div><span class="kind">Blade</span><b>DranSword</b></div></div></div>
+  </div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="row" style="align-items:center"><b style="font-size:13px">Elegir bit</b><span class="spacer"></span><span class="code">52 piezas</span></div>
+    <div class="search"><span class="ic">⌕</span><span class="ph">Nombre, código o “Scythe Incendio”…</span></div>
+    <div class="row"><span class="chip on">TENGO</span><span class="chip">TODOS</span><span class="chip">ATAQUE</span><span class="chip">DEFENSA</span></div>
+    <div class="scroll">
+      <div class="pl pick">
+        <span class="tierdot A">A</span>
+        <div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><b>Flat</b><span class="kana jp">フラット</span></div>
+        <div class="st"><div class="w" style="color:var(--x)">F</div><div class="t">ataque · 12 dientes</div></div>
+      </div>
+      <div class="pl">
+        <span class="tierdot S">S</span>
+        <div class="th"><div class="bey sta" style="color:var(--burst)"></div></div>
+        <div><b>Ball</b><span class="kana jp">ボール</span></div>
+        <div class="st"><div class="w">B</div><div class="t">stamina · 12 dientes</div></div>
+      </div>
+      <div class="pl">
+        <div class="th" style="margin-left:23px"><div class="bey atk" style="color:var(--pegasus)"></div></div>
+        <div><b>Glide Flat</b><span class="kana jp">グライドフラット</span></div>
+        <div class="st"><div class="w">GF</div><div class="t">ataque · eje 94</div></div>
+      </div>
+      <div class="pl">
+        <div class="th" style="margin-left:23px"><div class="bey def" style="color:var(--mute)"></div></div>
+        <div><b>High Needle</b><span class="kana jp">ハイニードル</span></div>
+        <div class="st"><div class="w">HN</div><div class="t">defensa · 13.3 mm</div></div>
+      </div>
+      <div class="pl no">
+        <div class="th" style="margin-left:23px"><div class="bey bal" style="color:var(--line2)"></div></div>
+        <div><b>Taper</b><span class="code" style="font-size:7.5px">no la tienes · viene en BX-02</span></div>
+        <div class="st"><div class="w" style="color:var(--mute)">T</div><div class="t">balance</div></div>
+      </div>
+      <div class="pl no">
+        <div class="th" style="margin-left:23px"><div class="bey atk" style="color:var(--line2)"></div></div>
+        <div><b>Vortex</b><span class="code" style="font-size:7.5px">no la tienes · viene en CX-01</span></div>
+        <div class="st"><div class="w" style="color:var(--mute)">V</div><div class="t">ataque</div></div>
+      </div>
+    </div>
+    <div class="btn go">Usar Flat</div>
+  </div>
+</div>
+
+<!-- 03 -->
+<div class="sec"><span class="n">03</span><span class="t">Armar combo · CX</span><span class="role">USER</span></div>
+<div class="phone">
+  <div class="status"><span>8:18</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo bey</h2><span class="side">CX</span></div>
+  <div class="body">
+    <div class="row"><span class="chip">BX</span><span class="chip">UX</span><span class="chip on">CX</span></div>
+    <div class="banner info"><b>CX parte el blade en tres</b>Lock chip, main blade y assist blade se combinan entre sí. Más combinaciones, más piezas que revisar en el chequeo.</div>
+    <div class="stack">
+      <div class="sl done" style="padding:7px 11px">
+        <div class="th" style="width:26px;flex:0 0 26px"><div class="bey atk" style="color:var(--dranzer)"></div></div>
+        <div><span class="kind">Lock chip</span><b style="font-size:11.5px">Dran</b></div><span class="go">›</span>
+      </div>
+      <div class="sl done" style="padding:7px 11px">
+        <div class="th" style="width:26px;flex:0 0 26px"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><span class="kind">Main blade</span><b style="font-size:11.5px">Brave</b></div><span class="go">›</span>
+      </div>
+      <div class="sl done" style="padding:7px 11px">
+        <div class="th" style="width:26px;flex:0 0 26px"><div class="bey bal" style="color:var(--pegasus)"></div></div>
+        <div><span class="kind">Assist blade</span><b style="font-size:11.5px">Slash · S</b></div><span class="go">›</span>
+      </div>
+      <div class="sl done" style="padding:7px 11px">
+        <div class="th" style="width:26px;flex:0 0 26px"><div class="bey def" style="color:var(--mute)"></div></div>
+        <div><span class="kind">Ratchet</span><b style="font-size:11.5px">6-60</b><span class="meta">6 contactos · viene en CX-01</span></div><span class="go">›</span>
+      </div>
+      <div class="sl done" style="padding:7px 11px">
+        <div class="th" style="width:26px;flex:0 0 26px"><div class="bey atk" style="color:var(--x)"></div></div>
+        <div><span class="kind">Bit</span><b style="font-size:11.5px">Vortex · V</b><span class="meta">ataque · eje 95</span></div><span class="go">›</span>
+      </div>
+    </div>
+    <div class="card hot">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700">DranBraveS 6-60V</div>
+      <div class="code" style="margin-top:5px">todas las piezas del set CX-01</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="btn go">Guardar bey</div>
+  </div>
+</div>
+
+<!-- 04 -->
+<div class="sec"><span class="n">04</span><span class="t">Bey terminado</span><span class="role">USER</span></div>
+<div class="phone">
+  <div class="status"><span>8:19</span><span class="sync"><i class="dot"></i>EN COLA</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Guardar bey</h2></div>
+  <div class="body">
+    <div style="position:relative;overflow:hidden;padding:15px;clip-path:var(--ch);background:linear-gradient(140deg,rgba(43,107,255,.22),var(--panel) 68%);border:1px solid var(--line2);display:flex;align-items:center;gap:14px">
+      <div style="width:74px;flex:0 0 74px"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;letter-spacing:-.02em">DranSword 3-60F</div>
+        <div class="kana jp" style="font-size:10px;color:var(--mute);margin-top:5px">ドランソード</div>
+        <div class="row" style="margin-top:7px"><span class="chip x">ATAQUE</span><span class="chip">GIRO R</span></div>
+      </div>
+    </div>
+
+    <div class="field"><span class="lb">Nombre para ti</span><span class="vl">Mi atacante</span></div>
+
+    <div class="label">Peso</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span style="font-size:11.5px">Blade</span><span class="spacer"></span><span class="code" style="color:var(--pegasus);font-size:12px">34.8 g</span></div>
+      <div class="row" style="align-items:center;margin-top:7px"><span style="font-size:11.5px">Ratchet 3-60</span><span class="spacer"></span><span class="code">clase 6+</span></div>
+      <div class="row" style="align-items:center;margin-top:7px"><span style="font-size:11.5px">Bit Flat</span><span class="spacer"></span><span class="code">clase 2+</span></div>
+      <div style="border-top:1px solid var(--line);margin-top:9px;padding-top:9px">
+        <div class="row" style="align-items:center"><span style="font-size:11.5px;font-weight:600">Total</span><span class="spacer"></span><span class="code" style="font-style:italic">sin datos suficientes</span></div>
+        <div style="font-size:10.5px;line-height:1.5;color:var(--mute);margin-top:6px">El fabricante no publica el peso en gramos de ratchets ni bits, solo su clase. Pesar el combo y anotarlo aquí da el dato exacto.</div>
+      </div>
+      <div class="btn ghost" style="margin-top:9px;padding:9px;font-size:10.5px">Pesar el mío</div>
+    </div>
+
+    <div class="banner info"><b>Este combo aparece en la meta</b>DranSword 3-60F está en tier A de los torneos WBO.</div>
+    <div class="spacer"></div>
+    <div class="btn go">Guardar</div>
+  </div>
+</div>
+
+<!-- ============ DECK ============ -->
+
+<!-- 05 -->
+<div class="sec"><span class="n">05</span><span class="t">Armar deck 3on3</span><span class="role">USER</span></div>
+<div class="phone">
+  <div class="status"><span>8:26</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo deck</h2><span class="side">3 DE 3</span></div>
+  <div class="body">
+    <div class="banner info"><b>El orden es el orden de combate</b>El bey 1 se enfrenta al bey 1 del rival, y así. Arrastra para reordenar.</div>
+    <div class="label">Alineación</div>
+    <div class="deck">
+      <div class="dk ok">
+        <span class="ord">1</span>
+        <div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><b>DranSword 3-60F</b><span class="meta">ataque · 34.8 g · tier A</span></div>
+        <span class="drag">≡</span>
+      </div>
+      <div class="dk ok">
+        <span class="ord">2</span>
+        <div class="th"><div class="bey atk" style="color:var(--dranzer)"></div></div>
+        <div><b>PhoenixWing 9-60GF</b><span class="meta">ataque · 38.5 g · tier S</span></div>
+        <span class="drag">≡</span>
+      </div>
+      <div class="dk ok">
+        <span class="ord">3</span>
+        <div class="th"><div class="bey sta" style="color:var(--burst)"></div></div>
+        <div><b>WizardRod 1-60H</b><span class="meta">stamina · 35.4 g · tier S</span></div>
+        <span class="drag">≡</span>
+      </div>
+    </div>
+
+    <div class="okline"><b>Deck legal</b>Ninguna pieza repetida · sin salón de la fama · los tres giran a la derecha.</div>
+
+    <div class="label">Composición</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span style="font-size:11.5px">Tipos</span><span class="spacer"></span><span class="chip x">2 ATAQUE</span><span class="chip p">1 STAMINA</span></div>
+      <div class="row" style="align-items:center;margin-top:8px"><span style="font-size:11.5px">Piezas distintas</span><span class="spacer"></span><span class="code">9 de 9</span></div>
+      <div style="font-size:10.5px;line-height:1.5;color:var(--mute);margin-top:8px">Sin defensa en el deck. Contra rivales con bits tipo Ball vas a sufrir en las rondas largas.</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="btn go">Guardar deck</div>
+  </div>
+</div>
+
+<!-- 06 -->
+<div class="sec"><span class="n">06</span><span class="t">Conflicto de piezas</span><span class="role">USER</span></div>
+<div class="phone">
+  <div class="status"><span>8:28</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo deck</h2><span class="side">1 ERROR</span></div>
+  <div class="body">
+    <div class="label">Alineación</div>
+    <div class="deck">
+      <div class="dk bad">
+        <span class="ord" style="color:var(--dranzer)">1</span>
+        <div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><b>DranSword 3-60F</b><span class="meta" style="color:var(--dranzer)">blade repetido</span></div>
+        <span class="drag">≡</span>
+      </div>
+      <div class="linkbad"><span>MISMA PIEZA</span></div>
+      <div class="dk bad">
+        <span class="ord" style="color:var(--dranzer)">2</span>
+        <div class="th"><div class="bey atk" style="color:var(--dranzer)"></div></div>
+        <div><b>DranSword 5-60B</b><span class="meta" style="color:var(--dranzer)">blade repetido · otro color</span></div>
+        <span class="drag">≡</span>
+      </div>
+      <div class="dk ok">
+        <span class="ord">3</span>
+        <div class="th"><div class="bey sta" style="color:var(--burst)"></div></div>
+        <div><b>WizardRod 1-60H</b><span class="meta">stamina · 35.4 g</span></div>
+        <span class="drag">≡</span>
+      </div>
+    </div>
+
+    <div class="err"><b>DranSword está en los beys 1 y 2</b>El reglamento cuenta dos piezas del mismo nombre como la misma, aunque sean de distinto color. En el chequeo del torneo te descalifican.</div>
+
+    <div class="label">Cambia el blade del bey 2 por</div>
+    <div class="card sel">
+      <div class="row" style="align-items:center">
+        <div style="width:30px;flex:0 0 30px"><div class="bey atk" style="color:var(--pegasus)"></div></div>
+        <div><b style="font-size:12px">DranDagger</b><div class="code" style="font-size:8.5px">ataque · lo tienes · BX-20</div></div>
+        <span class="spacer"></span><span class="chip x">USAR</span>
+      </div>
+    </div>
+    <div class="card sel">
+      <div class="row" style="align-items:center">
+        <div style="width:30px;flex:0 0 30px"><div class="bey def" style="color:var(--mute)"></div></div>
+        <div><b style="font-size:12px">KnightShield</b><div class="code" style="font-size:8.5px">defensa · lo tienes · tier S</div></div>
+        <span class="spacer"></span><span class="chip x">USAR</span>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="btn dis">Guardar deck</div>
+  </div>
+</div>
+
+<!-- 07 -->
+<div class="sec"><span class="n">07</span><span class="t">Pase de chequeo</span><span class="role">USER</span></div>
+<div class="phone">
+  <div class="status"><span>9:05</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Chequeo de deck</h2><span class="side">MESA</span></div>
+  <div class="body">
+    <div class="okline"><b>Deck listo para revisar</b>Enséñale esto al juez junto con tu caja BX-12.</div>
+    <div style="padding:18px;clip-path:var(--ch);background:var(--panel);border:1px solid var(--line2)">
+      <div class="qr"></div>
+      <div class="code" style="text-align:center;margin-top:12px;line-height:1.6">RYU_07 · Copa Barrio Norte<br>deck-8F31A2 · 9 piezas</div>
+    </div>
+    <div class="label">Lo que verá el juez</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span class="code" style="color:var(--text)">1 · DranSword 3-60F</span></div>
+      <div class="row" style="align-items:center;margin-top:6px"><span class="code" style="color:var(--text)">2 · PhoenixWing 9-60GF</span></div>
+      <div class="row" style="align-items:center;margin-top:6px"><span class="code" style="color:var(--text)">3 · WizardRod 1-60H</span></div>
+      <div style="border-top:1px solid var(--line);margin-top:9px;padding-top:9px" class="code">9 piezas distintas · sin salón de la fama</div>
+    </div>
+    <div class="banner warn"><b>El deck queda bloqueado</b>Después del chequeo no se puede cambiar. Si necesitas modificarlo, avisa al juez antes de empezar.</div>
+    <div class="spacer"></div>
+    <div class="btn go">Bloquear y presentar</div>
+    <div class="btn ghost">Seguir editando</div>
+  </div>
+</div>
+
+<!-- ============ TORNEO ============ -->
+
+<!-- 08 -->
+<div class="sec"><span class="n">08</span><span class="t">Crear torneo · datos</span><span class="role admin">ADMIN</span></div>
+<div class="phone">
+  <div class="status"><span>7:40</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo torneo</h2><span class="side">1 DE 3</span></div>
+  <div class="body">
+    <div class="steps"><i class="on"></i><i></i><i></i></div>
+    <div class="label">Lo básico</div>
+    <div class="field"><span class="lb">Nombre</span><span class="vl">Copa Barrio Norte</span></div>
+    <div class="row">
+      <div class="field grow"><span class="lb">Fecha</span><span class="vl">23 ago 2026</span></div>
+      <div class="field grow"><span class="lb">Hora</span><span class="vl">10:00</span></div>
+    </div>
+    <div class="field"><span class="lb">Lugar</span><span class="vl ph">Añadir dirección</span></div>
+
+    <div class="label">Nivel del evento</div>
+    <div class="card">
+      <div class="row"><span class="chip on">G3</span><span class="chip">G2</span><span class="chip">G1</span><span class="chip">GP</span><span class="chip">LIBRE</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">G3 local · organizado por tienda certificada. Es el más común y el que puedes crear tú.</div>
+    </div>
+
+    <div class="label">Categoría de edad</div>
+    <div class="card">
+      <div class="row"><span class="chip on">ABIERTA 6+</span><span class="chip on">REGULAR 6–12</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5;color:var(--pegasus)">Con las dos activas se generan dos cuadros separados. Nadie de 8 años se enfrenta a un adulto.</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="btn go">Siguiente</div>
+  </div>
+</div>
+
+<!-- 09 -->
+<div class="sec"><span class="n">09</span><span class="t">Crear torneo · formato</span><span class="role admin">ADMIN</span></div>
+<div class="phone">
+  <div class="status"><span>7:43</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo torneo</h2><span class="side">2 DE 3</span></div>
+  <div class="body">
+    <div class="steps"><i class="done"></i><i class="on"></i><i></i></div>
+    <div class="label">Reglamento</div>
+    <div class="card">
+      <div class="row"><span class="chip on">OFICIAL V12</span><span class="chip">WBO</span><span class="chip">PROPIO</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">v12 de marzo 2026. La WBO usa reglas propias que difieren en detalles: elígela si tu escena juega con ellas.</div>
+    </div>
+
+    <div class="label">Formato de combate</div>
+    <div class="card">
+      <div class="row"><span class="chip">1V1</span><span class="chip on">3ON3</span><span class="chip">EQUIPOS</span></div>
+      <div class="opt" style="margin-top:6px">
+        <div><div class="tx">Piezas no repetibles</div><div class="hint">obligatorio en 3on3</div></div>
+        <span class="spacer"></span><span class="sw on"><i></i></span>
+      </div>
+      <div class="opt">
+        <div><div class="tx">Permitir salón de la fama</div><div class="hint">solo válido en 3on3</div></div>
+        <span class="spacer"></span><span class="sw on"><i></i></span>
+      </div>
+    </div>
+
+    <div class="label">Cuadro</div>
+    <div class="card">
+      <div class="row"><span class="chip">SIMPLE</span><span class="chip on">DOBLE</span><span class="chip">SUIZO</span><span class="chip">LIGA</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">Eliminación doble: con 12 jugadores son unas 22 rondas. Calcula 2.5 h con 3 mesas.</div>
+    </div>
+
+    <div class="label">Puntuación</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span style="font-size:12px">Meta de puntos</span><span class="spacer"></span><span class="chip">3</span><span class="chip on">4</span><span class="chip">7</span></div>
+      <div class="opt" style="margin-top:4px">
+        <div><div class="tx">Xtreme Finish</div><div class="hint">3 puntos · necesita estadio BX-10</div></div>
+        <span class="spacer"></span><span class="sw on"><i></i></span>
+      </div>
+      <div class="opt">
+        <div><div class="tx">Punto por 2 faltas</div><div class="hint">regla v12 de lanzamiento</div></div>
+        <span class="spacer"></span><span class="sw on"><i></i></span>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="btn go">Siguiente</div>
+  </div>
+</div>
+
+<!-- 10 -->
+<div class="sec"><span class="n">10</span><span class="t">Crear torneo · inscripción</span><span class="role admin">ADMIN</span></div>
+<div class="phone">
+  <div class="status"><span>7:46</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo torneo</h2><span class="side">3 DE 3</span></div>
+  <div class="body">
+    <div class="steps"><i class="done"></i><i class="done"></i><i class="on"></i></div>
+    <div class="label">Inscripción</div>
+    <div class="row">
+      <div class="field grow"><span class="lb">Plazas</span><span class="vl">16</span></div>
+      <div class="field grow"><span class="lb">Cierra</span><span class="vl">22 ago</span></div>
+    </div>
+    <div class="card">
+      <div class="opt">
+        <div><div class="tx">Deck al inscribirse</div><div class="hint">lo revisas antes del evento</div></div>
+        <span class="spacer"></span><span class="sw on"><i></i></span>
+      </div>
+      <div class="opt">
+        <div><div class="tx">Check-in en mesa</div><div class="hint">evita sortear con ausentes</div></div>
+        <span class="spacer"></span><span class="sw on"><i></i></span>
+      </div>
+      <div class="opt">
+        <div><div class="tx">Chequeo de piezas obligatorio</div><div class="hint">con caja BX-12 o equivalente</div></div>
+        <span class="spacer"></span><span class="sw on"><i></i></span>
+      </div>
+    </div>
+
+    <div class="label">Quién registra los resultados</div>
+    <div class="card">
+      <div class="row"><span class="chip">SOLO JUEZ</span><span class="chip on">JUGADOR + CONFIRMA</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">Un jugador registra y el rival confirma. Tú solo intervienes en las disputas. Con 3 mesas es lo que hace que no seas el cuello de botella.</div>
+    </div>
+
+    <div class="label">Jueces</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span class="code" style="color:var(--text)">RYU_07 · tú</span><span class="spacer"></span><span class="chip">TAMBIÉN COMPITE</span></div>
+      <div class="row" style="align-items:center;margin-top:7px"><span class="code" style="color:var(--mute)">Añadir otro juez</span><span class="spacer"></span><span class="code">+</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="btn go">Crear y abrir inscripción</div>
+  </div>
+</div>
+
+<!-- 11 -->
+<div class="sec"><span class="n">11</span><span class="t">Torneo abierto</span><span class="role admin">ADMIN</span></div>
+<div class="phone">
+  <div class="status"><span>9:58</span><span class="sync ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Copa Barrio Norte</h2><span class="side">G3</span></div>
+  <div class="body">
+    <div class="card hot">
+      <div class="row" style="align-items:center"><span class="label">Inscripción abierta</span><span class="spacer"></span><span class="chip x">12 / 16</span></div>
+      <div class="code" style="margin-top:7px;line-height:1.6">3on3 · eliminación doble · reglamento v12<br>abierta 8 · regular 4</div>
+    </div>
+    <div class="row"><span class="chip on">INSCRITOS</span><span class="chip">AJUSTES</span><span class="chip">COMPARTIR</span></div>
+
+    <div class="label">Estado de los decks</div>
+    <div style="display:flex;flex-direction:column">
+      <div class="opt"><div style="width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;clip-path:var(--ch);background:var(--panel2);border:1px solid var(--line2);font-size:10px;font-weight:700">R</div>
+        <div><div class="tx">RYU_07</div><div class="hint">abierta · 9 piezas</div></div>
+        <span class="spacer"></span><span class="chip x">OK</span></div>
+      <div class="opt"><div style="width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;clip-path:var(--ch);background:var(--panel2);border:1px solid var(--line2);font-size:10px;font-weight:700">M</div>
+        <div><div class="tx">MULTI_K</div><div class="hint">abierta · 9 piezas</div></div>
+        <span class="spacer"></span><span class="chip x">OK</span></div>
+      <div class="opt"><div style="width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;clip-path:var(--ch);background:var(--panel2);border:1px solid rgba(255,59,47,.5);font-size:10px;font-weight:700;color:var(--dranzer)">K</div>
+        <div><div class="tx">KAZE</div><div class="hint" style="color:var(--dranzer)">bit Ball repetido en beys 2 y 3</div></div>
+        <span class="spacer"></span><span class="chip r">REVISAR</span></div>
+      <div class="opt"><div style="width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;clip-path:var(--ch);background:var(--panel2);border:1px solid var(--line2);font-size:10px;font-weight:700;color:var(--mute)">L</div>
+        <div><div class="tx">LUNA</div><div class="hint">regular · sin deck</div></div>
+        <span class="spacer"></span><span class="chip">PENDIENTE</span></div>
+    </div>
+
+    <div class="banner warn"><b>1 deck ilegal, 3 sin entregar</b>Avísales ahora. Si llegan el día del torneo sin arreglarlo, se quedan fuera.</div>
+    <div class="spacer"></div>
+    <div class="btn go">Avisar a los pendientes</div>
+    <div class="btn ghost">Cerrar inscripción y sortear</div>
+  </div>
+</div>
+
+<div class="notes">
+  <div class="note">
+    <div class="k" style="background:var(--x)"></div>
+    <h3>El constructor es un corte del bey</h3>
+    <p>Las piezas se apilan en vertical con una línea de ensamblaje al lado, en el mismo orden en que se montan de verdad: blade arriba, ratchet en medio, bit abajo. El rombo del conector se enciende cuando esa pieza ya está elegida.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--pegasus)"></div>
+    <h3>El peso total dice “sin datos”</h3>
+    <p>El fabricante publica gramos de los blades, pero de ratchets y bits solo una clase de peso. Sumar lo que hay daría un total falso, así que la app muestra pieza por pieza y ofrece pesar el combo. El dato del usuario siempre gana sobre el catálogo.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--dranzer)"></div>
+    <h3>El conflicto se dibuja entre los dos</h3>
+    <p>Cuando una pieza se repite, una barra roja une los dos beys implicados y ambos quedan marcados. No basta con decir “hay un error”: hay que señalar dónde y ofrecer el cambio con piezas que el jugador ya tenga.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--burst)"></div>
+    <h3>Cada ajuste explica su consecuencia</h3>
+    <p>Elegir eliminación doble dice cuántas rondas y cuánto durará. Activar las dos categorías avisa de que se generan dos cuadros. Un organizador novato no debería tener que saber esto de antemano.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--dragoon)"></div>
+    <h3>Las piezas que no tienes se ven, pero apagadas</h3>
+    <p>En el selector aparecen todas las piezas del catálogo; las que no posees salen atenuadas y con el set en el que vienen. Sirve igual para armar que para saber qué comprar.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--mute)"></div>
+    <h3>El organizador también compite</h3>
+    <p>En la pantalla de jueces, quien crea el torneo aparece marcado como participante. El rol es un permiso sobre este evento, no una identidad que te excluya de jugar.</p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

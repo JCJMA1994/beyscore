@@ -1,0 +1,35 @@
+name: beyscore_workspace
+description: "BeyScore — Monorepo workspace for Beyblade X apps & packages."
+publish_to: 'none'
+
+environment:
+  sdk: ^3.11.0
+
+workspace:
+  - packages/bey_domain
+  - packages/bey_data
+  - packages/bey_ui
+  - packages/bey_catalog
+  - packages/bey_tournament
+  - packages/bey_hub
+  - apps/app_player
+  - apps/app_organizer
+  - apps/app_table
+
+dev_dependencies:
+  melos: ^7.8.1
+
+melos:
+  command:
+    bootstrap:
+      usePubspecOverrides: true
+  scripts:
+    test:
+      run: melos exec --dir-exists="test" -- "flutter test"
+      description: Run all tests across packages and apps.
+    test:domain:
+      run: melos exec --scope="bey_domain" -- "dart test"
+      description: Run pure Dart tests for bey_domain.
+    analyze:
+      run: melos exec -- "flutter analyze . || dart analyze ."
+      description: Run static analysis across all packages and apps.

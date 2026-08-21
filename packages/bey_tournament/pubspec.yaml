@@ -1,0 +1,29 @@
+name: bey_tournament
+description: Tournament management, single-elimination bracket generator, table dashboard, and arbitration for BeyScore organizer app.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.29.0"
+
+dependencies:
+  bey_domain:
+    path: ../bey_domain
+  bey_data:
+    path: ../bey_data
+  bey_ui:
+    path: ../bey_ui
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+  rxdart: ^0.28.0
+  pdf: ^3.12.0
+  printing: ^5.14.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.2.0

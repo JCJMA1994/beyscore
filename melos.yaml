@@ -1,0 +1,35 @@
+name: beyscore_workspace
+repository: https://github.com/beyscore/beyscore
+
+packages:
+  - packages/*
+  - apps/*
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  analyze:
+    run: melos exec -- "flutter analyze . || dart analyze ."
+    description: Run static analysis across all packages and apps.
+
+  test:
+    run: melos exec --dir-exists="test" -- "flutter test || dart test"
+    description: Run all tests across packages and apps.
+
+  test:domain:
+    run: melos exec --scope="bey_domain" -- "dart test"
+    description: Run pure Dart tests for bey_domain.
+
+  build:player:apk:
+    run: melos exec --scope="app_player" -- "flutter build apk"
+    description: Build Android APK for app_player.
+
+  build:organizer:apk:
+    run: melos exec --scope="app_organizer" -- "flutter build apk"
+    description: Build Android APK for app_organizer.
+
+  build:table:apk:
+    run: melos exec --scope="app_table" -- "flutter build apk"
+    description: Build Android APK for app_table.

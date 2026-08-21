@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeyScore — Cómo fluye la app</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#06070C; --steel:#101420; --panel:#161C2B; --panel2:#1E2637;
+  --line:#2A3348; --line2:#3C4863; --text:#EEF1F7; --mute:#7C889F;
+  --dragoon:#2B6BFF; --dranzer:#FF3B2F; --pegasus:#FFC400; --burst:#A855F7; --x:#00E5D0;
+  --ch: polygon(0 8px,8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--void);color:var(--text);
+  font-family:'Inter Tight',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  padding:0 0 40px;overflow-x:hidden
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(120% 55% at 50% -10%,rgba(43,107,255,.18),transparent 60%),
+             radial-gradient(90% 45% at 100% 100%,rgba(255,59,47,.11),transparent 60%)
+}
+.wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:0 16px}
+
+/* ---------- header ---------- */
+header{padding:38px 0 20px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--x)}
+h1{font-family:'Archivo Black',sans-serif;font-size:44px;line-height:.86;letter-spacing:-.035em;
+  margin:12px 0 0;text-transform:uppercase;transform:skewX(-7deg);transform-origin:left}
+h1 em{font-style:normal;background:linear-gradient(100deg,var(--dragoon),var(--x));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--mute);font-size:14px;line-height:1.6;margin-top:16px}
+
+/* ---------- selector de flujo ---------- */
+.flows{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:22px 0 4px}
+.flowbtn{
+  background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);
+  padding:11px 8px;text-align:center;cursor:pointer;color:var(--mute);
+  font-size:11px;font-weight:700;letter-spacing:.02em;line-height:1.25;
+  transition:color .15s,border-color .15s,background .15s
+}
+.flowbtn .ic{display:block;font-family:'JetBrains Mono',monospace;font-size:15px;margin-bottom:4px}
+.flowbtn[aria-selected="true"]{background:var(--panel2);color:var(--text);border-color:var(--x)}
+.flowbtn:focus-visible{outline:2px solid var(--x);outline-offset:2px}
+.flowdesc{font-size:12.5px;color:var(--mute);line-height:1.5;margin:12px 0 22px;min-height:38px}
+
+/* ---------- barra de progreso tipo riel ---------- */
+.rail{display:flex;gap:3px;height:9px;margin-bottom:6px}
+.rail i{flex:1;border:1px solid var(--line2);
+  clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);transition:background .25s}
+.rail i.on{background:var(--x);border-color:var(--x);box-shadow:0 0 10px rgba(0,229,208,.5)}
+.railmeta{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--mute);letter-spacing:.1em;margin-bottom:16px}
+
+/* ---------- tarjeta del paso ---------- */
+.step{background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);
+  padding:18px 16px;margin-bottom:14px;position:relative;overflow:hidden}
+.step .num{
+  position:absolute;top:-6px;right:8px;font-family:'Archivo Black',sans-serif;
+  font-size:58px;line-height:1;color:transparent;-webkit-text-stroke:1px var(--line2);
+  transform:skewX(-7deg);pointer-events:none
+}
+.actor{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;padding:3px 7px;border:1px solid currentColor;
+  clip-path:var(--ch);display:inline-block}
+.step h2{font-family:'Archivo Black',sans-serif;font-size:19px;line-height:1.06;
+  letter-spacing:-.02em;margin:11px 0 9px;transform:skewX(-7deg);transform-origin:left;
+  position:relative;max-width:88%}
+.step p{font-size:13.5px;line-height:1.62;color:#C3CBD9}
+.why{
+  margin-top:13px;padding:11px 12px;border-left:3px solid var(--pegasus);
+  background:rgba(255,196,0,.07);font-size:12.5px;line-height:1.55;color:#F0DFAE
+}
+.why b{color:var(--pegasus);display:block;margin-bottom:3px;font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+
+/* ---------- diagrama de capas ---------- */
+.layers{background:var(--steel);border:1px solid var(--line);clip-path:var(--ch);
+  padding:14px 14px 16px;margin-bottom:14px}
+.ltitle{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--mute);margin-bottom:11px}
+.layer{display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:5px;
+  border:1px solid var(--line);background:var(--panel);clip-path:var(--ch);
+  transition:border-color .25s,background .25s,box-shadow .25s}
+.layer:last-of-type{margin-bottom:0}
+.layer .tag{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--mute);
+  width:44px;flex:0 0 44px;letter-spacing:.06em}
+.layer .nm{font-size:12px;font-weight:600}
+.layer .st{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--mute);text-align:right;max-width:44%;line-height:1.3}
+.layer.hot{background:var(--panel2);border-color:var(--x);box-shadow:0 0 16px rgba(0,229,208,-0.5)}
+.layer.hot{box-shadow:0 0 16px rgba(0,229,208,.22)}
+.layer.hot .nm{color:var(--x)}
+.layer.hot .st{color:var(--text)}
+.layer.warm{border-color:var(--pegasus)}
+.layer.warm .nm{color:var(--pegasus)}
+.arrowdown{text-align:center;color:var(--line2);font-size:11px;line-height:1;margin:1px 0}
+
+/* ---------- controles ---------- */
+.ctrls{display:flex;gap:8px;margin-bottom:8px}
+.btn{flex:1;padding:14px;text-align:center;cursor:pointer;clip-path:var(--ch);
+  font-weight:700;font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+  border:1px solid var(--line2);color:var(--text);background:transparent;font-family:inherit}
+.btn.go{background:linear-gradient(100deg,var(--dragoon),var(--x));border:0;color:#04121A}
+.btn:disabled{color:var(--mute);border-color:var(--line);cursor:not-allowed;opacity:.55}
+.btn:focus-visible{outline:2px solid var(--x);outline-offset:2px}
+.hint{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--mute);
+  text-align:center;letter-spacing:.06em;margin-bottom:30px}
+
+/* ---------- glosario ---------- */
+.gloss{margin-top:34px;border-top:1px solid var(--line);padding-top:22px}
+.gloss h3{font-family:'Archivo Black',sans-serif;font-size:14px;text-transform:uppercase;
+  letter-spacing:-.01em;transform:skewX(-7deg);transform-origin:left;margin-bottom:14px}
+.gitem{border-left:2px solid var(--line2);padding:2px 0 2px 12px;margin-bottom:15px}
+.gitem b{display:block;font-size:12.5px;margin-bottom:4px}
+.gitem span{font-size:12.5px;line-height:1.58;color:var(--mute)}
+.gitem.c1{border-color:var(--x)} .gitem.c2{border-color:var(--pegasus)}
+.gitem.c3{border-color:var(--burst)} .gitem.c4{border-color:var(--dranzer)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">BeyScore · guía de flujos</div>
+  <h1>Cómo <em>fluye</em><br>la app</h1>
+  <p class="lede">Tres recorridos, paso a paso, según el reglamento oficial v12. En cada uno verás qué toca el usuario, qué capa responde y por qué está diseñado así.</p>
+</header>
+
+<div class="flows" role="tablist" aria-label="Elegir flujo">
+  <button class="flowbtn" role="tab" data-flow="0" aria-selected="true"><span class="ic">◎</span>Combate</button>
+  <button class="flowbtn" role="tab" data-flow="1" aria-selected="false"><span class="ic">⇅</span>Sin conexión</button>
+  <button class="flowbtn" role="tab" data-flow="2" aria-selected="false"><span class="ic">⑂</span>Torneo</button>
+</div>
+<p class="flowdesc" id="flowdesc"></p>
+
+<div class="rail" id="rail" aria-hidden="true"></div>
+<div class="railmeta"><span id="pos">PASO 1</span><span id="tot"></span></div>
+
+<div class="step" aria-live="polite">
+  <span class="num" id="num">01</span>
+  <span class="actor" id="actor"></span>
+  <h2 id="title"></h2>
+  <p id="desc"></p>
+  <div class="why"><b id="whylabel">Por qué</b><span id="why"></span></div>
+</div>
+
+<div class="layers">
+  <div class="ltitle">Qué pasa por dentro</div>
+  <div class="layer" id="L0"><span class="tag">UI</span><span class="nm">Pantalla</span><span class="st">—</span></div>
+  <div class="arrowdown">▼</div>
+  <div class="layer" id="L1"><span class="tag">BLOC</span><span class="nm">Estado</span><span class="st">—</span></div>
+  <div class="arrowdown">▼</div>
+  <div class="layer" id="L2"><span class="tag">DOMAIN</span><span class="nm">Reglas del juego</span><span class="st">—</span></div>
+  <div class="arrowdown">▼</div>
+  <div class="layer" id="L3"><span class="tag">DATA</span><span class="nm">Drift (local)</span><span class="st">—</span></div>
+  <div class="arrowdown">▼</div>
+  <div class="layer" id="L4"><span class="tag">SYNC</span><span class="nm">Outbox / servidor</span><span class="st">—</span></div>
+</div>
+
+<div class="ctrls">
+  <button class="btn" id="prev">Atrás</button>
+  <button class="btn go" id="next">Siguiente</button>
+</div>
+<p class="hint" id="hint">Toca “Siguiente” para avanzar</p>
+
+<div class="gloss">
+  <h3>Palabras que aparecen mucho</h3>
+  <div class="gitem c1"><b>Finish</b><span>Cada forma de ganar puntos en una ronda: Spin (1), Over (2), Burst (2), Xtreme (3). La app guarda cada finish por separado, no el marcador. El marcador se calcula sumándolos.</span></div>
+  <div class="gitem c2"><b>Outbox</b><span>La cola de cosas que ya guardaste en tu teléfono pero todavía no llegan al servidor. Es lo que permite jugar sin internet: escribes local, la cola espera.</span></div>
+  <div class="gitem c3"><b>Fuente de verdad</b><span>Quién manda cuando dos versiones no coinciden. Aquí manda tu base local para leer, y el organizador para el estado del torneo.</span></div>
+  <div class="gitem c1"><b>Piezas no repetibles</b><span>En un deck 3on3, ninguna pieza puede estar en dos beys. Dos del mismo nombre en distinto color cuentan como la misma. Solo se libran dos lock chips CX: Ares y Emperor.</span></div>
+  <div class="gitem c4"><b>Semilla del sorteo</b><span>El número que genera el emparejamiento aleatorio. Se guarda para que cualquiera pueda repetir el sorteo y comprobar que salió igual.</span></div>
+</div>
+
+</div>
+
+<script>
+const FLOWS = [
+{
+  name:"Combate",
+  desc:"Un enfrentamiento oficial 3on3: tres beys contra tres, según el reglamento v12.",
+  steps:[
+   {actor:"JUGADOR", color:"var(--dragoon)", title:"Arma su deck de 3",
+    desc:"Elige tres beys completos. La app revisa que ninguna pieza se repita entre ellos, ni siquiera en otro color.",
+    why:"Es la descalificación más común en torneos. Un jugador con dos DranSword de distinto color cree que puede usar los dos, y lo descubre en la mesa de chequeo cuando ya es tarde.",
+    L:[["Validador de deck","hot"],["Estado: deck legal","hot"],["DeckValidator: sin repetidos","hot"],["Lee el inventario","hot"],["—",""]]},
+
+   {actor:"AMBOS", color:"var(--x)", title:"Deciden posición de lanzamiento",
+    desc:"Piedra, papel o tijera para elegir izquierda, derecha o centro. Una vez decidido, no se cambia en toda la partida.",
+    why:"La app guarda la posición porque el reglamento la fija. Si alguien la cambia a mitad, hay a qué apelar.",
+    L:[["Registra posiciones","hot"],["Partida configurada","hot"],["Fija las reglas","hot"],["Guarda el Match","hot"],["Encola","warm"]]},
+
+   {actor:"JUGADOR", color:"var(--dragoon)", title:"Ronda 1: bey 1 contra bey 1",
+    desc:"Se cuenta “Three, Two, One, Go-Shoot” y ambos lanzan en el instante de Shoot, a menos de 20 cm del estadio.",
+    why:"Los beys se enfrentan en el orden de la alineación. La app muestra qué bey toca sin que nadie tenga que recordarlo.",
+    L:[["Marcador con la tira 3on3","hot"],["Ronda 1 abierta","hot"],["Crea la ronda","hot"],["Guarda","hot"],["Encola","warm"]]},
+
+   {actor:"JUGADOR", color:"var(--dragoon)", title:"Toca “Burst”",
+    desc:"El bey rival se desarmó. Se pulsa el botón morado en su lado del marcador: 2 puntos.",
+    why:"Cuatro botones grandes, uno por tipo de finish. Registrar QUÉ pasó es igual de rápido que un +2, y además genera estadísticas.",
+    L:[["Tap en el botón","hot"],["Manda el evento","hot"],["ScoringService valida","hot"],["—",""],["—",""]]},
+
+   {actor:"JUEZ", color:"var(--burst)", title:"Falta de lanzamiento",
+    desc:"El rival lanza tarde dos veces en la misma ronda. Eso da 1 punto automático y la ronda se reinicia.",
+    why:"El marcador puede subir sin que nadie gane un combate. Se registra aparte: quien suma muchos puntos por penalización no juega mejor, necesita practicar el lanzamiento.",
+    L:[["Botón de falta","warm"],["Suma penalización","hot"],["Tipo PENALTY, 1 punto","hot"],["Guarda el finish","hot"],["Encola","warm"]]},
+
+   {actor:"APP", color:"var(--x)", title:"Alguien llega a 4",
+    desc:"La app suma los finishes de la ronda, ve que hay ganador y pasa al siguiente bey de cada alineación.",
+    why:"El marcador nunca se guarda como número editable. Se calcula sumando finishes, así que no puede mostrar algo que no ocurrió.",
+    L:[["Avanza la tira 3on3","hot"],["Ronda 2","hot"],["Suma y cierra","hot"],["Marca la ronda","hot"],["Encola","warm"]]},
+
+   {actor:"APP", color:"var(--x)", title:"Gana quien tome 2 rondas",
+    desc:"Si tras las tres rondas siguen empatados, se reordena la alineación y se sigue. Un empate dentro de una ronda repite los beys del mismo número.",
+    why:"Reglas oficiales v12. La app las aplica sola para que el juez no tenga que recordarlas en medio del ruido.",
+    L:[["Resultado del enfrentamiento","hot"],["Match cerrado","hot"],["Aplica desempates","hot"],["Guarda","hot"],["Encola","warm"]]},
+
+   {actor:"RIVAL", color:"var(--dranzer)", title:"Confirma o disputa",
+    desc:"El resultado queda pendiente hasta que el rival lo acepte. Si no está de acuerdo, pasa a disputa y decide el juez.",
+    why:"La app no adivina quién tiene razón. Un torneo real tiene árbitro; el software no debe reemplazarlo con un algoritmo.",
+    L:[["Aviso de confirmación","hot"],["Pendiente / disputado","hot"],["—",""],["Guarda el estado","hot"],["Notifica al organizador","warm"]]},
+  ]
+},
+{
+  name:"Sin conexión",
+  desc:"Qué pasa realmente cuando no hay internet, que es la situación normal, no la excepción.",
+  steps:[
+   {actor:"SITUACIÓN", color:"var(--pegasus)", title:"Se cae el wifi",
+    desc:"Nadie se entera. La app sigue funcionando igual porque para leer nunca usó la red.",
+    why:"“Offline-first” no significa guardar copias por si acaso. Significa que la base local ES la fuente de verdad y el servidor es solo un sincronizador.",
+    L:[["Todo normal","hot"],["Sin cambios",""],["—",""],["Sigue respondiendo","hot"],["Detecta que no hay red","warm"]]},
+
+   {actor:"JUGADOR", color:"var(--dragoon)", title:"Registra 7 combates",
+    desc:"Se juegan siete partidas seguidas. Todas se guardan sin un solo spinner de “guardando…”.",
+    why:"Cada acción se escribe local primero y se encola después. El usuario nunca espera a la red para ver el resultado de lo que acaba de tocar.",
+    L:[["Marcadores normales","hot"],["Estados normales","hot"],["Valida cada finish","hot"],["7 combates escritos","hot"],["7 en cola","warm"]]},
+
+   {actor:"APP", color:"var(--x)", title:"El aviso ámbar",
+    desc:"Arriba aparece “7 sin subir”. No es un error: es información. El color ámbar significa siempre lo mismo en toda la app.",
+    why:"Si el color decorara, el usuario aprendería a ignorarlo. Como ámbar solo significa “esto aún no salió de tu teléfono”, cuando aparece se cree.",
+    L:[["Indicador ámbar","warm"],["Escucha el estado de la cola","hot"],["—",""],["—",""],["Cuenta los pendientes","warm"]]},
+
+   {actor:"APP", color:"var(--x)", title:"Vuelve la señal",
+    desc:"La cola se vacía sola, en orden, con reintentos si algo falla. El usuario no toca nada.",
+    why:"Los IDs se generan en el teléfono, no en el servidor. Por eso dos dispositivos que estuvieron desconectados no chocan al reconectar.",
+    L:[["Indicador pasa a verde","hot"],["Nuevo estado de sync","hot"],["—",""],["Marca como sincronizado","hot"],["Envía en orden","hot"]]},
+
+   {actor:"CONFLICTO", color:"var(--dranzer)", title:"Dos teléfonos, un combate",
+    desc:"El jugador y el juez registraron el mismo combate. La app no borra ninguno: junta los finishes por número de ronda.",
+    why:"Los relojes de los teléfonos no están sincronizados. Decidir por “el más reciente” dejaría ganar siempre al que tiene la hora adelantada.",
+    L:[["Sin interrupción",""],["—",""],["Une los finishes","hot"],["Sin borrar nada","hot"],["Detecta la duplicación","warm"]]},
+
+   {actor:"JUEZ", color:"var(--burst)", title:"Cuando de verdad no coinciden",
+    desc:"Si los dos registros dicen cosas distintas de la misma ronda, eso no es un problema de datos: es un desacuerdo entre personas. Va a disputa.",
+    why:"Aquí el software se detiene a propósito. Elegir automáticamente sería inventar una verdad que la app no puede conocer.",
+    L:[["Marca disputa","warm"],["Estado disputado","hot"],["—",""],["Guarda ambas versiones","hot"],["Avisa al organizador","warm"]]},
+  ]
+},
+{
+  name:"Torneo",
+  desc:"El recorrido del organizador, desde crear el evento hasta publicar resultados.",
+  steps:[
+   {actor:"ORGANIZADOR", color:"var(--burst)", title:"Crea el torneo",
+    desc:"Nombre, formato (eliminación simple, doble, suizo) y reglas. Se abre la inscripción.",
+    why:"Ser organizador es un permiso sobre ESTE torneo, no un tipo de cuenta. El que organiza casi siempre también compite.",
+    L:[["Formulario","hot"],["Torneo en borrador","hot"],["Valida el formato","hot"],["Guarda el torneo","hot"],["Encola","warm"]]},
+
+   {actor:"JUGADORES", color:"var(--dragoon)", title:"Se inscriben con su deck",
+    desc:"Cada uno registra los tres combos que va a usar. El día del evento hacen check-in en la mesa.",
+    why:"El check-in evita el problema clásico: sortear con gente que se inscribió y no apareció, y quedarse con huecos en el cuadro.",
+    L:[["Lista de inscritos","hot"],["Cuenta inscritos","hot"],["—",""],["Guarda decks","hot"],["Encola","warm"]]},
+
+   {actor:"APP", color:"var(--x)", title:"El sorteo, con semilla",
+    desc:"Se genera un número (la semilla), se guarda, y con él se barajan los participantes. Aparece en pantalla: 8F31-A2.",
+    why:"Cualquiera puede repetir el sorteo con esa semilla y obtener exactamente el mismo cuadro. Es la forma de que nadie pueda acusarte de acomodarlo.",
+    L:[["Muestra la semilla","hot"],["Sorteo en curso","hot"],["Baraja determinista","hot"],["Guarda semilla y cuadro","hot"],["Encola","warm"]]},
+
+   {actor:"APP", color:"var(--x)", title:"Arma el cuadro",
+    desc:"Se emparejan los jugadores, se reparten descansos automáticos si no son potencia de 2, y se asignan mesas.",
+    why:"Generar el cuadro es una función pura: mismos participantes y misma semilla, mismo resultado. Se prueba sin base de datos ni pantalla.",
+    L:[["Cuadro visible","hot"],["Ronda 1 lista","hot"],["BracketGenerator","hot"],["Guarda los matches","hot"],["Encola","warm"]]},
+
+   {actor:"ORGANIZADOR", color:"var(--burst)", title:"Vigila las mesas",
+    desc:"Ve qué mesas están en vivo, cuáles libres y dónde hay una disputa. Solo interviene cuando hace falta.",
+    why:"El organizador no registra todos los resultados: los jugadores lo hacen y se confirman entre ellos. Él resuelve las excepciones.",
+    L:[["Panel de mesas","hot"],["Estados en vivo","hot"],["—",""],["Escucha los matches","hot"],["Recibe cambios","warm"]]},
+
+   {actor:"APP", color:"var(--x)", title:"Avanza la ronda",
+    desc:"Cuando todos los combates de la ronda están confirmados, los ganadores pasan y se asignan mesas nuevas.",
+    why:"El estado del cuadro tiene una sola verdad, y esa verdad es el dispositivo del organizador. Los demás la reciben, no la escriben.",
+    L:[["Cuadro actualizado","hot"],["Ronda 2","hot"],["Calcula quién avanza","hot"],["Crea los matches","hot"],["Propaga","hot"]]},
+
+   {actor:"ORGANIZADOR", color:"var(--burst)", title:"Cierra y publica",
+    desc:"Se declara campeón, se exporta a CSV y las estadísticas de cada jugador se actualizan.",
+    why:"Las estadísticas se recalculan al confirmar cada combate, no al abrir el perfil. Así la pantalla de estadísticas siempre carga al instante.",
+    L:[["Resultados finales","hot"],["Torneo cerrado","hot"],["Actualiza estadísticas","hot"],["Guarda el resumen","hot"],["Sube todo","hot"]]},
+  ]
+}
+];
+
+let fi = 0, si = 0;
+const $ = id => document.getElementById(id);
+const Ls = [0,1,2,3,4].map(i => $('L'+i));
+
+function render(){
+  const f = FLOWS[fi], s = f.steps[si];
+
+  $('flowdesc').textContent = f.desc;
+  $('num').textContent = String(si+1).padStart(2,'0');
+  $('actor').textContent = s.actor;
+  $('actor').style.color = s.color;
+  $('title').textContent = s.title;
+  $('desc').textContent = s.desc;
+  $('why').textContent = s.why;
+  $('pos').textContent = 'PASO ' + (si+1);
+  $('tot').textContent = f.name.toUpperCase() + ' · ' + f.steps.length + ' PASOS';
+
+  const rail = $('rail');
+  rail.innerHTML = '';
+  f.steps.forEach((_,i) => {
+    const b = document.createElement('i');
+    if (i <= si) b.className = 'on';
+    rail.appendChild(b);
+  });
+
+  s.L.forEach((cfg, i) => {
+    const [texto, estado] = cfg;
+    Ls[i].className = 'layer' + (estado ? ' ' + estado : '');
+    Ls[i].querySelector('.st').textContent = texto;
+  });
+
+  $('prev').disabled = si === 0;
+  const ultimo = si === f.steps.length - 1;
+  $('next').textContent = ultimo ? 'Volver al inicio' : 'Siguiente';
+  $('hint').textContent = ultimo
+    ? 'Fin del recorrido. Prueba otro flujo arriba.'
+    : 'Paso ' + (si+1) + ' de ' + f.steps.length;
+}
+
+document.querySelectorAll('.flowbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.flowbtn').forEach(o => o.setAttribute('aria-selected','false'));
+    b.setAttribute('aria-selected','true');
+    fi = +b.dataset.flow; si = 0; render();
+  });
+});
+$('next').addEventListener('click', () => {
+  si = (si + 1) % FLOWS[fi].steps.length;
+  render();
+});
+$('prev').addEventListener('click', () => { if (si > 0) { si--; render(); } });
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') $('next').click();
+  if (e.key === 'ArrowLeft') $('prev').click();
+});
+
+render();
+</script>
+</body>
+</html>

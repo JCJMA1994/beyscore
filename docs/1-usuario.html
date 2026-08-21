@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeyScore — 1/3 Usuario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--void:#06070C;--steel:#0E1220;--panel:#151B29;--panel2:#1C2434;--line:#28324A;
+--line2:#3A4762;--text:#EEF1F7;--mute:#78859D;--dragoon:#2B6BFF;--dranzer:#FF3B2F;
+--pegasus:#FFC400;--burst:#A855F7;--x:#00E5D0;
+--ch:polygon(0 8px,8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);
+--chl:polygon(0 16px,16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--void);color:var(--text);font-family:'Inter Tight',system-ui,sans-serif;
+-webkit-font-smoothing:antialiased;padding:0 0 90px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(120% 55% at 50% -8%,rgba(43,107,255,.20),transparent 62%),
+radial-gradient(90% 45% at 100% 102%,rgba(255,59,47,.11),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:0 16px}
+.jp{font-family:'Noto Sans JP',sans-serif}
+header{padding:44px 0 6px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;
+text-transform:uppercase;color:var(--dragoon)}
+h1{font-family:'Archivo Black',sans-serif;font-size:56px;line-height:.84;letter-spacing:-.035em;
+margin:14px 0 2px;text-transform:uppercase;transform:skewX(-8deg);transform-origin:left}
+h1 .g{background:linear-gradient(105deg,var(--dragoon),var(--x));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--mute);margin-top:10px}
+.lede{color:var(--mute);font-size:14px;line-height:1.62;margin-top:16px}
+.teeth{height:9px;margin:24px 0 4px;background:repeating-linear-gradient(90deg,var(--line2) 0 3px,transparent 3px 9px);
+-webkit-mask-image:linear-gradient(90deg,#000 0 62%,transparent);mask-image:linear-gradient(90deg,#000 0 62%,transparent)}
+.sec{display:flex;align-items:center;gap:10px;margin:46px 0 12px}
+.sec .n{font-family:'Archivo Black',sans-serif;font-size:22px;color:transparent;
+-webkit-text-stroke:1px var(--line2);transform:skewX(-8deg)}
+.sec .t{font-family:'Archivo Black',sans-serif;font-size:13.5px;text-transform:uppercase;letter-spacing:-.015em}
+.sec .role{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;
+padding:3px 7px;border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch)}
+.ni{font-size:12.5px;line-height:1.6;color:var(--mute);margin:10px 0 0}
+.phone{width:100%;aspect-ratio:390/844;background:var(--steel);clip-path:var(--chl);
+border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.phone::after{content:'';position:absolute;inset:0;pointer-events:none;
+background:linear-gradient(158deg,rgba(255,255,255,.055),transparent 30%)}
+.status{flex:0 0 27px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;
+font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mute)}
+.sy{display:flex;align-items:center;gap:5px;color:var(--pegasus);font-weight:700}
+.dot{width:5px;height:5px;background:var(--pegasus);border-radius:50%;box-shadow:0 0 8px currentColor}
+.sy.ok{color:var(--x)}.sy.ok .dot{background:var(--x)}
+.appbar{flex:0 0 auto;padding:5px 15px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--line)}
+.appbar .back{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--mute)}
+.appbar h2{font-family:'Archivo Black',sans-serif;font-size:15px;text-transform:uppercase;
+letter-spacing:-.018em;transform:skewX(-8deg)}
+.appbar .side{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mute)}
+.body{flex:1;overflow:hidden;padding:13px 15px;display:flex;flex-direction:column;gap:10px}
+.body.flush{padding:0}
+.tabbar{flex:0 0 auto;display:flex;background:var(--void);border-top:1px solid var(--line)}
+.tabbar div{flex:1;text-align:center;padding:11px 0 15px;font-size:8.5px;font-weight:700;
+letter-spacing:.1em;text-transform:uppercase;color:var(--mute);position:relative}
+.tabbar div.on{color:var(--text)}
+.tabbar div.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
+background:linear-gradient(90deg,var(--dragoon),var(--x));box-shadow:0 0 10px var(--x)}
+.label{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.18em;
+text-transform:uppercase;color:var(--mute)}
+.card{background:var(--panel);border:1px solid var(--line);padding:11px 13px;clip-path:var(--ch)}
+.card.sel{border-color:var(--line2);background:var(--panel2)}
+.card.hot{border-color:rgba(0,229,208,.45);box-shadow:inset 3px 0 0 var(--x)}
+.code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mute)}
+.btn{text-align:center;padding:13px;font-weight:700;font-size:12px;letter-spacing:.09em;
+text-transform:uppercase;clip-path:var(--ch);border:1px solid var(--line2);color:var(--text)}
+.btn.go{background:linear-gradient(100deg,var(--dragoon),var(--x));border:0;color:#04121A;box-shadow:0 0 26px rgba(0,229,208,.3)}
+.btn.ghost{background:transparent}.btn.dis{color:var(--mute);border-color:var(--line)}
+.row{display:flex;gap:8px}.grow{flex:1}.sp{flex:1}
+.chip{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;padding:4px 8px;
+border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch);white-space:nowrap}
+.chip.on{background:var(--text);color:var(--void);border-color:var(--text);font-weight:700}
+.chip.x{border-color:var(--x);color:var(--x)}.chip.r{border-color:var(--dranzer);color:var(--dranzer)}
+.bey{width:100%;aspect-ratio:1;border-radius:50%;position:relative}
+.bey::before{content:'';position:absolute;inset:0;border-radius:50%;opacity:.9}
+.bey::after{content:'';position:absolute;inset:27%;border-radius:50%;background:var(--panel);border:2px solid currentColor}
+.bey.atk::before{background:conic-gradient(from 0deg,currentColor 0 9%,transparent 9% 25%,currentColor 25% 34%,
+transparent 34% 50%,currentColor 50% 59%,transparent 59% 75%,currentColor 75% 84%,transparent 84%)}
+.bey.def::before{background:conic-gradient(from 15deg,currentColor 0 14%,transparent 14% 16.6%,currentColor 16.6% 30%,
+transparent 30% 33.3%,currentColor 33.3% 47%,transparent 47% 50%,currentColor 50% 64%,transparent 64% 66.6%,
+currentColor 66.6% 80%,transparent 80% 83.3%,currentColor 83.3% 97%,transparent 97%)}
+.bey.sta::before{background:radial-gradient(circle,transparent 52%,currentColor 53% 96%,transparent 97%)}
+.bey.bal::before{background:conic-gradient(from 0deg,currentColor 0 18%,transparent 18% 33%,currentColor 33% 44%,
+transparent 44% 66%,currentColor 66% 84%,transparent 84%)}
+.hero{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0 8px}
+.ring{width:92px;height:92px;border-radius:50%;border:2px dashed var(--x);opacity:.35;position:relative}
+.ring::after{content:'';position:absolute;inset:19px;border-radius:50%;border:6px solid var(--x);opacity:.5}
+@media (prefers-reduced-motion:no-preference){.ring{animation:rot 11s linear infinite}}
+@keyframes rot{to{transform:rotate(360deg)}}
+.hlogo{font-family:'Archivo Black',sans-serif;font-size:44px;transform:skewX(-8deg);
+text-transform:uppercase;letter-spacing:-.035em}
+.hlogo .b{background:linear-gradient(105deg,var(--dragoon),var(--x));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hlogo .s{background:linear-gradient(105deg,var(--dranzer),var(--pegasus));-webkit-background-clip:text;background-clip:text;color:transparent}
+.input{background:var(--panel);border:1.5px solid var(--line2);clip-path:var(--ch);padding:14px;display:flex;align-items:center;gap:8px}
+.input.f{border-color:var(--x);box-shadow:0 0 20px rgba(0,229,208,.18)}
+.input .val{font-family:'Archivo Black',sans-serif;font-size:20px;transform:skewX(-8deg)}
+.input .car{width:2px;height:22px;background:var(--x)}
+.rec{font-family:'Archivo Black',sans-serif;font-size:19px;letter-spacing:.05em;
+transform:skewX(-8deg);color:var(--pegasus);text-align:center;padding:10px 0}
+.stack{position:relative;padding-left:22px}
+.stack::before{content:'';position:absolute;left:8px;top:12px;bottom:12px;width:1px;
+background:repeating-linear-gradient(180deg,var(--line2) 0 4px,transparent 4px 9px)}
+.sl{position:relative;background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);
+padding:9px 11px;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sl::before{content:'';position:absolute;left:-14px;top:50%;width:12px;height:1px;background:var(--line2)}
+.sl::after{content:'';position:absolute;left:-17px;top:50%;transform:translateY(-50%);width:7px;height:7px;
+background:var(--line2);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.sl.done{border-color:var(--line2);background:var(--panel2)}
+.sl.done::after{background:var(--x);box-shadow:0 0 8px var(--x)}
+.sl.empty{border-style:dashed;background:transparent}
+.sl .th{width:32px;flex:0 0 32px}
+.sl .kind{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.14em;
+text-transform:uppercase;color:var(--mute);display:block;margin-bottom:2px}
+.sl b{font-size:12px;display:block;line-height:1.15}
+.sl .meta{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mute);margin-top:2px}
+.sl .go2{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--mute)}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:78px;background:var(--steel);border-top:1px solid var(--line2);
+clip-path:var(--chl);display:flex;flex-direction:column;padding:12px 15px;gap:9px;box-shadow:0 -18px 40px rgba(0,0,0,.55)}
+.grab{width:38px;height:3px;background:var(--line2);margin:0 auto 4px}
+.search{background:var(--panel);border:1px solid var(--line2);clip-path:var(--ch);padding:10px 12px;display:flex;gap:8px}
+.search .ph{font-size:12px;color:var(--mute)}
+.scroll{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:5px}
+.pl{background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);padding:8px 10px;display:flex;align-items:center;gap:9px}
+.pl.pick{border-color:var(--x);box-shadow:inset 3px 0 0 var(--x)}.pl.no{opacity:.42}
+.pl .th{width:28px;flex:0 0 28px}.pl b{font-size:11.5px;display:block;line-height:1.1}
+.pl .kana{font-size:7.5px;color:var(--mute)}
+.pl .st{margin-left:auto;text-align:right}
+.pl .st .w{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700}
+.pl .st .t2{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--mute)}
+.deck{display:flex;flex-direction:column;gap:6px}
+.dk{background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);padding:10px 11px;display:flex;align-items:center;gap:10px}
+.dk.bad{border-color:var(--dranzer);box-shadow:inset 3px 0 0 var(--dranzer)}
+.dk .ord{font-family:'Archivo Black',sans-serif;font-size:17px;color:var(--line2);transform:skewX(-8deg);width:18px;flex:0 0 18px;text-align:center}
+.dk .th{width:30px;flex:0 0 30px}.dk b{font-size:12px;display:block;line-height:1.15}
+.dk .meta{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mute);margin-top:2px}
+.dk .drag{margin-left:auto;color:var(--line2)}
+.linkbad{position:relative;height:18px;margin:-4px 0}
+.linkbad::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--dranzer)}
+.linkbad span{position:absolute;left:20px;top:2px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--dranzer);letter-spacing:.1em}
+.side2{padding:14px 15px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+.side2.A{background:linear-gradient(135deg,rgba(43,107,255,.17),transparent 62%)}
+.side2.B{background:linear-gradient(225deg,rgba(255,59,47,.17),transparent 62%);border-top:1px solid var(--line)}
+.spin{position:absolute;width:170px;height:170px;border-radius:50%;opacity:.12;border:2px dashed currentColor;top:-46px;right:-54px}
+.spin::after{content:'';position:absolute;inset:21px;border-radius:50%;border:6px solid currentColor;opacity:.5}
+.side2.A .spin{color:var(--dragoon)}.side2.B .spin{color:var(--dranzer);top:auto;bottom:-46px;left:-54px;right:auto}
+@media (prefers-reduced-motion:no-preference){.spin{animation:rot 10s linear infinite}}
+.head{display:flex;align-items:flex-end;gap:11px;position:relative}
+.psc{font-family:'Archivo Black',sans-serif;font-size:56px;line-height:.76;letter-spacing:-.06em;transform:skewX(-8deg)}
+.side2.A .psc{color:var(--dragoon);text-shadow:0 0 30px rgba(43,107,255,.55)}
+.side2.B .psc{color:var(--dranzer);text-shadow:0 0 30px rgba(255,59,47,.5)}
+.pn{font-family:'Archivo Black',sans-serif;font-size:16px;text-transform:uppercase;transform:skewX(-8deg)}
+.rail{display:flex;gap:4px;height:12px}
+.rail i{flex:1;border:1px solid var(--line2);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}
+.rail i.a{background:var(--dragoon);border-color:var(--dragoon);box-shadow:0 0 12px rgba(43,107,255,.6)}
+.rail i.b{background:var(--dranzer);border-color:var(--dranzer);box-shadow:0 0 12px rgba(255,59,47,.55)}
+.rail i.p{background:repeating-linear-gradient(45deg,var(--pegasus) 0 3px,transparent 3px 6px);border-color:var(--pegasus)}
+.rail.rev{flex-direction:row-reverse}
+.rail.rev i{clip-path:polygon(0 0,calc(100% - 5px) 0,100% 100%,5px 100%)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fin{background:var(--panel);border:1px solid var(--line);padding:9px 10px;clip-path:var(--ch);display:flex;align-items:center;gap:8px}
+.fin .mini{width:18px;height:18px;flex:0 0 18px}
+.fin b{font-size:11.5px;text-transform:uppercase;display:block}
+.fin span{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--mute)}
+.fin.b2{border-color:rgba(255,196,0,.4)}.fin.b2 b{color:var(--pegasus)}
+.fin.b3{border-color:rgba(168,85,247,.42)}.fin.b3 b{color:var(--burst)}
+.fin.b4{border-color:rgba(0,229,208,.45)}.fin.b4 b{color:var(--x)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.kpi{background:var(--panel);border:1px solid var(--line);padding:10px 11px;clip-path:var(--ch)}
+.kpi b{display:block;font-family:'Archivo Black',sans-serif;font-size:26px;letter-spacing:-.04em;line-height:1;transform:skewX(-8deg);transform-origin:left}
+.kpi span{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--mute)}
+.bars{display:flex;flex-direction:column;gap:7px}
+.stat{display:flex;align-items:center;gap:8px;font-size:10.5px}
+.stat .sn{width:58px;font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--mute)}
+.stat .st2{flex:1;height:11px;background:var(--void);border:1px solid var(--line);position:relative}
+.stat .sf{position:absolute;inset:0 auto 0 0;clip-path:polygon(0 0,100% 0,calc(100% - 4px) 100%,0 100%)}
+.stat .sv{width:32px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:9.5px}
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+.li .av{width:27px;height:27px;flex:0 0 27px;display:grid;place-items:center;font-size:10.5px;font-weight:700;
+clip-path:var(--ch);background:var(--panel2);border:1px solid var(--line2)}
+.li .meta{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--mute)}
+.li .right{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700}
+.ban{padding:10px 12px;font-size:11.5px;line-height:1.5;clip-path:var(--ch);border:1px solid}
+.ban b{display:block;margin-bottom:2px}
+.ban.w{border-color:rgba(255,196,0,.45);background:rgba(255,196,0,.09);color:#FFE49A}.ban.w b{color:var(--pegasus)}
+.ban.i{border-color:rgba(0,229,208,.4);background:rgba(0,229,208,.08);color:#A8F2EA}.ban.i b{color:var(--x)}
+.ban.d{border-color:rgba(255,59,47,.45);background:rgba(255,59,47,.1);color:#FFC0BB}.ban.d b{color:var(--dranzer)}
+.err{border-left:3px solid var(--dranzer);background:rgba(255,59,47,.09);padding:10px 12px;font-size:11.5px;line-height:1.5;color:#FFC0BB}
+.err b{display:block;color:var(--dranzer);margin-bottom:3px}
+.okl{border-left:3px solid var(--x);background:rgba(0,229,208,.08);padding:10px 12px;font-size:11.5px;line-height:1.5;color:#A8F2EA}
+.okl b{display:block;color:var(--x);margin-bottom:3px}
+.qr{width:118px;height:118px;margin:0 auto;background:repeating-conic-gradient(var(--text) 0 25%,transparent 0 50%) 0 0/14px 14px,var(--void);
+border:6px solid var(--text);clip-path:var(--ch)}
+.notes{margin-top:52px;display:flex;flex-direction:column;gap:2px}
+.note{background:var(--panel);border:1px solid var(--line);padding:15px 16px;clip-path:var(--ch)}
+.note h3{font-size:13px;margin-bottom:6px}
+.note p{font-size:13px;line-height:1.62;color:var(--mute)}
+.note .k{width:26px;height:3px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">1 de 3 · recorrido del competidor</div>
+  <h1><span class="g">Usuario</span></h1>
+  <div class="sub">PHONESHELL · VERTICAL · CUENTA ANÓNIMA</div>
+  <p class="lede">Desde que instala la app hasta que ve sus estadísticas. Sin email, sin contraseña, sin pantalla de login. Todo funciona sin conexión.</p>
+  <div class="teeth"></div>
+</header>
+
+<!-- 01 -->
+<div class="sec"><span class="n">01</span><span class="t">Primer arranque</span><span class="role">U1</span></div>
+<div class="phone">
+  <div class="status"><span>9:02</span><span class="sy ok"><i class="dot"></i>SIN CUENTA</span></div>
+  <div class="body">
+    <div class="sp"></div>
+    <div class="hero"><div class="ring"></div>
+      <div class="hlogo"><span class="b">Bey</span><span class="s">Score</span></div>
+      <div class="code" style="letter-spacing:.2em;margin-top:5px">MARCADOR Y TORNEOS</div></div>
+    <div class="sp"></div>
+    <div class="card"><div style="font-size:12.5px;line-height:1.65;color:var(--mute)">Funciona sin internet y sin cuenta. Lo que crees se queda en tu teléfono hasta que decidas otra cosa.</div></div>
+    <div class="btn go">Empezar</div>
+    <div class="btn ghost">Ya tengo un código</div>
+  </div>
+</div>
+<p class="ni">Sin login. “Ya tengo un código” es para quien reinstala o reclama su historial de invitado.</p>
+
+<!-- 02 -->
+<div class="sec"><span class="n">02</span><span class="t">Apodo</span><span class="role">U1</span></div>
+<div class="phone">
+  <div class="status"><span>9:02</span><span class="sy ok"><i class="dot"></i>SIN CUENTA</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Cómo te llamamos</h2></div>
+  <div class="body">
+    <div class="label">Tu apodo</div>
+    <div class="input f"><span class="val">RYU_07</span><span class="car"></span></div>
+    <div class="code" style="line-height:1.6">Lo verán los demás en el marcador y en el cuadro. Se puede cambiar después.</div>
+    <div class="card">
+      <div class="label">Lo que NO te pedimos</div>
+      <div class="row" style="flex-wrap:wrap;margin-top:8px">
+        <span class="chip">EMAIL</span><span class="chip">CONTRASEÑA</span>
+        <span class="chip">FECHA DE NACIMIENTO</span><span class="chip">TELÉFONO</span></div>
+      <div style="font-size:11px;line-height:1.55;color:var(--mute);margin-top:9px">Nada de esto hace falta para jugar.</div>
+    </div>
+    <div class="sp"></div>
+    <div class="btn go">Continuar</div>
+  </div>
+</div>
+<p class="ni">Un campo. La categoría de edad se elige al inscribirse a un torneo, y son dos botones, no una fecha.</p>
+
+<!-- 03 -->
+<div class="sec"><span class="n">03</span><span class="t">Código de recuperación</span><span class="role">U1</span></div>
+<div class="phone">
+  <div class="status"><span>9:03</span><span class="sy ok"><i class="dot"></i>LISTO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Guarda esto</h2></div>
+  <div class="body">
+    <div class="ban w"><b>Apúntalo o hazle una foto</b>Es la única forma de recuperar tu historial si cambias de teléfono.</div>
+    <div class="card hot" style="padding:15px">
+      <div class="label" style="text-align:center">Tu código</div>
+      <div class="rec">BEY-4K2P-9XQ1-7MRT</div>
+      <div class="row"><span class="btn ghost grow" style="padding:9px;font-size:10.5px">Copiar</span>
+        <span class="btn ghost grow" style="padding:9px;font-size:10.5px">Compartir</span></div>
+    </div>
+    <div class="card"><div class="label">Cómo se usa</div>
+      <div style="font-size:11.5px;line-height:1.6;color:var(--mute);margin-top:7px">Instalas la app en otro teléfono → “Ya tengo un código” → recuperas tus combos, decks y resultados.</div></div>
+    <div class="sp"></div>
+    <div class="btn go">Ya lo guardé</div>
+    <div class="btn ghost">Verlo luego en Perfil</div>
+  </div>
+</div>
+<p class="ni">Doce caracteres, no ocho: con ocho son 40 bits y alguien probando al azar acabaría acertando alguno.</p>
+
+<!-- 04 -->
+<div class="sec"><span class="n">04</span><span class="t">Inicio, sin torneo</span><span class="role">U2</span></div>
+<div class="phone">
+  <div class="status"><span>9:05</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><h2>BeyScore</h2><span class="side">RYU_07</span></div>
+  <div class="body">
+    <div class="card hot">
+      <div class="label">Empieza por aquí</div>
+      <b style="font-size:13.5px;display:block;margin-top:6px">Arma tu primer bey</b>
+      <div class="code" style="margin-top:4px">239 piezas en el catálogo</div>
+      <div class="btn go" style="margin-top:10px">Armar</div>
+    </div>
+    <div class="label">Modos</div>
+    <div class="card"><div class="row" style="align-items:center"><div><b style="font-size:13px">Combate rápido</b>
+      <div class="code" style="margin-top:2px">1v1, un teléfono</div></div><span class="sp"></span><span class="chip">1V1</span></div></div>
+    <div class="card"><div class="row" style="align-items:center"><div><b style="font-size:13px">Torneos</b>
+      <div class="code" style="margin-top:2px">buscar cerca de ti</div></div><span class="sp"></span><span class="chip x">3ON3</span></div></div>
+    <div class="card"><div class="row" style="align-items:center"><div><b style="font-size:13px">Crear un torneo</b>
+      <div class="code" style="margin-top:2px">tú organizas</div></div><span class="sp"></span><span class="chip">G3</span></div></div>
+    <div class="sp"></div>
+  </div>
+  <div class="tabbar"><div class="on">Inicio</div><div>Torneos</div><div>Beys</div><div>Perfil</div></div>
+</div>
+<p class="ni">“Crear un torneo” está aquí, para cualquiera. Ser organizador no es un tipo de cuenta: es haber creado uno.</p>
+
+<!-- 05 -->
+<div class="sec"><span class="n">05</span><span class="t">Armar bey</span><span class="role">U3</span></div>
+<div class="phone">
+  <div class="status"><span>9:08</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo bey</h2><span class="side">BX</span></div>
+  <div class="body">
+    <div class="row"><span class="chip on">BX</span><span class="chip">UX</span><span class="chip">CX</span></div>
+    <div class="code" style="line-height:1.5">El sistema decide cuántas piezas lleva. CX divide el blade en tres.</div>
+    <div class="stack" style="margin-top:4px">
+      <div class="sl done"><div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><span class="kind">Blade</span><b>DranSword</b><span class="meta">34.8 g · ataque · giro R</span></div><span class="go2">›</span></div>
+      <div class="sl done"><div class="th"><div class="bey def" style="color:var(--mute)"></div></div>
+        <div><span class="kind">Ratchet</span><b>3-60</b><span class="meta">3 contactos · 6.0 mm</span></div><span class="go2">›</span></div>
+      <div class="sl empty"><div class="th"><div class="bey sta" style="color:var(--line2)"></div></div>
+        <div><span class="kind">Bit</span><b style="color:var(--mute)">Elegir bit</b><span class="meta">52 disponibles</span></div><span class="go2">›</span></div>
+    </div>
+    <div class="label">Cómo va quedando</div>
+    <div class="card"><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700">DranSword 3-60<span style="color:var(--mute)">_</span></div>
+      <div class="code" style="margin-top:6px">La notación se arma sola con la abreviatura del bit.</div></div>
+    <div class="ban i"><b>Giro derecha</b>Sirve tu lanzador normal. Si girara a la izquierda harían falta el BX-40 o el BX-47.</div>
+    <div class="sp"></div>
+    <div class="btn dis">Falta el bit</div>
+  </div>
+</div>
+<p class="ni">Las piezas se apilan en el orden en que se montan de verdad. El rombo se enciende cuando esa pieza ya está.</p>
+
+<!-- 06 -->
+<div class="sec"><span class="n">06</span><span class="t">Elegir pieza</span><span class="role">U3</span></div>
+<div class="phone">
+  <div class="status"><span>9:09</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo bey</h2><span class="side">BX</span></div>
+  <div class="body" style="opacity:.3"><div class="row"><span class="chip on">BX</span><span class="chip">UX</span><span class="chip">CX</span></div></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="row" style="align-items:center"><b style="font-size:13px">Elegir bit</b><span class="sp"></span><span class="code">52 piezas</span></div>
+    <div class="search"><span class="code">⌕</span><span class="ph">Nombre, código o “Scythe Incendio”…</span></div>
+    <div class="row"><span class="chip on">TENGO</span><span class="chip">TODOS</span><span class="chip">ATAQUE</span><span class="chip">DEFENSA</span></div>
+    <div class="scroll">
+      <div class="pl pick"><div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><b>Flat</b><span class="kana jp">フラット</span></div>
+        <div class="st"><div class="w" style="color:var(--x)">F</div><div class="t2">ataque · 12 dientes</div></div></div>
+      <div class="pl"><div class="th"><div class="bey sta" style="color:var(--burst)"></div></div>
+        <div><b>Ball</b><span class="kana jp">ボール</span></div>
+        <div class="st"><div class="w">B</div><div class="t2">stamina · 12 dientes</div></div></div>
+      <div class="pl"><div class="th"><div class="bey atk" style="color:var(--pegasus)"></div></div>
+        <div><b>Glide Flat</b><span class="kana jp">グライドフラット</span></div>
+        <div class="st"><div class="w">GF</div><div class="t2">ataque · eje 94</div></div></div>
+      <div class="pl"><div class="th"><div class="bey def" style="color:var(--mute)"></div></div>
+        <div><b>High Needle</b><span class="kana jp">ハイニードル</span></div>
+        <div class="st"><div class="w">HN</div><div class="t2">defensa · 13.3 mm</div></div></div>
+      <div class="pl no"><div class="th"><div class="bey bal" style="color:var(--line2)"></div></div>
+        <div><b>Taper</b><span class="code" style="font-size:7.5px">no la tienes · viene en BX-02</span></div>
+        <div class="st"><div class="w" style="color:var(--mute)">T</div><div class="t2">balance</div></div></div>
+    </div>
+    <div class="btn go">Usar Flat</div>
+  </div>
+</div>
+<p class="ni">Ball es <b>stamina</b>, no defensa. El tipo sale del catálogo: deducirlo del nombre acierta el 32% de las veces.</p>
+
+<!-- 07 -->
+<div class="sec"><span class="n">07</span><span class="t">Bey terminado</span><span class="role">U3</span></div>
+<div class="phone">
+  <div class="status"><span>9:10</span><span class="sy"><i class="dot"></i>EN COLA</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Guardar bey</h2></div>
+  <div class="body">
+    <div style="position:relative;overflow:hidden;padding:15px;clip-path:var(--ch);background:linear-gradient(140deg,rgba(43,107,255,.22),var(--panel) 68%);border:1px solid var(--line2);display:flex;align-items:center;gap:14px">
+      <div style="width:72px;flex:0 0 72px"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+      <div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700">DranSword 3-60F</div>
+        <div class="jp" style="font-size:10px;color:var(--mute);margin-top:5px">ドランソード</div>
+        <div class="row" style="margin-top:7px"><span class="chip x">ATAQUE</span><span class="chip">GIRO R</span></div></div>
+    </div>
+    <div class="label">Peso</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span style="font-size:11.5px">Blade</span><span class="sp"></span><span class="code" style="color:var(--pegasus);font-size:12px">34.8 g</span></div>
+      <div class="row" style="align-items:center;margin-top:7px"><span style="font-size:11.5px">Ratchet 3-60</span><span class="sp"></span><span class="code">clase 6+</span></div>
+      <div class="row" style="align-items:center;margin-top:7px"><span style="font-size:11.5px">Bit Flat</span><span class="sp"></span><span class="code">clase 2+</span></div>
+      <div style="border-top:1px solid var(--line);margin-top:9px;padding-top:9px">
+        <div class="row" style="align-items:center"><span style="font-size:11.5px;font-weight:600">Total</span><span class="sp"></span><span class="code" style="font-style:italic">sin datos suficientes</span></div>
+        <div style="font-size:10.5px;line-height:1.5;color:var(--mute);margin-top:6px">El fabricante no publica el peso en gramos de ratchets ni bits, solo su clase.</div>
+      </div>
+      <div class="btn ghost" style="margin-top:9px;padding:9px;font-size:10.5px">Pesar el mío</div>
+    </div>
+    <div class="ban i"><b>Este combo está en la meta</b>DranSword 3-60F aparece en tier A de los torneos WBO.</div>
+    <div class="sp"></div>
+    <div class="btn go">Guardar</div>
+  </div>
+</div>
+<p class="ni">El total dice “sin datos suficientes” en vez de sumar ceros. Un número inventado es peor que un hueco honesto.</p>
+
+<!-- 08 -->
+<div class="sec"><span class="n">08</span><span class="t">Deck válido</span><span class="role">U4</span></div>
+<div class="phone">
+  <div class="status"><span>9:16</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo deck</h2><span class="side">3 DE 3</span></div>
+  <div class="body">
+    <div class="ban i"><b>El orden es el orden de combate</b>Tu bey 1 se enfrenta al bey 1 del rival. Arrastra para reordenar.</div>
+    <div class="label">Alineación</div>
+    <div class="deck">
+      <div class="dk"><span class="ord">1</span><div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><b>DranSword 3-60F</b><span class="meta">ataque · 34.8 g · tier A</span></div><span class="drag">≡</span></div>
+      <div class="dk"><span class="ord">2</span><div class="th"><div class="bey atk" style="color:var(--dranzer)"></div></div>
+        <div><b>PhoenixWing 9-60GF</b><span class="meta">ataque · 38.5 g · tier S</span></div><span class="drag">≡</span></div>
+      <div class="dk"><span class="ord">3</span><div class="th"><div class="bey sta" style="color:var(--burst)"></div></div>
+        <div><b>WizardRod 1-60H</b><span class="meta">stamina · 35.4 g · tier S</span></div><span class="drag">≡</span></div>
+    </div>
+    <div class="okl"><b>Deck legal</b>Ninguna pieza repetida · sin salón de la fama · los tres giran a la derecha.</div>
+    <div class="card"><div class="row" style="align-items:center"><span style="font-size:11.5px">Piezas distintas</span><span class="sp"></span><span class="code">9 de 9</span></div>
+      <div style="font-size:10.5px;line-height:1.5;color:var(--mute);margin-top:7px">Sin defensa en el deck. Contra bits tipo Ball vas a sufrir en las rondas largas.</div></div>
+    <div class="sp"></div>
+    <div class="btn go">Guardar deck</div>
+  </div>
+</div>
+
+<!-- 09 -->
+<div class="sec"><span class="n">09</span><span class="t">Conflicto de piezas</span><span class="role">U4</span></div>
+<div class="phone">
+  <div class="status"><span>9:17</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo deck</h2><span class="side">1 ERROR</span></div>
+  <div class="body">
+    <div class="label">Alineación</div>
+    <div class="deck">
+      <div class="dk bad"><span class="ord" style="color:var(--dranzer)">1</span><div class="th"><div class="bey atk" style="color:var(--dragoon)"></div></div>
+        <div><b>DranSword 3-60F</b><span class="meta" style="color:var(--dranzer)">blade repetido</span></div><span class="drag">≡</span></div>
+      <div class="linkbad"><span>MISMA PIEZA</span></div>
+      <div class="dk bad"><span class="ord" style="color:var(--dranzer)">2</span><div class="th"><div class="bey atk" style="color:var(--dranzer)"></div></div>
+        <div><b>DranSword 5-60B</b><span class="meta" style="color:var(--dranzer)">mismo blade, otro color</span></div><span class="drag">≡</span></div>
+      <div class="dk"><span class="ord">3</span><div class="th"><div class="bey sta" style="color:var(--burst)"></div></div>
+        <div><b>WizardRod 1-60H</b><span class="meta">stamina · 35.4 g</span></div><span class="drag">≡</span></div>
+    </div>
+    <div class="err"><b>DranSword está en los beys 1 y 2</b>El reglamento cuenta dos piezas del mismo nombre como la misma, aunque sean de distinto color. En el chequeo te descalifican.</div>
+    <div class="label">Cambia el blade del bey 2 por</div>
+    <div class="card sel"><div class="row" style="align-items:center">
+      <div style="width:28px;flex:0 0 28px"><div class="bey atk" style="color:var(--pegasus)"></div></div>
+      <div><b style="font-size:12px">DranDagger</b><div class="code" style="font-size:8.5px">ataque · lo tienes · BX-20</div></div>
+      <span class="sp"></span><span class="chip x">USAR</span></div></div>
+    <div class="card sel"><div class="row" style="align-items:center">
+      <div style="width:28px;flex:0 0 28px"><div class="bey def" style="color:var(--mute)"></div></div>
+      <div><b style="font-size:12px">KnightShield</b><div class="code" style="font-size:8.5px">defensa · lo tienes · tier S</div></div>
+      <span class="sp"></span><span class="chip x">USAR</span></div></div>
+    <div class="sp"></div>
+    <div class="btn dis">Guardar deck</div>
+  </div>
+</div>
+<p class="ni">No basta con decir “hay un error”: se marcan los dos beys, se une con una barra y se ofrecen piezas que ya tiene.</p>
+
+<!-- 10 -->
+<div class="sec"><span class="n">10</span><span class="t">Inscribirse</span><span class="role">U5</span></div>
+<div class="phone">
+  <div class="status"><span>19:40</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Copa Barrio Norte</h2><span class="side">G3</span></div>
+  <div class="body">
+    <div class="card hot"><div class="row" style="align-items:center"><span class="label">Inscripción abierta</span><span class="sp"></span><span class="chip x">12 / 16</span></div>
+      <div class="code" style="margin-top:7px;line-height:1.6">23 ago · 10:00 · Ludoteca Norte<br>3on3 · eliminación doble · reglamento v12</div></div>
+    <div class="label">Tu categoría</div>
+    <div class="card"><div class="row"><span class="chip on">ABIERTA 6+</span><span class="chip">REGULAR 6–12</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">Cada categoría tiene su propio cuadro. No se mezclan.</div></div>
+    <div class="label">Con qué deck</div>
+    <div class="card sel"><div class="row" style="align-items:center"><div><b style="font-size:12.5px">Mi deck principal</b>
+      <div class="code" style="margin-top:4px">DranSword · PhoenixWing · WizardRod</div></div><span class="sp"></span><span class="chip x">LEGAL</span></div></div>
+    <div class="ban w"><b>Chequeo de piezas obligatorio</b>Lleva tu caja el día del torneo. El deck queda bloqueado tras la revisión.</div>
+    <div class="sp"></div>
+    <div class="btn go">Inscribirme</div>
+  </div>
+</div>
+
+<!-- 11 -->
+<div class="sec"><span class="n">11</span><span class="t">Pase de chequeo</span><span class="role">U6</span></div>
+<div class="phone">
+  <div class="status"><span>9:52</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Chequeo de deck</h2><span class="side">MESA</span></div>
+  <div class="body">
+    <div class="okl"><b>Enséñale esto al juez</b>Junto con tu caja de deck.</div>
+    <div style="padding:16px;clip-path:var(--ch);background:var(--panel);border:1px solid var(--line2)">
+      <div class="qr"></div>
+      <div class="code" style="text-align:center;margin-top:12px;line-height:1.6">RYU_07 · Copa Barrio Norte<br>deck-8F31A2 · 9 piezas</div></div>
+    <div class="card">
+      <div class="code" style="color:var(--text)">1 · DranSword 3-60F</div>
+      <div class="code" style="color:var(--text);margin-top:6px">2 · PhoenixWing 9-60GF</div>
+      <div class="code" style="color:var(--text);margin-top:6px">3 · WizardRod 1-60H</div></div>
+    <div class="ban w"><b>Después queda bloqueado</b>Si necesitas cambiarlo, avisa al juez antes de empezar.</div>
+    <div class="sp"></div>
+    <div class="btn go">Bloquear y presentar</div>
+  </div>
+</div>
+
+<!-- 12 -->
+<div class="sec"><span class="n">12</span><span class="t">Te toca</span><span class="role">U7</span></div>
+<div class="phone">
+  <div class="status"><span>10:28</span><span class="sy"><i class="dot"></i>2 SIN SUBIR</span></div>
+  <div class="appbar"><h2>BeyScore</h2><span class="side">RYU_07 · G3</span></div>
+  <div class="body">
+    <div class="ban w"><b>Sin conexión</b>Todo sigue funcionando. Se subirá cuando vuelva.</div>
+    <div class="card hot">
+      <div class="label">Te toca</div>
+      <div class="row" style="align-items:center;gap:8px;margin-top:7px"><b style="font-size:13.5px">Mesa 3</b><span class="chip x">RONDA 2</span></div>
+      <div class="code" style="margin-top:5px">contra MULTI_K · 3on3 · vas 1–0</div>
+      <div class="btn go" style="margin-top:11px">Ir a la mesa</div>
+    </div>
+    <div class="label">Tu alineación</div>
+    <div class="card"><div class="row"><span class="chip">1 · DranSword</span><span class="chip x">2 · PhoenixWing</span><span class="chip">3 · WizardRod</span></div>
+      <div class="code" style="margin-top:8px;line-height:1.5">Vas por el bey 2. Prepáralo antes de llegar.</div></div>
+    <div class="sp"></div>
+  </div>
+  <div class="tabbar"><div class="on">Inicio</div><div>Torneos</div><div>Beys</div><div>Perfil</div></div>
+</div>
+<p class="ni">La franja ámbar informa, no bloquea. Sin conexión la app funciona entera.</p>
+
+<!-- 13 -->
+<div class="sec"><span class="n">13</span><span class="t">Marcador sin mesa</span><span class="role">U8</span></div>
+<div class="phone">
+  <div class="status"><span>10:31</span><span class="sy"><i class="dot"></i>LOCAL</span></div>
+  <div class="body flush">
+    <div style="display:flex;flex-direction:column;height:100%">
+      <div style="padding:9px 15px 8px;border-bottom:1px solid var(--line)">
+        <div class="row" style="align-items:center"><span class="label">3on3 · ronda 2 · bey 2</span><span class="sp"></span><span class="chip x">RYU 1 — 0 MULTI</span></div>
+      </div>
+      <div class="side2 A"><div class="spin"></div>
+        <div class="label">Tú · ataque</div>
+        <div class="head"><span class="psc">3</span><div style="padding-bottom:5px"><div class="pn">RYU_07</div>
+          <div class="code">PhoenixWing 9-60GF</div></div></div>
+        <div class="rail"><i class="a"></i><i class="a"></i><i class="a"></i><i></i></div>
+        <div class="fg" style="margin-top:3px">
+          <div class="fin"><span class="mini"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="#EEF1F7" stroke-width="1.4" opacity=".8"/><circle cx="10" cy="10" r="2" fill="#EEF1F7"/></svg></span><div><b>Spin</b><span>+1</span></div></div>
+          <div class="fin b2"><span class="mini"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="#FFC400" stroke-width="1.4" opacity=".45"/><path d="M10 10 L17 5" stroke="#FFC400" stroke-width="1.6"/><circle cx="17" cy="4.6" r="2" fill="#FFC400"/></svg></span><div><b>Over</b><span>+2</span></div></div>
+          <div class="fin b3"><span class="mini"><svg viewBox="0 0 20 20"><path d="M10 3 L12 9 L18 9 L13 13 L15 18 L10 14 L5 18 L7 13 L2 9 L8 9 Z" fill="#A855F7"/></svg></span><div><b>Burst</b><span>+2</span></div></div>
+          <div class="fin b4"><span class="mini"><svg viewBox="0 0 20 20"><path d="M2 14 Q10 2 18 14" fill="none" stroke="#00E5D0" stroke-width="1.5" stroke-dasharray="2 1.6"/><circle cx="17" cy="13.5" r="2.4" fill="#00E5D0"/></svg></span><div><b>Xtreme</b><span>+3</span></div></div>
+        </div>
+      </div>
+      <div class="side2 B"><div class="spin"></div>
+        <div class="label">MULTI_K · defensa</div>
+        <div class="head"><span class="psc">2</span><div style="padding-bottom:5px"><div class="pn">MULTI_K</div>
+          <div class="code">KnightShield 3-80N</div></div></div>
+        <div class="rail rev"><i></i><i></i><i class="p"></i><i class="b"></i></div>
+        <div class="fg" style="margin-top:3px">
+          <div class="fin"><span class="mini"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="#EEF1F7" stroke-width="1.4" opacity=".8"/><circle cx="10" cy="10" r="2" fill="#EEF1F7"/></svg></span><div><b>Spin</b><span>+1</span></div></div>
+          <div class="fin b2"><span class="mini"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="#FFC400" stroke-width="1.4" opacity=".45"/><path d="M10 10 L17 5" stroke="#FFC400" stroke-width="1.6"/><circle cx="17" cy="4.6" r="2" fill="#FFC400"/></svg></span><div><b>Over</b><span>+2</span></div></div>
+          <div class="fin b3"><span class="mini"><svg viewBox="0 0 20 20"><path d="M10 3 L12 9 L18 9 L13 13 L15 18 L10 14 L5 18 L7 13 L2 9 L8 9 Z" fill="#A855F7"/></svg></span><div><b>Burst</b><span>+2</span></div></div>
+          <div class="fin b4"><span class="mini"><svg viewBox="0 0 20 20"><path d="M2 14 Q10 2 18 14" fill="none" stroke="#00E5D0" stroke-width="1.5" stroke-dasharray="2 1.6"/><circle cx="17" cy="13.5" r="2.4" fill="#00E5D0"/></svg></span><div><b>Xtreme</b><span>+3</span></div></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:9px;padding:7px 15px;border-bottom:1px solid var(--line);font-size:11px">
+          <span style="font-weight:700;width:44px;color:var(--dragoon)">RYU</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--burst);letter-spacing:.1em">BURST</span>
+          <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:700">+2</span></div>
+        <div style="display:flex;align-items:center;gap:9px;padding:7px 15px;font-size:11px">
+          <span style="font-weight:700;width:44px;color:var(--dranzer)">MULTI</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--pegasus);letter-spacing:.1em">PENALIZACIÓN</span>
+          <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:700">+1</span></div>
+      </div>
+      <div style="padding:9px 15px;display:flex;gap:7px;border-top:1px solid var(--line)">
+        <div class="btn ghost grow" style="padding:9px;font-size:10.5px">Deshacer</div>
+        <div class="btn ghost grow" style="padding:9px;font-size:10.5px">Falta</div>
+        <div class="btn ghost grow" style="padding:9px;font-size:10.5px">Empate</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="ni">Cuando no hay tablet, el jugador marca en su teléfono. Cuatro botones por tipo de finish, nunca +1/−1: registrar <b>qué</b> pasó es igual de rápido y genera estadísticas.</p>
+
+<!-- 14 -->
+<div class="sec"><span class="n">14</span><span class="t">Confirmar</span><span class="role">U8</span></div>
+<div class="phone">
+  <div class="status"><span>10:36</span><span class="sy"><i class="dot"></i>EN COLA</span></div>
+  <div class="appbar"><h2>Ronda 2</h2><span class="side">3ON3</span></div>
+  <div class="body">
+    <div style="position:relative;overflow:hidden;padding:15px;clip-path:var(--ch);background:linear-gradient(135deg,rgba(43,107,255,.24),var(--panel) 66%);border:1px solid var(--line2)">
+      <div class="spin" style="color:var(--dragoon);top:-60px;right:-60px"></div>
+      <div class="label">Ganas la ronda</div>
+      <div class="pn" style="font-size:24px;margin:5px 0 9px;color:var(--dragoon)">RYU_07</div>
+      <div style="display:flex;align-items:baseline;gap:9px"><span class="psc" style="font-size:38px">4</span>
+        <span class="code" style="font-size:16px">—</span><span class="psc" style="font-size:38px;color:var(--mute);text-shadow:none">2</span></div>
+    </div>
+    <div class="label">Cómo se ganó</div>
+    <div class="bars">
+      <div class="stat"><span class="sn">XTREME</span><div class="st2"><div class="sf" style="width:75%;background:var(--x)"></div></div><span class="sv">3</span></div>
+      <div class="stat"><span class="sn">BURST</span><div class="st2"><div class="sf" style="width:50%;background:var(--burst)"></div></div><span class="sv">2</span></div>
+      <div class="stat"><span class="sn">PENAL.</span><div class="st2"><div class="sf" style="width:25%;background:repeating-linear-gradient(45deg,var(--pegasus) 0 4px,transparent 4px 8px)"></div></div><span class="sv">1</span></div>
+    </div>
+    <div class="ban i"><b>Falta que MULTI_K confirme</b>Cuenta apenas lo acepte. Si no está de acuerdo, lo revisa el juez.</div>
+    <div class="sp"></div>
+    <div class="btn go">Enviar a confirmar</div>
+    <div class="btn ghost">Corregir marcador</div>
+  </div>
+</div>
+
+<!-- 15 -->
+<div class="sec"><span class="n">15</span><span class="t">Mis estadísticas</span><span class="role">U9</span></div>
+<div class="phone">
+  <div class="status"><span>18:05</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><h2>RYU_07</h2><span class="side">48 RONDAS</span></div>
+  <div class="body">
+    <div class="kpis">
+      <div class="kpi"><b style="color:var(--x)">67%</b><span>Victorias</span></div>
+      <div class="kpi"><b style="color:var(--pegasus)">5</b><span>Racha actual</span></div>
+      <div class="kpi"><b style="color:var(--dragoon)">3.4</b><span>Puntos / ronda</span></div>
+      <div class="kpi"><b style="color:var(--burst)">28%</b><span>Gana por burst</span></div>
+    </div>
+    <div class="label">Cómo ganas tus puntos</div>
+    <div class="bars">
+      <div class="stat"><span class="sn">XTREME</span><div class="st2"><div class="sf" style="width:34%;background:var(--x)"></div></div><span class="sv">34%</span></div>
+      <div class="stat"><span class="sn">BURST</span><div class="st2"><div class="sf" style="width:28%;background:var(--burst)"></div></div><span class="sv">28%</span></div>
+      <div class="stat"><span class="sn">OVER</span><div class="st2"><div class="sf" style="width:23%;background:var(--pegasus)"></div></div><span class="sv">23%</span></div>
+      <div class="stat"><span class="sn">SPIN</span><div class="st2"><div class="sf" style="width:11%;background:var(--line2)"></div></div><span class="sv">11%</span></div>
+      <div class="stat"><span class="sn">PENAL.</span><div class="st2"><div class="sf" style="width:4%;background:repeating-linear-gradient(45deg,var(--pegasus) 0 4px,transparent 4px 8px)"></div></div><span class="sv">4%</span></div>
+    </div>
+    <div class="label">Tus beys</div>
+    <div class="list">
+      <div class="li"><span class="av" style="color:var(--dranzer)">P</span><div><b>PhoenixWing 9-60GF</b><div class="meta">22 rondas · tier S</div></div><span class="right" style="color:var(--x)">73%</span></div>
+      <div class="li"><span class="av" style="color:var(--dragoon)">D</span><div><b>DranSword 3-60F</b><div class="meta">17 rondas · tier A</div></div><span class="right" style="color:var(--x)">65%</span></div>
+      <div class="li"><span class="av" style="color:var(--mute)">W</span><div><b>WhaleWave 1-60LO</b><div class="meta">9 rondas</div></div><span class="right" style="color:var(--dranzer)">44%</span></div>
+    </div>
+    <div class="ban w"><b>Te cuesta la defensa</b>Pierdes 7 de cada 10 contra bits tipo Ball.</div>
+    <div class="sp"></div>
+  </div>
+  <div class="tabbar"><div>Inicio</div><div>Torneos</div><div>Beys</div><div class="on">Perfil</div></div>
+</div>
+<p class="ni">Todo esto existe porque se guarda cada finish por separado. Con solo el marcador final no habría nada de esto.</p>
+
+<div class="notes">
+  <div class="note"><div class="k" style="background:var(--dragoon)"></div>
+    <h3>Sin puerta de entrada</h3>
+    <p>Un apodo y dentro. Sin email, contraseña ni fecha de nacimiento. Muchos usuarios son niños: cada campo es una barrera y un dato sensible que luego hay que custodiar.</p></div>
+  <div class="note"><div class="k" style="background:var(--x)"></div>
+    <h3>Nada bloquea por falta de red</h3>
+    <p>La franja ámbar informa de que hay cosas sin subir, y ya. Escribir es local e instantáneo: no hay spinners de “guardando” en ninguna pantalla.</p></div>
+  <div class="note"><div class="k" style="background:var(--pegasus)"></div>
+    <h3>Los huecos se dibujan</h3>
+    <p>El peso total dice “sin datos suficientes” en vez de sumar ceros. Un número inventado es peor que un hueco honesto, porque el usuario no tiene forma de saber que es falso.</p></div>
+  <div class="note"><div class="k" style="background:var(--dranzer)"></div>
+    <h3>El error se avisa antes de la mesa</h3>
+    <p>Repetir un blade entre dos beys es la descalificación más común, y se descubre en el chequeo cuando ya es tarde. La app marca los dos beys implicados y ofrece un cambio con piezas que ya tiene.</p></div>
+  <div class="note"><div class="k" style="background:var(--burst)"></div>
+    <h3>Crear un torneo está en el menú de todos</h3>
+    <p>No hay app de organizador. Cualquiera crea un torneo desde aquí; a partir de ahí, dentro de ese torneo, le aparecen los controles.</p></div>
+</div>
+
+</div>
+</body>
+</html>

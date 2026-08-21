@@ -1,0 +1,67 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+Thumbs.db
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+melos_*.iml
+
+# Visual Studio Code
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
+
+# Flutter / Dart / Pub Monorepo
+**/.dart_tool/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+**/build/
+**/coverage/
+**/doc/api/
+pubspec_overrides.yaml
+**/pubspec_overrides.yaml
+
+# Symbolication & Obfuscation
+app.*.symbols
+app.*.map.json
+
+# Android
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/android/**/build/
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+
+# iOS / macOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.framework
+**/macos/Pods/
+**/macos/Flutter/ephemeral/
+
+# Windows / Linux desktop
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/

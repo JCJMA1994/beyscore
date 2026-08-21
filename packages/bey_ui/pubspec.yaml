@@ -1,0 +1,26 @@
+name: bey_ui
+description: Reusable UI design system, tokens, and core widgets for BeyScore.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.29.0"
+
+dependencies:
+  bey_domain:
+    path: ../bey_domain
+  flutter:
+    sdk: flutter
+  audioplayers: ^6.1.0
+  flutter_tts: ^4.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.2.0
+
+flutter:
+  assets:
+    - assets/audio/

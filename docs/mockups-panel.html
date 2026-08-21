@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeyScore — Panel web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#06070C; --steel:#0E1220; --panel:#151B29; --panel2:#1C2434;
+  --line:#28324A; --line2:#3A4762; --text:#EEF1F7; --mute:#78859D;
+  --dragoon:#2B6BFF; --dranzer:#FF3B2F; --pegasus:#FFC400;
+  --burst:#A855F7; --x:#00E5D0;
+  --ch:polygon(0 8px,8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--void);color:var(--text);font-family:'Inter Tight',system-ui,sans-serif;
+-webkit-font-smoothing:antialiased;padding:0 0 80px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(120% 55% at 50% -8%,rgba(43,107,255,.20),transparent 62%),
+radial-gradient(90% 45% at 100% 102%,rgba(255,59,47,.13),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:0 16px}
+
+header{padding:44px 0 6px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;
+text-transform:uppercase;color:var(--x)}
+h1{font-family:'Archivo Black',sans-serif;font-size:54px;line-height:.84;letter-spacing:-.035em;
+margin:14px 0 2px;text-transform:uppercase;transform:skewX(-8deg);transform-origin:left}
+h1 .g{background:linear-gradient(105deg,var(--dragoon),var(--x));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--mute);margin-top:10px}
+.lede{color:var(--mute);font-size:14px;line-height:1.62;margin-top:16px}
+.teeth{height:9px;margin:24px 0 4px;
+background:repeating-linear-gradient(90deg,var(--line2) 0 3px,transparent 3px 9px);
+-webkit-mask-image:linear-gradient(90deg,#000 0 62%,transparent);
+mask-image:linear-gradient(90deg,#000 0 62%,transparent)}
+
+.sec{display:flex;align-items:center;gap:10px;margin:44px 0 12px}
+.sec .n{font-family:'Archivo Black',sans-serif;font-size:22px;line-height:1;color:transparent;
+-webkit-text-stroke:1px var(--line2);transform:skewX(-8deg)}
+.sec .t{font-family:'Archivo Black',sans-serif;font-size:13.5px;text-transform:uppercase;letter-spacing:-.015em}
+.sec .role{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;
+padding:3px 7px;border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch)}
+.note-inline{font-size:12.5px;line-height:1.6;color:var(--mute);margin:10px 0 0}
+
+/* ===== ventana de navegador a todo el ancho ===== */
+.bleed{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding:0 10px}
+.win{width:100%;aspect-ratio:1.6;background:var(--steel);border:1px solid var(--line2);
+display:flex;flex-direction:column;overflow:hidden;
+clip-path:polygon(0 12px,12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)}
+.chrome{flex:0 0 auto;height:6%;min-height:18px;display:flex;align-items:center;gap:6px;
+padding:0 10px;background:var(--void);border-bottom:1px solid var(--line)}
+.chrome .d{width:5px;height:5px;border-radius:50%;background:var(--line2)}
+.chrome .url{flex:1;margin-left:6px;font-family:'JetBrains Mono',monospace;
+font-size:clamp(5px,1.1vw,8px);color:var(--mute);background:var(--panel);padding:2px 8px;
+clip-path:var(--ch)}
+.app{flex:1;display:flex;overflow:hidden}
+
+/* barra lateral */
+.side{width:17%;background:var(--void);border-right:1px solid var(--line);
+padding:clamp(6px,1.4vw,12px) clamp(5px,1.1vw,10px);display:flex;flex-direction:column;gap:clamp(3px,.7vw,6px)}
+.logo{font-family:'Archivo Black',sans-serif;font-size:clamp(8px,1.7vw,13px);
+transform:skewX(-8deg);margin-bottom:clamp(4px,1vw,8px)}
+.logo .g2{background:linear-gradient(105deg,var(--dragoon),var(--x));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.nav{font-family:'JetBrains Mono',monospace;font-size:clamp(5px,1.15vw,8.5px);letter-spacing:.1em;
+color:var(--mute);padding:clamp(3px,.7vw,6px) clamp(4px,.8vw,7px);clip-path:var(--ch)}
+.nav.on{background:var(--panel2);color:var(--text);box-shadow:inset 2px 0 0 var(--x)}
+.sidefoot{margin-top:auto;font-family:'JetBrains Mono',monospace;font-size:clamp(4.5px,1vw,7px);
+color:var(--mute);line-height:1.5}
+
+/* contenido */
+.main{flex:1;padding:clamp(7px,1.6vw,15px);display:flex;flex-direction:column;
+gap:clamp(5px,1.2vw,10px);overflow:hidden}
+.tophead{display:flex;align-items:flex-end;gap:clamp(5px,1.2vw,10px)}
+.h2{font-family:'Archivo Black',sans-serif;font-size:clamp(10px,2.3vw,20px);
+transform:skewX(-8deg);letter-spacing:-.02em}
+.stamp{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:clamp(4.5px,1vw,7.5px);
+color:var(--pegasus);border:1px solid rgba(255,196,0,.4);padding:2px 6px;clip-path:var(--ch)}
+.stamp.ok{color:var(--x);border-color:rgba(0,229,208,.4)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(4px,.9vw,8px)}
+.kpi{background:var(--panel);border:1px solid var(--line);padding:clamp(5px,1.1vw,10px);clip-path:var(--ch)}
+.kpi b{display:block;font-family:'Archivo Black',sans-serif;font-size:clamp(12px,2.8vw,26px);
+letter-spacing:-.04em;line-height:1;transform:skewX(-8deg);transform-origin:left}
+.kpi span{font-family:'JetBrains Mono',monospace;font-size:clamp(4px,.95vw,7px);letter-spacing:.12em;
+text-transform:uppercase;color:var(--mute);display:block;margin-top:3px}
+
+.cols{display:flex;gap:clamp(5px,1.2vw,10px);flex:1;overflow:hidden}
+.card{background:var(--panel);border:1px solid var(--line);padding:clamp(5px,1.2vw,11px);
+clip-path:var(--ch);display:flex;flex-direction:column;gap:clamp(3px,.8vw,7px)}
+.ct{font-family:'JetBrains Mono',monospace;font-size:clamp(4.5px,1vw,7.5px);letter-spacing:.16em;
+text-transform:uppercase;color:var(--mute)}
+
+/* filas de mesas */
+.trow{display:flex;align-items:center;gap:clamp(4px,.9vw,8px);padding:clamp(3px,.7vw,6px) 0;
+border-bottom:1px solid var(--line);font-size:clamp(5.5px,1.25vw,10px)}
+.trow .tn{width:clamp(12px,2.4vw,20px);height:clamp(12px,2.4vw,20px);display:grid;place-items:center;
+clip-path:var(--ch);background:var(--panel2);border:1px solid var(--line2);
+font-size:clamp(4.5px,1vw,8px);font-weight:700;flex:0 0 auto}
+.trow .st{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:clamp(4.5px,1vw,7.5px);
+font-weight:700}
+.trow .sm{font-family:'JetBrains Mono',monospace;font-size:clamp(4px,.9vw,6.5px);color:var(--mute)}
+
+/* barras */
+.bar{display:flex;align-items:center;gap:clamp(3px,.8vw,7px);font-size:clamp(5px,1.1vw,9px)}
+.bar .bn{width:22%;font-family:'JetBrains Mono',monospace;font-size:clamp(4px,.95vw,7px);color:var(--mute)}
+.bar .bt{flex:1;height:clamp(6px,1.3vw,11px);background:var(--void);border:1px solid var(--line);position:relative}
+.bar .bf{position:absolute;inset:0 auto 0 0;clip-path:polygon(0 0,100% 0,calc(100% - 3px) 100%,0 100%)}
+.bar .bv{width:12%;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;
+font-size:clamp(4px,.95vw,7.5px)}
+
+/* bracket compacto */
+.brk{display:flex;gap:clamp(3px,.8vw,7px);flex:1}
+.brnd{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:clamp(2px,.6vw,5px)}
+.sb{background:var(--panel2);border:1px solid var(--line);clip-path:var(--ch)}
+.sb div{padding:clamp(2px,.5vw,4px) clamp(3px,.7vw,6px);font-size:clamp(4px,.95vw,7.5px);
+display:flex;gap:4px;align-items:center}
+.sb div+div{border-top:1px solid var(--line)}
+.sb .w{font-weight:700} .sb .l{color:var(--mute)}
+.sb .sc{margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:700}
+.sb.live{border-color:var(--x);box-shadow:0 0 10px rgba(0,229,208,.25)}
+.sb.champ{border-color:var(--pegasus);background:rgba(255,196,0,.1)}
+
+/* tabla ranking */
+.tb{width:100%;border-collapse:collapse;font-size:clamp(5px,1.15vw,9.5px)}
+.tb th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:clamp(4px,.9vw,6.5px);
+letter-spacing:.12em;text-transform:uppercase;color:var(--mute);padding:clamp(2px,.6vw,5px) clamp(3px,.7vw,6px);
+border-bottom:1px solid var(--line2)}
+.tb td{padding:clamp(3px,.7vw,6px);border-bottom:1px solid var(--line);color:var(--mute)}
+.tb td b{color:var(--text)}
+.tb .pos{font-family:'Archivo Black',sans-serif;transform:skewX(-8deg);color:var(--line2)}
+.tb tr.p1 .pos{color:var(--pegasus)} .tb tr.p2 .pos{color:var(--mute)}
+.tb tr.p3 .pos{color:var(--dranzer)}
+
+.pill{font-family:'JetBrains Mono',monospace;font-size:clamp(4px,.9vw,6.5px);padding:1px 5px;
+border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch)}
+.pill.x{border-color:var(--x);color:var(--x)}
+.pill.r{border-color:var(--dranzer);color:var(--dranzer)}
+.pill.p{border-color:var(--pegasus);color:var(--pegasus)}
+
+.btn{text-align:center;padding:clamp(4px,.9vw,8px);font-weight:700;font-size:clamp(5px,1.1vw,9px);
+letter-spacing:.08em;text-transform:uppercase;clip-path:var(--ch);border:1px solid var(--line2);color:var(--text)}
+.btn.go{background:linear-gradient(100deg,var(--dragoon),var(--x));border:0;color:#04121A}
+
+.alert{border-left:2px solid var(--dranzer);background:rgba(255,59,47,.09);
+padding:clamp(4px,.9vw,8px);font-size:clamp(4.5px,1.05vw,8.5px);line-height:1.45;color:#FFC0BB}
+.alert b{display:block;color:var(--dranzer)}
+
+.notes{margin-top:52px;display:flex;flex-direction:column;gap:2px}
+.note{background:var(--panel);border:1px solid var(--line);padding:15px 16px;clip-path:var(--ch)}
+.note h3{font-size:13px;margin-bottom:6px}
+.note p{font-size:13px;line-height:1.62;color:var(--mute)}
+.note .k{width:26px;height:3px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">BeyScore · cuarta superficie</div>
+  <h1>Panel<br><span class="g">web</span></h1>
+  <div class="sub">FLUTTER WEB · SOLO LECTURA</div>
+  <p class="lede">Lo que no cabe en un teléfono: cuadro completo, ranking, analítica del evento. Mismo código, ruta <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--x)">/dashboard</code>, se abre en el portátil.</p>
+  <div class="teeth"></div>
+</header>
+
+<!-- 01 EN VIVO -->
+<div class="sec"><span class="n">01</span><span class="t">Torneo en vivo</span><span class="role">ORGANIZADOR</span></div>
+</div>
+<div class="bleed">
+  <div class="win">
+    <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span>
+      <span class="url">beyscore.app/t/copa-barrio-norte/live</span></div>
+    <div class="app">
+      <div class="side">
+        <div class="logo">Bey<span class="g2">Score</span></div>
+        <div class="nav on">EN VIVO</div>
+        <div class="nav">CUADRO</div>
+        <div class="nav">RANKING</div>
+        <div class="nav">ANALÍTICA</div>
+        <div class="nav">INSCRITOS</div>
+        <div class="nav">EXPORTAR</div>
+        <div class="sidefoot">COPA BARRIO NORTE<br>G3 · 3ON3 · V12<br>23 AGO 2026</div>
+      </div>
+      <div class="main">
+        <div class="tophead">
+          <div class="h2">Ronda 2 de 4</div>
+          <span class="stamp">ACTUALIZADO HACE 8 s</span>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><b style="color:var(--x)">3</b><span>Mesas activas</span></div>
+          <div class="kpi"><b style="color:var(--pegasus)">6:42</b><span>Media por combate</span></div>
+          <div class="kpi"><b style="color:var(--dranzer)">1</b><span>Disputa abierta</span></div>
+          <div class="kpi"><b>12</b><span>Combates jugados</span></div>
+        </div>
+        <div class="cols">
+          <div class="card" style="flex:1.15">
+            <span class="ct">Mesas</span>
+            <div class="trow"><span class="tn" style="color:var(--x)">1</span>
+              <div><b>KAZE</b> vs <b>NEO_X</b><div class="sm">bey 2 de 3 · 4–1</div></div>
+              <span class="st" style="color:var(--x)">EN VIVO</span></div>
+            <div class="trow"><span class="tn" style="color:var(--x)">2</span>
+              <div><b>LUNA</b> vs <b>PIT</b><div class="sm">bey 1 de 3 · 2–2</div></div>
+              <span class="st" style="color:var(--x)">EN VIVO</span></div>
+            <div class="trow"><span class="tn" style="color:var(--dranzer)">3</span>
+              <div><b>RYU_07</b> vs <b>MULTI_K</b><div class="sm">bloqueada · desacuerdo</div></div>
+              <span class="st" style="color:var(--dranzer)">DISPUTA</span></div>
+            <div class="trow" style="border-bottom:0"><span class="tn" style="color:var(--mute)">4</span>
+              <div style="color:var(--mute)">Sin asignar<div class="sm">esperando ronda</div></div>
+              <span class="st" style="color:var(--mute)">LIBRE</span></div>
+            <div class="alert" style="margin-top:auto"><b>Mesa 3 lleva 4 min parada</b>La disputa se resuelve desde tu teléfono, no desde aquí.</div>
+          </div>
+          <div class="card" style="flex:1">
+            <span class="ct">Finishes de hoy</span>
+            <div class="bar"><span class="bn">XTREME</span><div class="bt"><div class="bf" style="width:31%;background:var(--x)"></div></div><span class="bv">31%</span></div>
+            <div class="bar"><span class="bn">BURST</span><div class="bt"><div class="bf" style="width:26%;background:var(--burst)"></div></div><span class="bv">26%</span></div>
+            <div class="bar"><span class="bn">OVER</span><div class="bt"><div class="bf" style="width:24%;background:var(--pegasus)"></div></div><span class="bv">24%</span></div>
+            <div class="bar"><span class="bn">SPIN</span><div class="bt"><div class="bf" style="width:14%;background:var(--line2)"></div></div><span class="bv">14%</span></div>
+            <div class="bar"><span class="bn">PENAL.</span><div class="bt"><div class="bf" style="width:5%;background:repeating-linear-gradient(45deg,var(--pegasus) 0 3px,transparent 3px 6px)"></div></div><span class="bv">5%</span></div>
+            <span class="ct" style="margin-top:auto">Sincronización</span>
+            <div class="trow" style="border-bottom:0;padding:0">
+              <div class="sm">3 mesas conectadas al hub · 0 pendientes</div>
+              <span class="st" style="color:var(--x)">OK</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+<p class="note-inline">El panel observa, no manda. Los botones de acción no existen aquí: la disputa se resuelve desde el teléfono del juez, que es quien está en el salón.</p>
+
+<!-- 02 CUADRO -->
+<div class="sec"><span class="n">02</span><span class="t">Cuadro completo</span><span class="role">PÚBLICO</span></div>
+</div>
+<div class="bleed">
+  <div class="win">
+    <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span>
+      <span class="url">beyscore.app/t/copa-barrio-norte/bracket</span></div>
+    <div class="app">
+      <div class="side">
+        <div class="logo">Bey<span class="g2">Score</span></div>
+        <div class="nav">EN VIVO</div>
+        <div class="nav on">CUADRO</div>
+        <div class="nav">RANKING</div>
+        <div class="nav">ANALÍTICA</div>
+        <div class="nav">INSCRITOS</div>
+        <div class="nav">EXPORTAR</div>
+        <div class="sidefoot">SEMILLA 8F31-A2<br>ELIM. DOBLE<br>CAT. ABIERTA</div>
+      </div>
+      <div class="main">
+        <div class="tophead">
+          <div class="h2">Cuadro · categoría abierta</div>
+          <span class="pill">8 JUGADORES</span>
+          <span class="stamp ok">FINALIZADO</span>
+        </div>
+        <div class="brk">
+          <div class="brnd">
+            <div class="sb"><div><span class="w">RYU_07</span><span class="sc">2</span></div><div><span class="l">ZORO_B</span><span class="sc">0</span></div></div>
+            <div class="sb"><div><span class="w">MULTI_K</span><span class="sc">2</span></div><div><span class="l">NEO_X</span><span class="sc">1</span></div></div>
+            <div class="sb"><div><span class="w">KAZE</span><span class="sc">2</span></div><div><span class="l">LUNA</span><span class="sc">0</span></div></div>
+            <div class="sb"><div><span class="w">TOGURO</span><span class="sc">2</span></div><div><span class="l">PIT</span><span class="sc">1</span></div></div>
+          </div>
+          <div class="brnd">
+            <div class="sb"><div><span class="w" style="color:var(--dragoon)">RYU_07</span><span class="sc">2</span></div><div><span class="l">MULTI_K</span><span class="sc">1</span></div></div>
+            <div class="sb"><div><span class="w" style="color:var(--dranzer)">TOGURO</span><span class="sc">2</span></div><div><span class="l">KAZE</span><span class="sc">0</span></div></div>
+          </div>
+          <div class="brnd">
+            <div class="sb"><div><span class="w" style="color:var(--dragoon)">RYU_07</span><span class="sc">2</span></div><div><span class="l">TOGURO</span><span class="sc">1</span></div></div>
+          </div>
+          <div class="brnd">
+            <div class="sb champ"><div><span class="w" style="color:var(--pegasus)">🏆 RYU_07</span></div><div><span class="l" style="font-size:.85em">campeón</span></div></div>
+          </div>
+        </div>
+        <div class="card" style="flex:0 0 auto">
+          <span class="ct">Recorrido del campeón</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="pill x">2–0 ZORO_B</span><span class="pill x">2–1 MULTI_K</span><span class="pill x">2–1 TOGURO</span>
+            <span class="pill p">6 rondas ganadas · 1 perdida</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+<p class="note-inline">El cuadro completo es lo que justifica esta superficie: en un teléfono con 8 personas ya hay que hacer scroll horizontal, y con 32 es ilegible.</p>
+
+<!-- 03 ANALITICA -->
+<div class="sec"><span class="n">03</span><span class="t">Analítica del evento</span><span class="role">ORGANIZADOR</span></div>
+</div>
+<div class="bleed">
+  <div class="win">
+    <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span>
+      <span class="url">beyscore.app/t/copa-barrio-norte/analytics</span></div>
+    <div class="app">
+      <div class="side">
+        <div class="logo">Bey<span class="g2">Score</span></div>
+        <div class="nav">EN VIVO</div>
+        <div class="nav">CUADRO</div>
+        <div class="nav">RANKING</div>
+        <div class="nav on">ANALÍTICA</div>
+        <div class="nav">INSCRITOS</div>
+        <div class="nav">EXPORTAR</div>
+        <div class="sidefoot">24 COMBATES<br>61 RONDAS<br>218 FINISHES</div>
+      </div>
+      <div class="main">
+        <div class="tophead"><div class="h2">Analítica</div><span class="stamp ok">DATOS FINALES</span></div>
+        <div class="kpis">
+          <div class="kpi"><b style="color:var(--x)">6:42</b><span>Media por combate</span></div>
+          <div class="kpi"><b style="color:var(--pegasus)">3h 12</b><span>Duración total</span></div>
+          <div class="kpi"><b style="color:var(--burst)">3.6</b><span>Puntos por ronda</span></div>
+          <div class="kpi"><b style="color:var(--dranzer)">5%</b><span>Puntos por falta</span></div>
+        </div>
+        <div class="cols">
+          <div class="card" style="flex:1">
+            <span class="ct">Blades más usados</span>
+            <div class="bar"><span class="bn">PHOENIXW</span><div class="bt"><div class="bf" style="width:78%;background:var(--dranzer)"></div></div><span class="bv">14</span></div>
+            <div class="bar"><span class="bn">WIZARDROD</span><div class="bt"><div class="bf" style="width:61%;background:var(--burst)"></div></div><span class="bv">11</span></div>
+            <div class="bar"><span class="bn">DRANSWORD</span><div class="bt"><div class="bf" style="width:50%;background:var(--dragoon)"></div></div><span class="bv">9</span></div>
+            <div class="bar"><span class="bn">KNIGHTSH</span><div class="bt"><div class="bf" style="width:39%;background:var(--pegasus)"></div></div><span class="bv">7</span></div>
+            <div class="bar"><span class="bn">IMPACTDR</span><div class="bt"><div class="bf" style="width:28%;background:var(--line2)"></div></div><span class="bv">5</span></div>
+          </div>
+          <div class="card" style="flex:1">
+            <span class="ct">Mejor % de victoria por combo</span>
+            <table class="tb">
+              <tr><th>Combo</th><th>Usos</th><th>Gana</th></tr>
+              <tr><td><b>PhoenixWing 9-60GF</b></td><td>14</td><td style="color:var(--x)"><b>71%</b></td></tr>
+              <tr><td><b>WizardRod 1-60H</b></td><td>11</td><td style="color:var(--x)"><b>64%</b></td></tr>
+              <tr><td><b>DranSword 3-60F</b></td><td>9</td><td><b>44%</b></td></tr>
+              <tr><td><b>WhaleWave 1-60LO</b></td><td>5</td><td style="color:var(--dranzer)"><b>20%</b></td></tr>
+            </table>
+            <div class="alert" style="border-left-color:var(--x);background:rgba(0,229,208,.07);color:#A8F2EA;margin-top:auto">
+              <b style="color:var(--x)">Tu meta local difiere de la WBO</b>WizardRod rinde aquí mejor que en el ranking global.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+<p class="note-inline">Con los finishes guardados uno a uno, la analítica sale gratis. Si se guardara solo el marcador final, nada de esto existiría.</p>
+
+<!-- 04 RANKING -->
+<div class="sec"><span class="n">04</span><span class="t">Ranking y perfil</span><span class="role">PÚBLICO</span></div>
+</div>
+<div class="bleed">
+  <div class="win">
+    <div class="chrome"><span class="d"></span><span class="d"></span><span class="d"></span>
+      <span class="url">beyscore.app/t/copa-barrio-norte/ranking</span></div>
+    <div class="app">
+      <div class="side">
+        <div class="logo">Bey<span class="g2">Score</span></div>
+        <div class="nav">EN VIVO</div>
+        <div class="nav">CUADRO</div>
+        <div class="nav on">RANKING</div>
+        <div class="nav">ANALÍTICA</div>
+        <div class="nav">INSCRITOS</div>
+        <div class="nav">EXPORTAR</div>
+        <div class="sidefoot">CATEGORÍA<br>ABIERTA 6+<br>8 JUGADORES</div>
+      </div>
+      <div class="main">
+        <div class="tophead"><div class="h2">Clasificación final</div>
+          <span class="pill">ABIERTA</span><span class="pill">REGULAR</span>
+          <span class="stamp ok">CONFIRMADO</span></div>
+        <div class="card" style="flex:1">
+          <table class="tb">
+            <tr><th></th><th>Jugador</th><th>Rondas</th><th>Puntos</th><th>Burst</th><th>Xtreme</th><th>Bey principal</th></tr>
+            <tr class="p1"><td class="pos">1</td><td><b>RYU_07</b></td><td>6–1</td><td>26</td><td>31%</td><td>38%</td><td>PhoenixWing 9-60GF</td></tr>
+            <tr class="p2"><td class="pos">2</td><td><b>TOGURO</b></td><td>5–3</td><td>23</td><td>24%</td><td>29%</td><td>WizardRod 1-60H</td></tr>
+            <tr class="p3"><td class="pos">3</td><td><b>KAZE</b></td><td>4–3</td><td>19</td><td>35%</td><td>18%</td><td>DranSword 3-60F</td></tr>
+            <tr><td class="pos">4</td><td><b>MULTI_K</b></td><td>3–4</td><td>17</td><td>19%</td><td>22%</td><td>KnightShield 3-80B</td></tr>
+            <tr><td class="pos">5</td><td><b>NEO_X</b></td><td>2–4</td><td>12</td><td>28%</td><td>11%</td><td>ImpactDrake 9-60LR</td></tr>
+            <tr><td class="pos">6</td><td><b>PIT</b></td><td>2–4</td><td>11</td><td>15%</td><td>14%</td><td>LeonClaw 4-60T</td></tr>
+            <tr><td class="pos">7</td><td><b>LUNA</b></td><td>1–4</td><td>8</td><td>22%</td><td>9%</td><td>SharkEdge 3-60LF</td></tr>
+            <tr><td class="pos">8</td><td><b>ZORO_B</b></td><td>0–4</td><td>4</td><td>10%</td><td>0%</td><td>WhaleWave 1-60LO</td></tr>
+          </table>
+          <div style="display:flex;gap:6px;margin-top:auto">
+            <span class="btn" style="flex:1">Descargar CSV</span>
+            <span class="btn" style="flex:1">Copiar enlace público</span>
+            <span class="btn go" style="flex:1">Publicar resultados</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="notes">
+  <div class="note">
+    <div class="k" style="background:var(--x)"></div>
+    <h3>Mira, no manda</h3>
+    <p>El panel no tiene botones de acción sobre el torneo. Resolver una disputa o cerrar una ronda se hace desde el teléfono del juez, que es quien está en el salón viendo el estadio. Un portátil en otra habitación no debería poder cambiar un resultado.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--pegasus)"></div>
+    <h3>La marca de hora está siempre</h3>
+    <p>“Actualizado hace 8 s” en la esquina, y si pasa de dos minutos cambia a ámbar. En un panel que no manda, el riesgo real es decidir algo mirando datos viejos.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--burst)"></div>
+    <h3>La analítica sale gratis</h3>
+    <p>Todo esto —qué blade rinde más aquí, cuántos puntos vienen de penalización, cuánto dura un combate— existe solo porque guardamos cada finish por separado en vez del marcador final. Fue la primera decisión de la arquitectura y es la que más rinde.</p>
+  </div>
+  <div class="note">
+    <div class="k" style="background:var(--dragoon)"></div>
+    <h3>Cero binario nuevo</h3>
+    <p>Es Flutter Web sobre el mismo código: mismos tokens, mismas entidades, mismas consultas de Drift compiladas a IndexedDB. Solo cambia el shell y el ancho disponible.</p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

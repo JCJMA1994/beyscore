@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeyScore — 2/3 Organizador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#06070C;--steel:#0E1220;--panel:#151B29;--panel2:#1C2434;--line:#28324A;
+--line2:#3A4762;--text:#EEF1F7;--mute:#78859D;--dragoon:#2B6BFF;--dranzer:#FF3B2F;
+--pegasus:#FFC400;--burst:#A855F7;--x:#00E5D0;
+--ch:polygon(0 8px,8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);
+--chl:polygon(0 16px,16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--void);color:var(--text);font-family:'Inter Tight',system-ui,sans-serif;
+-webkit-font-smoothing:antialiased;padding:0 0 90px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(120% 55% at 50% -8%,rgba(168,85,247,.18),transparent 62%),
+radial-gradient(90% 45% at 100% 102%,rgba(255,59,47,.13),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:0 16px}
+header{padding:44px 0 6px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;
+text-transform:uppercase;color:var(--burst)}
+h1{font-family:'Archivo Black',sans-serif;font-size:52px;line-height:.84;letter-spacing:-.035em;
+margin:14px 0 2px;text-transform:uppercase;transform:skewX(-8deg);transform-origin:left}
+h1 .g{background:linear-gradient(105deg,var(--burst),var(--dranzer));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--mute);margin-top:10px}
+.lede{color:var(--mute);font-size:14px;line-height:1.62;margin-top:16px}
+.teeth{height:9px;margin:24px 0 4px;background:repeating-linear-gradient(90deg,var(--line2) 0 3px,transparent 3px 9px);
+-webkit-mask-image:linear-gradient(90deg,#000 0 62%,transparent);mask-image:linear-gradient(90deg,#000 0 62%,transparent)}
+.warnbox{border:1px solid rgba(168,85,247,.45);background:rgba(168,85,247,.09);padding:14px 15px;
+clip-path:var(--ch);margin-top:20px}
+.warnbox b{display:block;color:var(--burst);font-size:13px;margin-bottom:6px}
+.warnbox p{font-size:13px;line-height:1.6;color:#D9C4F5}
+.sec{display:flex;align-items:center;gap:10px;margin:46px 0 12px}
+.sec .n{font-family:'Archivo Black',sans-serif;font-size:22px;color:transparent;
+-webkit-text-stroke:1px var(--line2);transform:skewX(-8deg)}
+.sec .t{font-family:'Archivo Black',sans-serif;font-size:13.5px;text-transform:uppercase;letter-spacing:-.015em}
+.sec .role{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;
+padding:3px 7px;border:1px solid rgba(168,85,247,.5);color:var(--burst);clip-path:var(--ch)}
+.ni{font-size:12.5px;line-height:1.6;color:var(--mute);margin:10px 0 0}
+.phone{width:100%;aspect-ratio:390/844;background:var(--steel);clip-path:var(--chl);
+border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.phone::after{content:'';position:absolute;inset:0;pointer-events:none;
+background:linear-gradient(158deg,rgba(255,255,255,.055),transparent 30%)}
+.status{flex:0 0 27px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;
+font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mute)}
+.sy{display:flex;align-items:center;gap:5px;color:var(--pegasus);font-weight:700}
+.dot{width:5px;height:5px;background:var(--pegasus);border-radius:50%;box-shadow:0 0 8px currentColor}
+.sy.ok{color:var(--x)}.sy.ok .dot{background:var(--x)}
+.appbar{flex:0 0 auto;padding:5px 15px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--line)}
+.appbar .back{font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--mute)}
+.appbar h2{font-family:'Archivo Black',sans-serif;font-size:15px;text-transform:uppercase;
+letter-spacing:-.018em;transform:skewX(-8deg)}
+.appbar .side{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--mute)}
+.body{flex:1;overflow:hidden;padding:13px 15px;display:flex;flex-direction:column;gap:10px}
+.tabbar{flex:0 0 auto;display:flex;background:var(--void);border-top:1px solid var(--line)}
+.tabbar div{flex:1;text-align:center;padding:11px 0 15px;font-size:8.5px;font-weight:700;
+letter-spacing:.1em;text-transform:uppercase;color:var(--mute);position:relative}
+.tabbar div.on{color:var(--text)}
+.tabbar div.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;
+background:linear-gradient(90deg,var(--dragoon),var(--x));box-shadow:0 0 10px var(--x)}
+.label{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.18em;
+text-transform:uppercase;color:var(--mute)}
+.card{background:var(--panel);border:1px solid var(--line);padding:11px 13px;clip-path:var(--ch)}
+.card.sel{border-color:var(--line2);background:var(--panel2)}
+.card.hot{border-color:rgba(0,229,208,.45);box-shadow:inset 3px 0 0 var(--x)}
+.code{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mute)}
+.btn{text-align:center;padding:13px;font-weight:700;font-size:12px;letter-spacing:.09em;
+text-transform:uppercase;clip-path:var(--ch);border:1px solid var(--line2);color:var(--text)}
+.btn.go{background:linear-gradient(100deg,var(--dragoon),var(--x));border:0;color:#04121A;box-shadow:0 0 26px rgba(0,229,208,.3)}
+.btn.hot{background:linear-gradient(100deg,var(--dranzer),#FF7A3D);border:0;color:#1A0603}
+.btn.ghost{background:transparent}.btn.dis{color:var(--mute);border-color:var(--line)}
+.row{display:flex;gap:8px}.grow{flex:1}.sp{flex:1}
+.chip{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;padding:4px 8px;
+border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch);white-space:nowrap}
+.chip.on{background:var(--text);color:var(--void);border-color:var(--text);font-weight:700}
+.chip.x{border-color:var(--x);color:var(--x)}.chip.r{border-color:var(--dranzer);color:var(--dranzer)}
+.chip.p{border-color:var(--pegasus);color:var(--pegasus)}
+.steps{display:flex;gap:4px;align-items:center}
+.steps i{flex:1;height:3px;background:var(--line2)}
+.steps i.on{background:var(--x);box-shadow:0 0 8px var(--x)}.steps i.dn{background:var(--dragoon)}
+.field{background:var(--panel);border:1px solid var(--line2);clip-path:var(--ch);padding:10px 12px}
+.field .lb{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.14em;
+text-transform:uppercase;color:var(--mute);display:block;margin-bottom:4px}
+.field .vl{font-size:13px;font-weight:600}.field .vl.ph{color:var(--mute);font-weight:400}
+.opt{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--line)}
+.opt:last-child{border-bottom:0}
+.opt .tx{font-size:12px}
+.opt .hint{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--mute);margin-top:2px}
+.sw{width:36px;height:20px;background:var(--line);clip-path:var(--ch);position:relative;flex:0 0 36px}
+.sw i{position:absolute;top:3px;left:3px;width:14px;height:14px;background:var(--mute);clip-path:var(--ch)}
+.sw.on{background:rgba(0,229,208,.25)}.sw.on i{left:19px;background:var(--x);box-shadow:0 0 8px var(--x)}
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+.li .av{width:27px;height:27px;flex:0 0 27px;display:grid;place-items:center;font-size:10.5px;font-weight:700;
+clip-path:var(--ch);background:var(--panel2);border:1px solid var(--line2)}
+.li .meta{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--mute)}
+.li .right{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700}
+.ban{padding:10px 12px;font-size:11.5px;line-height:1.5;clip-path:var(--ch);border:1px solid}
+.ban b{display:block;margin-bottom:2px}
+.ban.w{border-color:rgba(255,196,0,.45);background:rgba(255,196,0,.09);color:#FFE49A}.ban.w b{color:var(--pegasus)}
+.ban.i{border-color:rgba(0,229,208,.4);background:rgba(0,229,208,.08);color:#A8F2EA}.ban.i b{color:var(--x)}
+.ban.d{border-color:rgba(255,59,47,.45);background:rgba(255,59,47,.1);color:#FFC0BB}.ban.d b{color:var(--dranzer)}
+.denied{border:1px dashed var(--line2);background:rgba(120,133,157,.06);padding:12px;clip-path:var(--ch)}
+.denied .dt{font-weight:700;font-size:12px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase}
+.denied .dr{font-size:11.5px;line-height:1.5;color:var(--mute);margin-top:6px}
+.qr{width:118px;height:118px;margin:0 auto;background:repeating-conic-gradient(var(--text) 0 25%,transparent 0 50%) 0 0/14px 14px,var(--void);
+border:6px solid var(--text);clip-path:var(--ch)}
+.bracket{display:flex;padding:2px 0}
+.rnd{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:9px;padding:0 4px}
+.sb{background:var(--panel);border:1px solid var(--line);clip-path:var(--ch)}
+.sb div{padding:5px 7px;font-size:9.5px;display:flex;gap:5px;align-items:center}
+.sb div+div{border-top:1px solid var(--line)}
+.sb .w{font-weight:700}.sb .l{color:var(--mute)}
+.sb .s{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--mute);width:11px}
+.sb .sc{margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10px}
+.sb.live{border-color:var(--x);box-shadow:0 0 18px rgba(0,229,208,.25)}
+.hub{display:flex;flex-direction:column;gap:7px;align-items:center;padding:4px 0}
+.hrow{display:flex;gap:6px;width:100%}
+.node{flex:1;background:var(--panel);border:1px solid var(--line);clip-path:var(--ch);padding:7px 6px;text-align:center}
+.node.on{border-color:var(--x);box-shadow:0 0 12px rgba(0,229,208,.22)}
+.node.off{border-color:rgba(255,59,47,.5)}
+.node b{font-size:10px;display:block}
+.node .s2{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--mute);margin-top:2px;display:block}
+.arrows{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--line2);letter-spacing:.4em}
+.hubnode{width:72%;background:var(--panel2);border:1.5px solid var(--x);clip-path:var(--ch);
+padding:9px;text-align:center;box-shadow:0 0 22px rgba(0,229,208,.2)}
+.notes{margin-top:52px;display:flex;flex-direction:column;gap:2px}
+.note{background:var(--panel);border:1px solid var(--line);padding:15px 16px;clip-path:var(--ch)}
+.note h3{font-size:13px;margin-bottom:6px}
+.note p{font-size:13px;line-height:1.62;color:var(--mute)}
+.note .k{width:26px;height:3px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">2 de 3 · recorrido del organizador</div>
+  <h1><span class="g">Organizador</span></h1>
+  <div class="sub">LA MISMA APP · LOS MISMOS TABS · OTRA CAPACIDAD</div>
+  <p class="lede">Desde crear el torneo hasta publicar los resultados. Todo ocurre dentro del torneo que organiza.</p>
+  <div class="warnbox">
+    <b>Fíjate en lo que NO vas a ver</b>
+    <p>Ni una pestaña “Administración”, ni un modo admin, ni una app aparte, ni un login distinto. Los mismos cuatro tabs que el usuario. Ser organizador es haber creado <em>este</em> torneo, no un tipo de cuenta.</p>
+  </div>
+  <div class="teeth"></div>
+</header>
+
+<!-- 01 -->
+<div class="sec"><span class="n">01</span><span class="t">Crear · datos</span><span class="role">A1</span></div>
+<div class="phone">
+  <div class="status"><span>7:40</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo torneo</h2><span class="side">1 DE 3</span></div>
+  <div class="body">
+    <div class="steps"><i class="on"></i><i></i><i></i></div>
+    <div class="field"><span class="lb">Nombre</span><span class="vl">Copa Barrio Norte</span></div>
+    <div class="row"><div class="field grow"><span class="lb">Fecha</span><span class="vl">23 ago 2026</span></div>
+      <div class="field grow"><span class="lb">Hora</span><span class="vl">10:00</span></div></div>
+    <div class="field"><span class="lb">Lugar</span><span class="vl ph">Añadir dirección</span></div>
+    <div class="label">Nivel del evento</div>
+    <div class="card"><div class="row"><span class="chip on">G3</span><span class="chip">G2</span><span class="chip">G1</span><span class="chip">GP</span><span class="chip">LIBRE</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">G3 local, organizado por tienda certificada. Es el que puedes crear tú.</div></div>
+    <div class="label">Categoría de edad</div>
+    <div class="card"><div class="row"><span class="chip on">ABIERTA 6+</span><span class="chip on">REGULAR 6–12</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5;color:var(--pegasus)">Con las dos activas se generan dos cuadros separados. Nadie de 8 años se enfrenta a un adulto.</div></div>
+    <div class="sp"></div>
+    <div class="btn go">Siguiente</div>
+  </div>
+</div>
+<p class="ni">Cada ajuste explica su consecuencia. Un organizador novato no debería tener que saberlo de antemano.</p>
+
+<!-- 02 -->
+<div class="sec"><span class="n">02</span><span class="t">Crear · formato</span><span class="role">A1</span></div>
+<div class="phone">
+  <div class="status"><span>7:43</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo torneo</h2><span class="side">2 DE 3</span></div>
+  <div class="body">
+    <div class="steps"><i class="dn"></i><i class="on"></i><i></i></div>
+    <div class="label">Reglamento</div>
+    <div class="card"><div class="row"><span class="chip on">OFICIAL V12</span><span class="chip">WBO</span><span class="chip">PROPIO</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">v12 de marzo 2026. La WBO usa reglas propias que difieren: elígela si tu escena juega con ellas.</div></div>
+    <div class="label">Formato</div>
+    <div class="card"><div class="row"><span class="chip">1V1</span><span class="chip on">3ON3</span><span class="chip">EQUIPOS</span></div>
+      <div class="opt" style="margin-top:6px"><div><div class="tx">Piezas no repetibles</div><div class="hint">obligatorio en 3on3</div></div><span class="sp"></span><span class="sw on"><i></i></span></div>
+      <div class="opt"><div><div class="tx">Permitir salón de la fama</div><div class="hint">solo válido en 3on3</div></div><span class="sp"></span><span class="sw on"><i></i></span></div></div>
+    <div class="label">Cuadro y puntuación</div>
+    <div class="card"><div class="row"><span class="chip">SIMPLE</span><span class="chip on">DOBLE</span><span class="chip">SUIZO</span><span class="chip">LIGA</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">Con 12 jugadores son unas 22 rondas. Calcula 2.5 h con 3 mesas.</div>
+      <div class="opt" style="margin-top:4px"><div><div class="tx">Meta de puntos</div></div><span class="sp"></span><span class="chip">3</span><span class="chip on">4</span><span class="chip">7</span></div>
+      <div class="opt"><div><div class="tx">Punto por 2 faltas</div><div class="hint">regla v12 de lanzamiento</div></div><span class="sp"></span><span class="sw on"><i></i></span></div></div>
+    <div class="sp"></div>
+    <div class="btn go">Siguiente</div>
+  </div>
+</div>
+
+<!-- 03 -->
+<div class="sec"><span class="n">03</span><span class="t">Crear · inscripción</span><span class="role">A1</span></div>
+<div class="phone">
+  <div class="status"><span>7:46</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Nuevo torneo</h2><span class="side">3 DE 3</span></div>
+  <div class="body">
+    <div class="steps"><i class="dn"></i><i class="dn"></i><i class="on"></i></div>
+    <div class="row"><div class="field grow"><span class="lb">Plazas</span><span class="vl">16</span></div>
+      <div class="field grow"><span class="lb">Cierra</span><span class="vl">22 ago</span></div></div>
+    <div class="card">
+      <div class="opt"><div><div class="tx">Deck al inscribirse</div><div class="hint">lo revisas antes del evento</div></div><span class="sp"></span><span class="sw on"><i></i></span></div>
+      <div class="opt"><div><div class="tx">Check-in en mesa</div><div class="hint">evita sortear con ausentes</div></div><span class="sp"></span><span class="sw on"><i></i></span></div>
+      <div class="opt"><div><div class="tx">Chequeo de piezas obligatorio</div><div class="hint">con caja BX-12 o equivalente</div></div><span class="sp"></span><span class="sw on"><i></i></span></div></div>
+    <div class="label">Quién registra los resultados</div>
+    <div class="card"><div class="row"><span class="chip">SOLO JUEZ</span><span class="chip on">JUGADOR + CONFIRMA</span></div>
+      <div class="code" style="margin-top:9px;line-height:1.5">Un jugador registra y el rival confirma. Tú solo intervienes en disputas. Con 3 mesas es lo que evita que seas el cuello de botella.</div></div>
+    <div class="label">Jueces</div>
+    <div class="card"><div class="row" style="align-items:center"><span class="code" style="color:var(--text)">RYU_07 · tú</span><span class="sp"></span><span class="chip p">TAMBIÉN COMPITE</span></div>
+      <div class="row" style="align-items:center;margin-top:7px"><span class="code">Añadir otro juez</span><span class="sp"></span><span class="code">+</span></div></div>
+    <div class="sp"></div>
+    <div class="btn go">Crear y abrir inscripción</div>
+  </div>
+</div>
+<p class="ni">Ya en la creación se reconoce que el organizador compite. No es un caso raro: es lo normal.</p>
+
+<!-- 04 -->
+<div class="sec"><span class="n">04</span><span class="t">Revisar decks</span><span class="role">A2</span></div>
+<div class="phone">
+  <div class="status"><span>21:12</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Inscritos</h2><span class="side">12 / 16</span></div>
+  <div class="body">
+    <div class="ban d"><b>1 deck ilegal, 3 sin entregar</b>Avísales ahora. Si llegan sin arreglarlo, se quedan fuera.</div>
+    <div class="label">Con app</div>
+    <div class="list">
+      <div class="li"><span class="av">R</span><div><b>RYU_07</b><div class="meta">abierta · 9 piezas</div></div><span class="right" style="color:var(--x)">OK</span></div>
+      <div class="li"><span class="av">M</span><div><b>MULTI_K</b><div class="meta">abierta · 9 piezas</div></div><span class="right" style="color:var(--x)">OK</span></div>
+      <div class="li"><span class="av" style="color:var(--dranzer);border-color:rgba(255,59,47,.5)">K</span>
+        <div><b>KAZE</b><div class="meta" style="color:var(--dranzer)">bit Ball en beys 2 y 3</div></div><span class="right" style="color:var(--dranzer)">REVISAR</span></div>
+    </div>
+    <div class="label">Invitados · sin app</div>
+    <div class="list">
+      <div class="li"><span class="av" style="color:var(--pegasus)">L</span><div><b>LUNA</b><div class="meta">BEY-7T4M-2WQ8-5PZR</div></div><span class="right" style="color:var(--pegasus)">INVITADA</span></div>
+      <div class="li"><span class="av" style="color:var(--pegasus)">P</span><div><b>PIT</b><div class="meta">BEY-2N9X-5KL3-8DHV</div></div><span class="right" style="color:var(--pegasus)">INVITADO</span></div>
+    </div>
+    <div class="card"><div class="label">El código sirve para</div>
+      <div style="font-size:11.5px;line-height:1.6;color:var(--mute);margin-top:7px">Que ese jugador se instale la app después y reclame estos resultados. Dáselo en papel al terminar.</div></div>
+    <div class="sp"></div>
+    <div class="btn go">Añadir invitado</div>
+  </div>
+</div>
+<p class="ni">Sin invitados la app solo funciona si los 16 se registran, y eso no va a pasar en un torneo de barrio.</p>
+
+<!-- 05 -->
+<div class="sec"><span class="n">05</span><span class="t">Sorteo</span><span class="role">A3</span></div>
+<div class="phone">
+  <div class="status"><span>9:12</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Sorteo</h2><span class="side">12 INSCRITOS</span></div>
+  <div class="body">
+    <div class="label">Cómo emparejar</div>
+    <div class="card"><div class="row"><span class="chip on">AL AZAR</span><span class="chip">POR RANKING</span><span class="chip">MANUAL</span></div>
+      <div class="code" style="margin-top:9px;color:var(--x)">SEMILLA 8F31-A2 · GUARDADA</div>
+      <div style="font-size:11px;line-height:1.5;color:var(--mute);margin-top:5px">Cualquiera puede repetir el sorteo con esta semilla y obtener el mismo cuadro. Nadie puede acusarte de acomodarlo.</div></div>
+    <div class="label">Se generan dos cuadros</div>
+    <div class="card"><div class="row" style="align-items:center"><span style="font-size:12px">Abierta 6+</span><span class="sp"></span><span class="code">8 jugadores</span></div>
+      <div class="row" style="align-items:center;margin-top:8px"><span style="font-size:12px">Regular 6–12</span><span class="sp"></span><span class="code">4 jugadores</span></div></div>
+    <div class="ban w"><b>2 jugadores sin chequeo de deck</b>Si sorteas ahora quedan fuera.</div>
+    <div class="sp"></div>
+    <div class="btn go">Sortear y armar cuadro</div>
+    <div class="btn ghost">Ver lista de inscritos</div>
+  </div>
+</div>
+
+<!-- 06 -->
+<div class="sec"><span class="n">06</span><span class="t">Levantar el hub</span><span class="role">A4</span></div>
+<div class="phone">
+  <div class="status"><span>9:55</span><span class="sy ok"><i class="dot"></i>HUB ACTIVO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Añadir mesa</h2><span class="side">MESA 3</span></div>
+  <div class="body">
+    <div class="ban i"><b>Tu teléfono es el centro</b>Las mesas se conectan a él, no a internet. Déjalo enchufado y con la app abierta.</div>
+    <div style="padding:15px;clip-path:var(--ch);background:var(--panel);border:1px solid var(--line2)">
+      <div class="qr"></div>
+      <div class="code" style="text-align:center;margin-top:12px;line-height:1.7">192.168.1.42:8080<br>Copa Barrio Norte · Mesa 3<br><span style="color:var(--x)">caduca en 5 min</span></div></div>
+    <div class="card"><div class="label">En la tablet</div>
+      <div style="font-size:11.5px;line-height:1.7;color:var(--mute);margin-top:7px">Ajustes → Modo mesa → Escanear. Queda emparejada hasta que termine el torneo.</div></div>
+    <div class="sp"></div>
+    <div class="btn ghost">Generar código nuevo</div>
+  </div>
+</div>
+<p class="ni">QR y no descubrimiento automático: mDNS falla en la mitad de los routers, y el QR funciona con el hotspot del organizador.</p>
+
+<!-- 07 -->
+<div class="sec"><span class="n">07</span><span class="t">Estado de la red</span><span class="role">A5</span></div>
+<div class="phone">
+  <div class="status"><span>10:31</span><span class="sy ok"><i class="dot"></i>HUB ACTIVO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Sincronización</h2><span class="side">LOCAL</span></div>
+  <div class="body">
+    <div class="hub">
+      <div class="hrow">
+        <div class="node on"><b>Mesa 1</b><span class="s2">hace 1 s</span></div>
+        <div class="node on"><b>Mesa 2</b><span class="s2">hace 2 s</span></div>
+        <div class="node off"><b>Mesa 3</b><span class="s2">hace 4 min</span></div></div>
+      <div class="arrows">▼ ▼ ▼</div>
+      <div class="hubnode"><b style="font-size:11.5px">TU TELÉFONO</b><span class="s2">fuente de verdad · 192.168.1.42</span></div>
+      <div class="arrows">▼</div>
+      <div class="hrow"><div class="node"><b>Nube</b><span class="s2">sin internet · 14 en cola</span></div></div>
+    </div>
+    <div class="ban d"><b>Mesa 3 sin contacto hace 4 minutos</b>Su combate sigue funcionando: guarda en local y subirá al reconectar. Revisa que la tablet siga en la wifi.</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span style="font-size:11.5px">Operaciones en cola</span><span class="sp"></span><span class="code" style="color:var(--pegasus)">14</span></div>
+      <div class="row" style="align-items:center;margin-top:8px"><span style="font-size:11.5px">Sondeo</span><span class="sp"></span><span class="code">cada 2 s</span></div>
+      <div class="row" style="align-items:center;margin-top:8px"><span style="font-size:11.5px">Pantalla siempre encendida</span><span class="sp"></span><span class="chip x">SÍ</span></div></div>
+    <div class="sp"></div>
+    <div class="btn ghost">Mostrar QR de reconexión</div>
+  </div>
+</div>
+<p class="ni">Perder una mesa no para nada: el marcador es local. Lo único que se retrasa es que tú lo veas.</p>
+
+<!-- 08 -->
+<div class="sec"><span class="n">08</span><span class="t">Panel de mesas</span><span class="role">A5</span></div>
+<div class="phone">
+  <div class="status"><span>10:34</span><span class="sy"><i class="dot"></i>7 SIN SUBIR</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Copa Barrio Norte</h2><span class="side">G3 · R2</span></div>
+  <div class="body">
+    <div class="ban d"><b>1 resultado en disputa</b>Mesa 5 · KAZE dice 4–3, TOGURO dice 3–4.</div>
+    <div class="btn hot">Resolver disputa</div>
+    <div class="label">Mesas en vivo</div>
+    <div class="list">
+      <div class="li"><span class="av">1</span><div><b>KAZE vs NEO_X</b><div class="meta">bey 2 de 3 · 4–1</div></div><span class="right" style="color:var(--x)">EN VIVO</span></div>
+      <div class="li"><span class="av">3</span><div><b>RYU_07 vs MULTI_K</b><div class="meta">bey 2 de 3 · 3–2</div></div><span class="right" style="color:var(--x)">EN VIVO</span></div>
+      <div class="li"><span class="av">5</span><div><b>KAZE vs TOGURO</b><div class="meta">disputa</div></div><span class="right" style="color:var(--dranzer)">PARADA</span></div>
+      <div class="li"><span class="av" style="color:var(--mute)">6</span><div><b style="color:var(--mute)">Sin asignar</b><div class="meta">esperando ronda</div></div><span class="right" style="color:var(--mute)">LIBRE</span></div>
+    </div>
+    <div class="label">Torneo</div>
+    <div class="card"><div class="row" style="align-items:center"><span style="font-size:12px">Cerrar ronda 2</span><span class="sp"></span><span class="code">2 de 4 listos</span></div></div>
+    <div class="card"><div class="row" style="align-items:center"><span style="font-size:12px">Subir todo ahora</span><span class="sp"></span><span class="code" style="color:var(--pegasus)">7 pendientes</span></div></div>
+    <div class="sp"></div>
+  </div>
+  <div class="tabbar"><div>Inicio</div><div class="on">Torneos</div><div>Beys</div><div>Perfil</div></div>
+</div>
+<p class="ni">Mismos cuatro tabs que el usuario. Los controles de organizador viven dentro del torneo, no en una pestaña propia.</p>
+
+<!-- 09 -->
+<div class="sec"><span class="n">09</span><span class="t">Resolver disputa</span><span class="role">A6</span></div>
+<div class="phone">
+  <div class="status"><span>10:36</span><span class="sy"><i class="dot"></i>LOCAL</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Mesa 5</h2><span class="side">DISPUTA</span></div>
+  <div class="body">
+    <div class="ban d"><b>Las dos versiones</b>Los jugadores no coinciden en la ronda 3.</div>
+    <div class="card sel" style="box-shadow:inset 3px 0 0 var(--dragoon)">
+      <div class="row" style="align-items:center"><b style="font-size:12.5px">KAZE dice</b><span class="sp"></span><span class="code" style="color:var(--text);font-size:13px">4 — 3</span></div>
+      <div class="code" style="margin-top:6px">último finish: XTREME para KAZE</div></div>
+    <div class="card sel" style="box-shadow:inset 3px 0 0 var(--dranzer)">
+      <div class="row" style="align-items:center"><b style="font-size:12.5px">TOGURO dice</b><span class="sp"></span><span class="code" style="color:var(--text);font-size:13px">3 — 4</span></div>
+      <div class="code" style="margin-top:6px">último finish: OVER para TOGURO</div></div>
+    <div class="card"><div class="label">Coinciden hasta aquí</div>
+      <div class="code" style="margin-top:7px;line-height:1.6;color:var(--text)">3–3 tras 5 finishes<br>solo discrepa el último</div></div>
+    <div class="label">Tu decisión</div>
+    <div class="row"><span class="btn ghost grow" style="padding:11px;font-size:10.5px">Vale KAZE</span>
+      <span class="btn ghost grow" style="padding:11px;font-size:10.5px">Vale TOGURO</span></div>
+    <div class="btn ghost" style="font-size:10.5px">Anular el último y repetir</div>
+    <div class="ban w"><b>Nada se borra</b>Quede lo que quede, el registro guarda las dos versiones y tu decisión.</div>
+    <div class="sp"></div>
+  </div>
+</div>
+<p class="ni">La app no adivina quién tiene razón: enseña dónde empiezan a discrepar y decide una persona.</p>
+
+<!-- 10 -->
+<div class="sec"><span class="n">10</span><span class="t">Conflicto de interés</span><span class="role">A6</span></div>
+<div class="phone">
+  <div class="status"><span>10:41</span><span class="sy"><i class="dot"></i>LOCAL</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Mesa 3</h2><span class="side">TU COMBATE</span></div>
+  <div class="body">
+    <div class="ban w"><b>Estás jugando este combate</b>Aunque seas el organizador, aquí eres competidor.</div>
+    <div class="card"><div class="row" style="align-items:center">
+      <div><b style="font-size:12.5px">RYU_07 vs MULTI_K</b><div class="code" style="margin-top:4px">bey 2 de 3 · 3–2</div></div>
+      <span class="sp"></span><span class="chip x">EN VIVO</span></div></div>
+    <div class="label">Lo que sí puedes</div>
+    <div class="btn ghost">Registrar tu resultado</div>
+    <div class="label">Lo que no</div>
+    <div class="denied">
+      <div class="dt">Resolver disputa</div>
+      <div class="dr">No puedes arbitrar un combate que juegas. Que lo haga otro juez.</div>
+    </div>
+    <div class="denied">
+      <div class="dt">Aplicar derrota instantánea</div>
+      <div class="dr">Mismo motivo. Pide a JUEZ_02 que lo revise desde su teléfono.</div>
+    </div>
+    <div class="ban i"><b>Si fueras el único juez</b>Se te permitiría, pero quedaría marcado como ARBITRAJE PROPIO y visible para todos.</div>
+    <div class="sp"></div>
+  </div>
+</div>
+<p class="ni">La pantalla clave del modelo de permisos. El botón no se esconde: se muestra deshabilitado <b>con el motivo</b>. Ocultarlo haría pensar que la app está rota.</p>
+
+<!-- 11 -->
+<div class="sec"><span class="n">11</span><span class="t">Cerrar ronda</span><span class="role">A7</span></div>
+<div class="phone">
+  <div class="status"><span>11:02</span><span class="sy"><i class="dot"></i>3 SIN SUBIR</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Ronda 2</h2><span class="side">4 DE 4</span></div>
+  <div class="body">
+    <div class="okl" style="border-left:3px solid var(--x);background:rgba(0,229,208,.08);padding:10px 12px;font-size:11.5px;line-height:1.5;color:#A8F2EA">
+      <b style="display:block;color:var(--x);margin-bottom:3px">Todos los combates confirmados</b>Ya se puede avanzar al siguiente cuadro.</div>
+    <div class="label">Resultados</div>
+    <div class="list">
+      <div class="li"><span class="av">1</span><div><b>KAZE 2 — 0 NEO_X</b><div class="meta">confirmado</div></div><span class="right" style="color:var(--x)">OK</span></div>
+      <div class="li"><span class="av">3</span><div><b>RYU_07 2 — 1 MULTI_K</b><div class="meta">confirmado</div></div><span class="right" style="color:var(--x)">OK</span></div>
+      <div class="li"><span class="av">5</span><div><b>TOGURO 2 — 1 KAZE</b><div class="meta">resuelto por juez</div></div><span class="right" style="color:var(--pegasus)">JUEZ</span></div>
+      <div class="li"><span class="av">6</span><div><b>LUNA 0 — 2 PIT</b><div class="meta">confirmado</div></div><span class="right" style="color:var(--x)">OK</span></div>
+    </div>
+    <div class="label">Cuadro tras cerrar</div>
+    <div class="bracket">
+      <div class="rnd"><div class="sb"><div><span class="s">1</span><span class="w">RYU_07</span><span class="sc">2</span></div><div><span class="s">4</span><span class="l">MULTI_K</span><span class="sc">1</span></div></div>
+        <div class="sb"><div><span class="s">2</span><span class="w">TOGURO</span><span class="sc">2</span></div><div><span class="s">3</span><span class="l">KAZE</span><span class="sc">1</span></div></div></div>
+      <div class="rnd"><div class="sb live"><div><span class="w" style="color:var(--dragoon)">RYU_07</span><span class="sc">–</span></div><div><span class="w" style="color:var(--dranzer)">TOGURO</span><span class="sc">–</span></div></div></div>
+    </div>
+    <div class="sp"></div>
+    <div class="btn go">Cerrar ronda y asignar mesas</div>
+  </div>
+</div>
+
+<!-- 12 -->
+<div class="sec"><span class="n">12</span><span class="t">Finalizar</span><span class="role">A8</span></div>
+<div class="phone">
+  <div class="status"><span>13:18</span><span class="sy ok"><i class="dot"></i>SINCRONIZADO</span></div>
+  <div class="appbar"><span class="back">‹</span><h2>Finalizar</h2><span class="side">G3</span></div>
+  <div class="body">
+    <div style="position:relative;overflow:hidden;padding:16px;clip-path:var(--ch);background:linear-gradient(135deg,rgba(255,196,0,.22),var(--panel) 68%);border:1px solid var(--line2)">
+      <div class="label">Campeón · abierta</div>
+      <div style="font-family:'Archivo Black';font-size:26px;transform:skewX(-8deg);margin:6px 0 4px;color:var(--pegasus)">RYU_07</div>
+      <div class="code">6 rondas ganadas · 1 perdida</div></div>
+    <div class="card"><div class="label">Clasificación</div>
+      <div class="code" style="margin-top:8px;line-height:1.9;color:var(--text)">1 · RYU_07<br>2 · TOGURO<br>3 · KAZE<br>4 · MULTI_K</div></div>
+    <div class="ban i"><b>Al publicar queda fijo</b>Los resultados se vuelven inmutables y se genera el enlace público.</div>
+    <div class="card">
+      <div class="row" style="align-items:center"><span style="font-size:11.5px">Subir a la nube</span><span class="sp"></span><span class="code" style="color:var(--x)">listo</span></div>
+      <div class="row" style="align-items:center;margin-top:8px"><span style="font-size:11.5px">Exportar CSV</span><span class="sp"></span><span class="code">para el grupo</span></div>
+      <div class="row" style="align-items:center;margin-top:8px"><span style="font-size:11.5px">Códigos de invitados</span><span class="sp"></span><span class="code" style="color:var(--pegasus)">2 por entregar</span></div></div>
+    <div class="sp"></div>
+    <div class="btn go">Publicar resultados</div>
+    <div class="btn ghost">Guardar sin publicar</div>
+  </div>
+</div>
+
+<div class="notes">
+  <div class="note"><div class="k" style="background:var(--burst)"></div>
+    <h3>Sin pestaña de administración</h3>
+    <p>Los mismos cuatro tabs. Los controles de organizador viven dentro del torneo del que eres dueño; en los torneos ajenos no aparecen. Ser admin no es una identidad, es un permiso sobre un recurso.</p></div>
+  <div class="note"><div class="k" style="background:var(--pegasus)"></div>
+    <h3>Denegar con el motivo delante</h3>
+    <p>Cuando no puedes hacer algo, el botón se muestra deshabilitado y explica por qué. Esconderlo en silencio hace que el organizador crea que la app está rota y se ponga a reiniciarla en mitad del torneo.</p></div>
+  <div class="note"><div class="k" style="background:var(--dranzer)"></div>
+    <h3>No arbitras lo que juegas</h3>
+    <p>Salvo que no haya absolutamente nadie más: entonces se permite y queda marcado como arbitraje propio, visible para todos. La solución a un conflicto inevitable es transparencia, no bloqueo.</p></div>
+  <div class="note"><div class="k" style="background:var(--x)"></div>
+    <h3>Tu teléfono es el centro</h3>
+    <p>Las mesas se conectan a él por wifi local, no a internet. El salón puede no tener cobertura y el torneo funciona igual. Perder una mesa no interrumpe ningún combate.</p></div>
+  <div class="note"><div class="k" style="background:var(--dragoon)"></div>
+    <h3>El sorteo se puede auditar</h3>
+    <p>La semilla queda guardada y a la vista. Cualquiera puede repetir el sorteo y comprobar que sale el mismo cuadro. Es lo que evita que te acusen de acomodarlo.</p></div>
+</div>
+
+</div>
+</body>
+</html>

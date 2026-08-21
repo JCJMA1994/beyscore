@@ -1,0 +1,19 @@
+{
+  "java.import.gradle.enabled": false,
+  "java.import.maven.enabled": false,
+  "java.autobuild.enabled": false,
+  "java.project.importOnFirstTimeStartup": "disabled",
+  "java.configuration.updateBuildConfiguration": "disabled",
+  "gradle.autoDetect": "off",
+  "gradle.nestedProjects": false,
+  "dart.flutterAdditionalArgs": [],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.dart_tool": false
+  }
+}

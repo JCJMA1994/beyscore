@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeyScore — 3/3 Mesa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--void:#06070C;--steel:#0E1220;--panel:#151B29;--panel2:#1C2434;--line:#28324A;
+--line2:#3A4762;--text:#EEF1F7;--mute:#78859D;--dragoon:#2B6BFF;--dranzer:#FF3B2F;
+--pegasus:#FFC400;--burst:#A855F7;--x:#00E5D0;
+--ch:polygon(0 8px,8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--void);color:var(--text);font-family:'Inter Tight',system-ui,sans-serif;
+-webkit-font-smoothing:antialiased;padding:0 0 90px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+background:radial-gradient(120% 55% at 50% -8%,rgba(0,229,208,.16),transparent 62%),
+radial-gradient(90% 45% at 100% 102%,rgba(255,59,47,.13),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:0 16px}
+header{padding:44px 0 6px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;
+text-transform:uppercase;color:var(--x)}
+h1{font-family:'Archivo Black',sans-serif;font-size:60px;line-height:.84;letter-spacing:-.035em;
+margin:14px 0 2px;text-transform:uppercase;transform:skewX(-8deg);transform-origin:left}
+h1 .g{background:linear-gradient(105deg,var(--x),var(--dragoon));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--mute);margin-top:10px}
+.lede{color:var(--mute);font-size:14px;line-height:1.62;margin-top:16px}
+.warnbox{border:1px solid rgba(0,229,208,.4);background:rgba(0,229,208,.08);padding:14px 15px;
+clip-path:var(--ch);margin-top:20px}
+.warnbox b{display:block;color:var(--x);font-size:13px;margin-bottom:6px}
+.warnbox p{font-size:13px;line-height:1.6;color:#A8F2EA}
+.teeth{height:9px;margin:24px 0 4px;background:repeating-linear-gradient(90deg,var(--line2) 0 3px,transparent 3px 9px);
+-webkit-mask-image:linear-gradient(90deg,#000 0 62%,transparent);mask-image:linear-gradient(90deg,#000 0 62%,transparent)}
+.sec{display:flex;align-items:center;gap:10px;margin:44px 0 12px}
+.sec .n{font-family:'Archivo Black',sans-serif;font-size:22px;color:transparent;
+-webkit-text-stroke:1px var(--line2);transform:skewX(-8deg)}
+.sec .t{font-family:'Archivo Black',sans-serif;font-size:13.5px;text-transform:uppercase;letter-spacing:-.015em}
+.sec .role{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.14em;
+padding:3px 7px;border:1px solid rgba(0,229,208,.5);color:var(--x);clip-path:var(--ch)}
+.ni{font-size:12.5px;line-height:1.6;color:var(--mute);margin:10px 0 0}
+.bleed{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding:0 10px}
+.tab{width:100%;aspect-ratio:1.43;background:var(--steel);border:1px solid var(--line2);
+position:relative;overflow:hidden;
+clip-path:polygon(0 14px,14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%)}
+.br{position:absolute;width:22px;height:22px;border:2px solid var(--x);opacity:.55;z-index:3}
+.br.tl{top:8px;left:8px;border-right:0;border-bottom:0}
+.br.tr{top:8px;right:8px;border-left:0;border-bottom:0}
+.br.bl{bottom:8px;left:8px;border-right:0;border-top:0}
+.br.b2{bottom:8px;right:8px;border-left:0;border-top:0}
+.tbar{position:absolute;top:0;left:0;right:0;height:22px;display:flex;align-items:center;
+justify-content:space-between;padding:0 36px;font-family:'JetBrains Mono',monospace;
+font-size:clamp(6px,1.4vw,9px);color:var(--mute);z-index:4}
+.tbar .sy{color:var(--pegasus);display:flex;align-items:center;gap:4px}
+.tbar .sy i{width:4px;height:4px;background:var(--pegasus);border-radius:50%}
+.tbar .sy.ok{color:var(--x)}.tbar .sy.ok i{background:var(--x)}
+.duel{position:absolute;inset:0;display:flex}
+.half{flex:1;padding:16px 14px;display:flex;flex-direction:column;gap:7px;position:relative}
+.half.A{background:linear-gradient(115deg,rgba(43,107,255,.20),transparent 72%)}
+.half.B{background:linear-gradient(245deg,rgba(255,59,47,.20),transparent 72%);align-items:flex-end}
+.half.B .stack{align-items:flex-end}
+.mid{width:20%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+padding:14px 0 12px;border-left:1px solid var(--line);border-right:1px solid var(--line);background:rgba(6,7,12,.5)}
+.nametab{font-family:'Archivo Black',sans-serif;font-size:clamp(13px,3.4vw,22px);text-transform:uppercase;
+transform:skewX(-8deg);padding:4px 10px;clip-path:var(--ch);display:inline-block}
+.half.A .nametab{background:var(--dragoon);color:#04121A}
+.half.B .nametab{background:var(--dranzer);color:#1A0603}
+.beyline{font-family:'JetBrains Mono',monospace;font-size:clamp(7px,1.7vw,11px);color:var(--mute)}
+.bigscore{font-family:'Archivo Black',sans-serif;font-size:clamp(38px,10vw,84px);line-height:.78;
+letter-spacing:-.06em;transform:skewX(-8deg)}
+.half.A .bigscore{color:var(--dragoon);text-shadow:0 0 40px rgba(43,107,255,.6)}
+.half.B .bigscore{color:var(--dranzer);text-shadow:0 0 40px rgba(255,59,47,.55)}
+.fbtn{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1.5px solid;width:100%;
+justify-content:space-between;
+clip-path:polygon(0 5px,5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%)}
+.half.B .fbtn{flex-direction:row-reverse}
+.fbtn .fl{font-family:'Archivo Black',sans-serif;font-size:clamp(9px,2.3vw,15px);transform:skewX(-8deg);line-height:1}
+.fbtn .fs{font-family:'JetBrains Mono',monospace;font-size:clamp(6px,1.4vw,9px);color:var(--mute);display:block;margin-top:1px}
+.fbtn .fp{font-family:'Archivo Black',sans-serif;font-size:clamp(11px,2.7vw,18px);transform:skewX(-8deg)}
+.f1{border-color:rgba(238,241,247,.35)}.f1 .fl,.f1 .fp{color:var(--text)}
+.f2{border-color:rgba(255,196,0,.55)}.f2 .fl,.f2 .fp{color:var(--pegasus)}
+.f3{border-color:rgba(168,85,247,.6)}.f3 .fl,.f3 .fp{color:var(--burst)}
+.f4{border-color:rgba(0,229,208,.65)}.f4 .fl,.f4 .fp{color:var(--x)}
+.stack{display:flex;flex-direction:column;gap:5px;width:100%}
+.rail{display:flex;gap:3px;height:9px;width:100%}
+.rail i{flex:1;border:1px solid var(--line2);clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)}
+.rail i.a{background:var(--dragoon);border-color:var(--dragoon);box-shadow:0 0 12px rgba(43,107,255,.7)}
+.rail i.b{background:var(--dranzer);border-color:var(--dranzer);box-shadow:0 0 12px rgba(255,59,47,.6)}
+.rail i.p{background:repeating-linear-gradient(45deg,var(--pegasus) 0 3px,transparent 3px 6px);border-color:var(--pegasus)}
+.rail.rev{flex-direction:row-reverse}
+.rail.rev i{clip-path:polygon(0 0,calc(100% - 4px) 0,100% 100%,4px 100%)}
+.fault{display:flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid rgba(255,196,0,.4);
+clip-path:var(--ch);background:rgba(255,196,0,.07)}
+.half.B .fault{flex-direction:row-reverse}
+.fault .fx{font-family:'JetBrains Mono',monospace;font-size:clamp(6px,1.4vw,8.5px);letter-spacing:.1em;color:var(--pegasus)}
+.pips{display:flex;gap:3px}
+.pips i{width:9px;height:7px;border:1px solid var(--pegasus);opacity:.4}
+.pips i.on{background:var(--pegasus);opacity:1;box-shadow:0 0 7px var(--pegasus)}
+.rnd{font-family:'Archivo Black',sans-serif;font-size:clamp(15px,3.6vw,26px);transform:skewX(-8deg)}
+.clock{font-family:'JetBrains Mono',monospace;font-size:clamp(8px,2vw,13px);color:var(--x);margin-top:2px}
+.xmark{display:flex;align-items:center;gap:2px}
+.xmark i{width:0;height:0;border-top:clamp(7px,1.8vw,12px) solid transparent;border-bottom:clamp(7px,1.8vw,12px) solid transparent}
+.xmark i.l{border-left:clamp(9px,2.2vw,15px) solid var(--dragoon)}
+.xmark i.r{border-right:clamp(9px,2.2vw,15px) solid var(--dranzer)}
+.midbtn{font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.5vw,9px);letter-spacing:.1em;
+padding:5px 8px;border:1px solid var(--line2);color:var(--mute);clip-path:var(--ch);text-align:center;white-space:nowrap}
+.ready{position:absolute;inset:0;display:flex}
+.rh{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative}
+.rh.A.on{background:var(--dragoon)}.rh.B.on{background:var(--dranzer)}
+.rh .rtxt{font-family:'Archivo Black',sans-serif;font-size:clamp(13px,3.2vw,22px);transform:skewX(-8deg);letter-spacing:.04em}
+.rh.on .rtxt{color:#04121A}.rh.B.on .rtxt{color:#1A0603}
+.thumb{width:clamp(46px,11vw,86px);aspect-ratio:1;border:1.5px solid currentColor;clip-path:var(--ch);
+display:grid;place-items:center;padding:10%}
+.bey{width:100%;aspect-ratio:1;border-radius:50%;position:relative}
+.bey::before{content:'';position:absolute;inset:0;border-radius:50%;opacity:.9}
+.bey::after{content:'';position:absolute;inset:27%;border-radius:50%;background:var(--steel);border:2px solid currentColor}
+.bey.atk::before{background:conic-gradient(from 0deg,currentColor 0 9%,transparent 9% 25%,currentColor 25% 34%,
+transparent 34% 50%,currentColor 50% 59%,transparent 59% 75%,currentColor 75% 84%,transparent 84%)}
+.bey.def::before{background:conic-gradient(from 15deg,currentColor 0 14%,transparent 14% 16.6%,currentColor 16.6% 30%,
+transparent 30% 33.3%,currentColor 33.3% 47%,transparent 47% 50%,currentColor 50% 64%,transparent 64% 66.6%,
+currentColor 66.6% 80%,transparent 80% 83.3%,currentColor 83.3% 97%,transparent 97%)}
+.bigx{position:absolute;inset:0;pointer-events:none;z-index:1}
+.bigx::before,.bigx::after{content:'';position:absolute;left:50%;top:-20%;width:5px;height:140%;background:var(--x);opacity:.5}
+.bigx::before{transform:translateX(-50%) rotate(28deg)}
+.bigx::after{transform:translateX(-50%) rotate(-28deg)}
+.cdwrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--x)}
+.cdnum{font-family:'Archivo Black',sans-serif;font-size:clamp(80px,22vw,190px);line-height:.78;
+letter-spacing:-.07em;color:#04121A;transform:skewX(-8deg)}
+.cdlbl{font-family:'Archivo Black',sans-serif;font-size:clamp(11px,2.6vw,18px);color:#04121A;letter-spacing:.3em;opacity:.65;margin-top:6px}
+.idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px}
+.tableno{font-family:'Archivo Black',sans-serif;font-size:clamp(46px,12vw,100px);line-height:.8;
+transform:skewX(-8deg);color:var(--x);text-shadow:0 0 44px rgba(0,229,208,.5)}
+.nextrow{display:flex;align-items:center;gap:clamp(8px,2vw,18px);margin-top:2px}
+.np{font-family:'Archivo Black',sans-serif;font-size:clamp(12px,2.9vw,22px);transform:skewX(-8deg)}
+.win{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+background:linear-gradient(120deg,rgba(43,107,255,.28),var(--steel) 70%)}
+.winname{font-family:'Archivo Black',sans-serif;font-size:clamp(24px,6.4vw,54px);transform:skewX(-8deg);
+color:var(--dragoon);text-shadow:0 0 40px rgba(43,107,255,.5)}
+.linescore{display:flex;align-items:baseline;gap:12px;font-family:'Archivo Black',sans-serif;
+font-size:clamp(24px,6vw,50px);transform:skewX(-8deg)}
+.lineup3{display:flex;gap:6px;margin-top:6px}
+.lu{padding:5px 9px;border:1px solid var(--line2);clip-path:var(--ch);text-align:center;min-width:64px}
+.lu.w{border-color:var(--dragoon);background:rgba(43,107,255,.14)}
+.lu.now{border-color:var(--x);box-shadow:0 0 12px rgba(0,229,208,.3)}
+.lu .n2{font-family:'JetBrains Mono',monospace;font-size:6.5px;letter-spacing:.12em;color:var(--mute)}
+.lu b{font-size:clamp(7px,1.7vw,11px);display:block;margin-top:2px}
+.lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+gap:12px;background:rgba(255,59,47,.1);padding:22px;text-align:center}
+.lockttl{font-family:'Archivo Black',sans-serif;font-size:clamp(16px,4vw,32px);transform:skewX(-8deg);color:var(--dranzer)}
+.lockmsg{font-size:clamp(9px,2.1vw,14px);line-height:1.55;color:#FFC0BB;max-width:62%}
+.pairwrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px}
+.scanbox{width:clamp(90px,22vw,170px);aspect-ratio:1;border:2px dashed var(--x);clip-path:var(--ch);
+display:grid;place-items:center;position:relative}
+.scanbox .qr{width:70%;height:70%;background:repeating-conic-gradient(var(--text) 0 25%,transparent 0 50%) 0 0/12px 12px,var(--void);border:5px solid var(--text)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+.tbl th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;
+text-transform:uppercase;color:var(--mute);padding:6px 8px;border-bottom:1px solid var(--line2)}
+.tbl td{padding:8px;border-bottom:1px solid var(--line);color:var(--mute);vertical-align:top}
+.tbl td b{color:var(--text)}
+.notes{margin-top:52px;display:flex;flex-direction:column;gap:2px}
+.note{background:var(--panel);border:1px solid var(--line);padding:15px 16px;clip-path:var(--ch)}
+.note h3{font-size:13px;margin-bottom:6px}
+.note p{font-size:13px;line-height:1.62;color:var(--mute)}
+.note .k{width:26px;height:3px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">3 de 3 · dispositivo compartido</div>
+  <h1><span class="g">Mesa</span></h1>
+  <div class="sub">TABLESHELL · HORIZONTAL · SIN IDENTIDAD</div>
+  <p class="lede">Tablet en un brazo articulado sobre el estadio. La usan los dos jugadores a la vez.</p>
+  <div class="warnbox">
+    <b>La mesa no es una persona</b>
+    <p>No inicia sesión con la cuenta de nadie: se empareja con un torneo y un número de mesa. Por eso puede registrar el combate que tiene delante y nada más. Ni disputas, ni derrota instantánea, ni acceso al catálogo o a los decks.</p>
+  </div>
+  <div class="teeth"></div>
+</header>
+
+<!-- 01 -->
+<div class="sec"><span class="n">01</span><span class="t">Emparejar</span><span class="role">M1</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MODO MESA · SIN EMPAREJAR</span><span class="sy">SIN TORNEO</span></div>
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br b2"></span>
+  <div class="pairwrap">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);letter-spacing:.3em;color:var(--mute)">ESCANEA EL CÓDIGO DEL ORGANIZADOR</div>
+    <div class="scanbox"><div class="qr"></div></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);color:var(--mute);text-align:center;line-height:1.7">
+      Él lo genera en Torneo → Mesas → Añadir mesa<br><span style="color:var(--x)">No hace falta cuenta ni contraseña</span></div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">No hay pantalla de inicio de sesión. Un dispositivo compartido con una cuenta personal dentro sería una identidad prestada a cualquiera que lo toque.</p>
+
+<!-- 02 -->
+<div class="sec"><span class="n">02</span><span class="t">Reposo</span><span class="role">M2</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · COPA BARRIO NORTE</span><span class="sy"><i></i>2 SIN SUBIR</span></div>
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br b2"></span>
+  <div class="idle">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(7px,1.7vw,11px);letter-spacing:.3em;color:var(--mute)">MESA</div>
+    <div class="tableno">3</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);letter-spacing:.2em;color:var(--mute);margin-top:4px">SIGUIENTE · RONDA 2</div>
+    <div class="nextrow"><span class="np" style="color:var(--dragoon)">RYU_07</span>
+      <span class="xmark"><i class="l"></i><i class="r"></i></span>
+      <span class="np" style="color:var(--dranzer)">MULTI_K</span></div>
+    <div style="margin-top:8px;padding:6px 14px;border:1px solid var(--x);clip-path:var(--ch);font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);letter-spacing:.14em;color:var(--x)">TOCA PARA EMPEZAR</div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Nunca se queda en negro. Con la pantalla apagada los jugadores no saben si la app se cerró y acaban tocando cosas para despertarla.</p>
+
+<!-- 03 -->
+<div class="sec"><span class="n">03</span><span class="t">Preparación</span><span class="role">M3</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · 3ON3 · RONDA 2 DE 3</span><span class="sy"><i></i>LOCAL</span></div>
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br b2"></span>
+  <div class="bigx"></div>
+  <div class="ready">
+    <div class="rh A">
+      <div class="nametab">RYU_07</div>
+      <div class="thumb" style="color:var(--dragoon)"><div class="bey atk"></div></div>
+      <div class="beyline">PhoenixWing 9-60GF</div>
+      <div class="rtxt" style="color:var(--dragoon)">TOCA SI ESTÁS LISTO</div></div>
+    <div style="width:16%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:2">
+      <div class="rnd">R2</div>
+      <div style="font-family:'Archivo Black';font-size:clamp(10px,2.4vw,17px);color:var(--mute);transform:skewX(-8deg)">VS</div></div>
+    <div class="rh B">
+      <div class="nametab">MULTI_K</div>
+      <div class="thumb" style="color:var(--dranzer)"><div class="bey def"></div></div>
+      <div class="beyline">KnightShield 3-80N</div>
+      <div class="rtxt" style="color:var(--dranzer)">TOCA SI ESTÁS LISTO</div></div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Cada uno ve el bey que le toca de su alineación. Es el único momento para detectar que alguien puso el bey equivocado.</p>
+
+<!-- 04 -->
+<div class="sec"><span class="n">04</span><span class="t">Uno listo</span><span class="role">M3</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · ESPERANDO A RYU_07</span><span class="sy"><i></i>LOCAL</span></div>
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br b2"></span>
+  <div class="bigx"></div>
+  <div class="ready">
+    <div class="rh A">
+      <div class="nametab">RYU_07</div>
+      <div class="thumb" style="color:var(--dragoon)"><div class="bey atk"></div></div>
+      <div class="beyline">PhoenixWing 9-60GF</div>
+      <div class="rtxt" style="color:var(--dragoon)">TOCA SI ESTÁS LISTO</div></div>
+    <div style="width:16%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:2">
+      <div class="rnd">R2</div>
+      <div style="font-family:'Archivo Black';font-size:clamp(10px,2.4vw,17px);color:var(--mute);transform:skewX(-8deg)">VS</div></div>
+    <div class="rh B on">
+      <div class="rtxt" style="font-size:clamp(18px,4.6vw,38px)">LISTO</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);color:rgba(26,6,3,.65);letter-spacing:.14em">MULTI_K · KNIGHTSHIELD</div></div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">La mitad confirmada se llena del color de su jugador. Se lee de reojo a dos metros: si tu lado sigue oscuro, faltas tú.</p>
+
+<!-- 05 -->
+<div class="sec"><span class="n">05</span><span class="t">Cuenta atrás</span><span class="role">M4</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="cdwrap">
+    <div class="cdnum">3</div>
+    <div class="cdlbl">GO SHOOT</div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <i style="width:26px;height:4px;background:#04121A"></i>
+      <i style="width:26px;height:4px;background:#04121A;opacity:.3"></i>
+      <i style="width:26px;height:4px;background:#04121A;opacity:.3"></i></div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Pantalla completa y nada más. Los jugadores miran el estadio con el lanzador en la mano: el número tiene que leerse con la visión periférica.</p>
+
+<!-- 06 -->
+<div class="sec"><span class="n">06</span><span class="t">Marcador</span><span class="role">M5</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · 3ON3 R2 · BEY 2 DE 3</span><span class="sy"><i></i>3 SIN SUBIR</span></div>
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br b2"></span>
+  <div class="duel">
+    <div class="half A">
+      <div class="nametab">RYU_07</div>
+      <div class="beyline">PhoenixWing 9-60GF · 38.5 g</div>
+      <div style="margin:2px 0 3px"><span class="bigscore">3</span></div>
+      <div class="rail"><i class="a"></i><i class="a"></i><i class="a"></i><i></i></div>
+      <div class="stack" style="margin-top:4px">
+        <div class="fbtn f1"><span><span class="fl">SPIN</span><span class="fs">FINISH</span></span><span class="fp">+1</span></div>
+        <div class="fbtn f2"><span><span class="fl">OVER</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f3"><span><span class="fl">BURST</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f4"><span><span class="fl">XTREME</span><span class="fs">FINISH</span></span><span class="fp">+3</span></div></div>
+      <div class="fault" style="margin-top:auto"><span class="fx">FALLO DE LANZAMIENTO</span><span class="pips"><i></i><i></i></span></div>
+    </div>
+    <div class="mid">
+      <div style="text-align:center"><div class="rnd">R2</div><div class="clock">01:24</div></div>
+      <div class="xmark"><i class="l"></i><i class="r"></i></div>
+      <div style="display:flex;flex-direction:column;gap:5px;width:82%">
+        <div class="midbtn">EMPATE</div>
+        <div class="midbtn">DESHACER</div>
+        <div class="midbtn" style="border-color:rgba(255,59,47,.5);color:var(--dranzer)">LLAMAR JUEZ</div></div>
+    </div>
+    <div class="half B">
+      <div class="nametab">MULTI_K</div>
+      <div class="beyline">KnightShield 3-80N · 32.3 g</div>
+      <div style="margin:2px 0 3px"><span class="bigscore">2</span></div>
+      <div class="rail rev"><i></i><i></i><i class="p"></i><i class="b"></i></div>
+      <div class="stack" style="margin-top:4px">
+        <div class="fbtn f1"><span><span class="fl">SPIN</span><span class="fs">FINISH</span></span><span class="fp">+1</span></div>
+        <div class="fbtn f2"><span><span class="fl">OVER</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f3"><span><span class="fl">BURST</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f4"><span><span class="fl">XTREME</span><span class="fs">FINISH</span></span><span class="fp">+3</span></div></div>
+      <div class="fault" style="margin-top:auto"><span class="fx">FALLO DE LANZAMIENTO</span><span class="pips"><i class="on"></i><i></i></span></div>
+    </div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Cada uno pulsa los botones de su lado, los que tiene físicamente delante. El segmento rayado del riel de MULTI_K es un punto por penalización, no un finish ganado.</p>
+
+<!-- 07 -->
+<div class="sec"><span class="n">07</span><span class="t">Segunda falta</span><span class="role">M5</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · FALTA DE LANZAMIENTO</span><span class="sy"><i></i>LOCAL</span></div>
+  <span class="br tl" style="border-color:var(--pegasus)"></span><span class="br tr" style="border-color:var(--pegasus)"></span>
+  <span class="br bl" style="border-color:var(--pegasus)"></span><span class="br b2" style="border-color:var(--pegasus)"></span>
+  <div class="lock" style="background:rgba(255,196,0,.1)">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);letter-spacing:.3em;color:var(--pegasus)">SEGUNDA FALTA DE MULTI_K</div>
+    <div class="lockttl" style="color:var(--pegasus)">+1 PARA RYU_07</div>
+    <div class="pips" style="transform:scale(1.6);margin:4px 0"><i class="on"></i><i class="on"></i></div>
+    <div class="lockmsg" style="color:#FFE49A">Dos faltas acumuladas en la misma ronda dan un punto al rival. La ronda se reinicia y los contadores vuelven a cero.</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <div class="midbtn">CANCELAR</div>
+      <div class="midbtn" style="border-color:var(--pegasus);color:var(--pegasus)">CONFIRMAR Y REINICIAR</div></div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Las casillas están siempre a la vista en el marcador. Si la regla vive en un menú, nadie la usa y queda en el papel.</p>
+
+<!-- 08 -->
+<div class="sec"><span class="n">08</span><span class="t">Fin de ronda</span><span class="role">M6</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · RONDA 2 CERRADA</span><span class="sy"><i></i>EN COLA</span></div>
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br b2"></span>
+  <div class="win">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);letter-spacing:.3em;color:var(--mute)">GANA LA RONDA</div>
+    <div class="winname">RYU_07</div>
+    <div class="linescore"><span style="color:var(--dragoon)">4</span><span style="color:var(--mute);font-size:.6em">—</span><span style="color:var(--mute)">2</span></div>
+    <div class="lineup3">
+      <div class="lu w"><span class="n2">BEY 1</span><b>DranSword</b></div>
+      <div class="lu w"><span class="n2">BEY 2</span><b>PhoenixWing</b></div>
+      <div class="lu"><span class="n2">BEY 3</span><b style="color:var(--mute)">no juega</b></div></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);color:var(--x);letter-spacing:.14em;margin-top:8px">2–0 · ENFRENTAMIENTO TERMINADO</div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <div class="midbtn" style="border-color:var(--x);color:var(--x)">CONFIRMAR LOS DOS</div>
+      <div class="midbtn">CORREGIR</div></div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Aquí los dos jugadores están delante, así que se confirma con un solo gesto en vez de mandar aviso al teléfono del rival.</p>
+
+<!-- 09 -->
+<div class="sec"><span class="n">09</span><span class="t">La mesa no arbitra</span><span class="role">M7</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · BLOQUEADA</span><span class="sy">ESPERANDO JUEZ</span></div>
+  <span class="br tl" style="border-color:var(--dranzer)"></span><span class="br tr" style="border-color:var(--dranzer)"></span>
+  <span class="br bl" style="border-color:var(--dranzer)"></span><span class="br b2" style="border-color:var(--dranzer)"></span>
+  <div class="lock">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(6.5px,1.6vw,10px);letter-spacing:.3em;color:var(--dranzer)">DESACUERDO</div>
+    <div class="lockttl">LLAMANDO AL JUEZ</div>
+    <div class="lockmsg">Esta tablet la usan los dos jugadores, así que no puede decidir quién tiene razón. El resultado queda guardado tal como iba y lo resuelve un juez desde su propio teléfono.</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <div class="midbtn">CANCELAR</div>
+      <div class="midbtn" style="border-color:var(--pegasus);color:var(--pegasus)">SEGUIR SIN RESOLVER</div></div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Sin identidad personal no puede haber una decisión con un nombre detrás. Por eso la mesa se para y llama.</p>
+
+<!-- 10 -->
+<div class="sec"><span class="n">10</span><span class="t">Sin hub</span><span class="role">M8</span></div>
+</div>
+<div class="bleed"><div class="tab">
+  <div class="tbar"><span>MESA 3 · 3ON3 R2 · BEY 3 DE 3</span><span class="sy"><i></i>SIN HUB · 9 EN COLA</span></div>
+  <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br b2"></span>
+  <div style="position:absolute;top:22px;left:0;right:0;padding:5px 36px;background:rgba(255,196,0,.14);
+    border-bottom:1px solid rgba(255,196,0,.4);font-family:'JetBrains Mono',monospace;
+    font-size:clamp(6px,1.4vw,9px);color:var(--pegasus);letter-spacing:.1em;z-index:4;text-align:center">
+    SIN CONTACTO CON EL ORGANIZADOR · EL COMBATE SIGUE · SE SUBIRÁ AL RECONECTAR</div>
+  <div class="duel">
+    <div class="half A" style="padding-top:34px">
+      <div class="nametab">RYU_07</div>
+      <div class="beyline">WizardRod 1-60H · 35.4 g</div>
+      <div style="margin:2px 0 3px"><span class="bigscore">1</span></div>
+      <div class="rail"><i class="a"></i><i></i><i></i><i></i></div>
+      <div class="stack" style="margin-top:4px">
+        <div class="fbtn f1"><span><span class="fl">SPIN</span><span class="fs">FINISH</span></span><span class="fp">+1</span></div>
+        <div class="fbtn f2"><span><span class="fl">OVER</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f3"><span><span class="fl">BURST</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f4"><span><span class="fl">XTREME</span><span class="fs">FINISH</span></span><span class="fp">+3</span></div></div>
+    </div>
+    <div class="mid" style="padding-top:34px">
+      <div style="text-align:center"><div class="rnd">R2</div><div class="clock" style="color:var(--pegasus)">LOCAL</div></div>
+      <div class="xmark"><i class="l"></i><i class="r"></i></div>
+      <div style="display:flex;flex-direction:column;gap:5px;width:82%">
+        <div class="midbtn">EMPATE</div>
+        <div class="midbtn">DESHACER</div>
+        <div class="midbtn" style="border-color:rgba(255,59,47,.5);color:var(--dranzer)">LLAMAR JUEZ</div></div>
+    </div>
+    <div class="half B" style="padding-top:34px">
+      <div class="nametab">MULTI_K</div>
+      <div class="beyline">WyvernGale 5-70B · 32.0 g</div>
+      <div style="margin:2px 0 3px"><span class="bigscore">2</span></div>
+      <div class="rail rev"><i></i><i></i><i class="b"></i><i class="b"></i></div>
+      <div class="stack" style="margin-top:4px">
+        <div class="fbtn f1"><span><span class="fl">SPIN</span><span class="fs">FINISH</span></span><span class="fp">+1</span></div>
+        <div class="fbtn f2"><span><span class="fl">OVER</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f3"><span><span class="fl">BURST</span><span class="fs">FINISH</span></span><span class="fp">+2</span></div>
+        <div class="fbtn f4"><span><span class="fl">XTREME</span><span class="fs">FINISH</span></span><span class="fp">+3</span></div></div>
+    </div>
+  </div>
+</div></div>
+<div class="wrap">
+<p class="ni">Perder el hub no interrumpe nada: pulsar un botón nunca cruzó la red. Solo cambia la franja de arriba.</p>
+
+<div class="sec"><span class="n">—</span><span class="t">Capacidades del dispositivo de mesa</span></div>
+<table class="tbl">
+  <tr><th>Capacidad</th><th>Mesa</th><th>Por qué</th></tr>
+  <tr><td><b>recordMatchResult</b></td><td style="color:var(--x)">SÍ</td><td>solo el combate asignado a esta mesa</td></tr>
+  <tr><td><b>confirmResult</b></td><td style="color:var(--x)">SÍ</td><td>los dos jugadores están presentes</td></tr>
+  <tr><td><b>resolveDispute</b></td><td style="color:var(--dranzer)">NO</td><td>sin identidad: cualquiera la toca</td></tr>
+  <tr><td><b>applyInstantLoss</b></td><td style="color:var(--dranzer)">NO</td><td>decisión de juez, con nombre detrás</td></tr>
+  <tr><td><b>closeRound · runDraw</b></td><td style="color:var(--dranzer)">NO</td><td>afecta al torneo entero</td></tr>
+  <tr><td><b>editTournament</b></td><td style="color:var(--dranzer)">NO</td><td>nunca desde un dispositivo compartido</td></tr>
+  <tr><td><b>ver catálogo · decks</b></td><td style="color:var(--dranzer)">NO</td><td>no es la app de nadie</td></tr>
+</table>
+<p class="ni">Estas siete filas salen del mismo <code style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--x)">PermissionService</code> que usan el usuario y el organizador, sin añadir ninguna excepción. Que una superficie nueva no obligue a tocar el modelo es la señal de que estaba bien planteado.</p>
+
+<div class="notes">
+  <div class="note"><div class="k" style="background:var(--x)"></div>
+    <h3>Un dispositivo, no una persona</h3>
+    <p>Se empareja con una mesa, no inicia sesión. Por eso registra el combate que tiene delante y nada más. Un juez que quiera resolver una disputa lo hace desde su teléfono, donde sí hay un nombre detrás de la decisión.</p></div>
+  <div class="note"><div class="k" style="background:linear-gradient(90deg,var(--dragoon),var(--dranzer))"></div>
+    <h3>Simetría física, no visual</h3>
+    <p>Los botones de cada jugador están del lado donde ese jugador está de pie. La mitad derecha va en espejo para que el punto quede hacia fuera y la etiqueta hacia el centro: se lee igual desde los dos lados de la mesa.</p></div>
+  <div class="note"><div class="k" style="background:var(--pegasus)"></div>
+    <h3>Las faltas viven en la pantalla principal</h3>
+    <p>Dos casillas por jugador, siempre visibles. Al encenderse la segunda se otorga el punto y la ronda se reinicia. Esconderlas en un menú haría que nadie las usara.</p></div>
+  <div class="note"><div class="k" style="background:var(--burst)"></div>
+    <h3>Nunca se apaga</h3>
+    <p>Entre combates muestra su número y quién viene. Con la pantalla en negro los jugadores no saben si la app se cerró y acaban tocando cosas para despertarla.</p></div>
+  <div class="note"><div class="k" style="background:var(--dranzer)"></div>
+    <h3>Perder la red no para el combate</h3>
+    <p>Pulsar un botón nunca cruzó la red: se escribe en la base local de la tablet. Cuando cae el hub, lo único que cambia es la franja de arriba y que el organizador tarda en verlo.</p></div>
+</div>
+
+</div>
+</body>
+</html>
