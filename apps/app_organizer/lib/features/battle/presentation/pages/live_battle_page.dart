@@ -70,6 +70,7 @@ class _LiveBattlePageState extends State<LiveBattlePage> with SingleTickerProvid
     });
 
     _triggerTickHaptic();
+    unawaited(BeyAudioService.instance.playCount(3));
     _animController.forward(from: 0);
 
     _countdownTimer = Timer.periodic(const Duration(milliseconds: 950), (timer) {
@@ -78,10 +79,12 @@ class _LiveBattlePageState extends State<LiveBattlePage> with SingleTickerProvid
         if (_countdownStep > 1) {
           _countdownStep--;
           _triggerTickHaptic();
+          unawaited(BeyAudioService.instance.playCount(_countdownStep));
           _animController.forward(from: 0);
         } else if (_countdownStep == 1) {
           _countdownStep = 0; // 0 = GO SHOOT!
           _triggerShootHaptic();
+          unawaited(BeyAudioService.instance.playGoShoot());
           _animController.forward(from: 0);
         } else {
           timer.cancel();

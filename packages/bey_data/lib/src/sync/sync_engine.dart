@@ -81,21 +81,78 @@ class SyncEngine {
           nickname: profile.nickname,
           recoveryCodeHash: profile.recoveryCodeHash,
         );
+
+        // 2. Bidirectional Sync Combos: Pull from cloud first, merge to SQLite, then push
+        final cloudCombos = await _supabaseSync.pullCombos(profile.id);
+        final localCombos = await _comboDataSource.getCombos();
+        final localCombosMap = {for (final c in localCombos) c.id: c};
+
+        for (final c in cloudCombos) {
+          final id = c['id'] as String;
+          final cloudUpdatedAt = DateTime.tryParse(c['updated_at'] as String? ?? '');
+          final local = localCombosMap[id];
+
+          if (local == null || (cloudUpdatedAt != null && (local.updatedAt == null || cloudUpdatedAt.isAfter(local.updatedAt!)))) {
+            final combo = Combo(
+              id: id,
+              name: c['name'] as String? ?? 'Combo',
+              bladeId: c['blade_id'] as String? ?? '',
+              ratchetId: c['ratchet_id'] as String? ?? '',
+              bitId: c['bit_id'] as String? ?? '',
+              lockChipId: c['lock_chip_id'] as String?,
+              assistBladeId: c['assist_blade_id'] as String?,
+              system: BeySystem.values[(c['system'] as int?) ?? 0],
+              calculatedWeight: (c['calculated_weight'] as num?)?.toDouble(),
+              updatedAt: cloudUpdatedAt,
+            );
+            await _comboDataSource.insertOrUpdateCombo(combo);
+          }
+        }
+
+        final allCombos = await _comboDataSource.getCombos();
+        if (allCombos.isNotEmpty) {
+          await _supabaseSync.pushCombos(allCombos, userId: profile.id);
+        }
+
+        // 3. Bidirectional Sync Decks: Pull from cloud first, merge to SQLite, then push
+        final cloudDecks = await _supabaseSync.pullDecks(profile.id);
+        final localDecks = await _deckDataSource.getDecks();
+        final localDecksMap = {for (final d in localDecks) d.id: d};
+
+        for (final d in cloudDecks) {
+          final id = d['id'] as String;
+          final cloudUpdatedAt = DateTime.tryParse(d['updated_at'] as String? ?? '');
+          final local = localDecksMap[id];
+
+          if (local == null || (cloudUpdatedAt != null && (local.updatedAt == null || cloudUpdatedAt.isAfter(local.updatedAt!)))) {
+            final comboIds = (d['combo_ids'] as List?)?.cast<String>() ?? [];
+            final deck = Deck(
+              id: id,
+              name: d['name'] as String? ?? 'Deck 3on3',
+              comboIds: comboIds,
+              updatedAt: cloudUpdatedAt,
+            );
+            await _deckDataSource.insertOrUpdateDeck(deck);
+          }
+        }
+
+        final allDecks = await _deckDataSource.getDecks();
+        if (allDecks.isNotEmpty) {
+          await _supabaseSync.pushDecks(allDecks, userId: profile.id);
+        }
+      } else {
+        // Guest mode fallback: push whatever is local if client authenticated
+        final combos = await _comboDataSource.getCombos();
+        if (combos.isNotEmpty) {
+          await _supabaseSync.pushCombos(combos);
+        }
+        final decks = await _deckDataSource.getDecks();
+        if (decks.isNotEmpty) {
+          await _supabaseSync.pushDecks(decks);
+        }
       }
 
-      // 2. Sync Combos
-      final combos = await _comboDataSource.getCombos();
-      if (combos.isNotEmpty) {
-        await _supabaseSync.pushCombos(combos, userId: profile?.id);
-      }
-
-      // 3. Sync Decks
-      final decks = await _deckDataSource.getDecks();
-      if (decks.isNotEmpty) {
-        await _supabaseSync.pushDecks(decks, userId: profile?.id);
-      }
-
-      // 4. Sync Tournaments: ONLY completed tournaments sync with the cloud (for global rankings & history)
+      // 4. Sync Tournaments: ONLY completed tournaments sync with the cloud
       final tournamentSource = _tournamentDataSource;
       if (tournamentSource != null) {
         final tournaments = await tournamentSource.getTournaments();
