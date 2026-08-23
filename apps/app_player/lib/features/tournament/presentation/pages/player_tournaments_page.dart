@@ -603,9 +603,12 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
                 text: 'INSCRIBIRME A ESTE TORNEO',
                 variant: ChamferButtonVariant.go,
                 onPressed: () async {
-                  await context.push('/tournaments/${t.id}/register');
+                  await _tournamentRepo.save(t);
                   if (context.mounted) {
-                    context.read<TournamentBloc>().add(TournamentStarted());
+                    await context.push('/tournaments/${t.id}/register');
+                    if (context.mounted) {
+                      context.read<TournamentBloc>().add(TournamentStarted());
+                    }
                   }
                 },
               )

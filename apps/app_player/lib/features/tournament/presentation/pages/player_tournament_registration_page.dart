@@ -44,25 +44,41 @@ class _PlayerTournamentRegistrationPageState extends State<PlayerTournamentRegis
   }
 
   Future<void> _loadData() async {
-    final profile = await _identityRepo.getActiveProfile();
-    final combos = await _comboRepo.watchAll().first;
-    final decks = await _deckRepo.watchAll().first;
+    try {
+      final profile = await _identityRepo.getActiveProfile();
+      final combos = await _comboRepo.watchAll().first;
+      final decks = await _deckRepo.watchAll().first;
 
-    final tournamentStream = _tournamentRepo.watchById(widget.tournamentId);
-    final tournament = await tournamentStream.first;
+      Tournament? tournament;
+      try {
+        final tournamentStream = _tournamentRepo.watchById(widget.tournamentId);
+        tournament = await tournamentStream.first;
+      } catch (_) {}
 
-    if (mounted) {
-      setState(() {
-        _profile = profile;
-        _tournament = tournament;
-        _allDecks = decks;
-        _combosMap = {for (final c in combos) c.id: c};
-        _selectedDivision = tournament.ageDivision;
-        if (decks.isNotEmpty && (_selectedDeck == null || !decks.any((d) => d.id == _selectedDeck?.id))) {
-          _selectedDeck = decks.last;
-        }
-        _isLoading = false;
-      });
+      if (tournament == null) {
+        final allTournaments = await _tournamentRepo.watchAll().first;
+        tournament = allTournaments.where((t) => t.id == widget.tournamentId).firstOrNull;
+      }
+
+      if (mounted) {
+        setState(() {
+          _profile = profile;
+          _tournament = tournament;
+          _allDecks = decks;
+          _combosMap = {for (final c in combos) c.id: c};
+          if (tournament != null) {
+            _selectedDivision = tournament.ageDivision;
+          }
+          if (decks.isNotEmpty && (_selectedDeck == null || !decks.any((d) => d.id == _selectedDeck?.id))) {
+            _selectedDeck = decks.last;
+          }
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

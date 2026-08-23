@@ -63,16 +63,6 @@ class MetaPresetService {
       system: BeySystem.ux,
     ),
     MetaPreset(
-      name: 'Shark Scale 4-50K',
-      archetype: 'Ataque',
-      tier: 'S',
-      description: 'Aceleración baja y rebote activo para knockouts ascendentes constantes.',
-      bladeId: 'shark_scale',
-      ratchetId: '4-50',
-      bitId: 'kick',
-      system: BeySystem.ux,
-    ),
-    MetaPreset(
       name: 'Silver Wolf 9-60FB',
       archetype: 'Balance',
       tier: 'S',
@@ -80,6 +70,16 @@ class MetaPresetService {
       bladeId: 'silver_wolf',
       ratchetId: '9-60',
       bitId: 'free_ball',
+      system: BeySystem.ux,
+    ),
+    MetaPreset(
+      name: 'Shark Scale 4-50K',
+      archetype: 'Ataque',
+      tier: 'S',
+      description: 'Aceleración baja y rebote activo para knockouts ascendentes constantes.',
+      bladeId: 'shark_scale',
+      ratchetId: '4-50',
+      bitId: 'kick',
       system: BeySystem.ux,
     ),
     MetaPreset(

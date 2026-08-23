@@ -109,11 +109,32 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  const Text('No tienes combos creados en tu arsenal.'),
-                  const SizedBox(height: 12),
+                  Text(
+                    'No tienes combos armados en tu inventario.',
+                    style: AppTypography.bodySmall.copyWith(color: AppColors.mute),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
                   ChamferButton(
-                    text: 'CREAR UN COMBO PRIMERO',
+                    text: 'CARGAR BEY META SUGERIDO',
                     variant: ChamferButtonVariant.go,
+                    onPressed: () {
+                      final presetIndex = (slotIndex - 1).clamp(0, MetaPresetService.popularPresets.length - 1);
+                      final combo = MetaPresetService.popularPresets[presetIndex].toCombo(
+                        id: 'meta-combo-$slotIndex-${DateTime.now().millisecondsSinceEpoch}',
+                      );
+                      setState(() {
+                        if (slotIndex == 1) _combo1 = combo;
+                        if (slotIndex == 2) _combo2 = combo;
+                        if (slotIndex == 3) _combo3 = combo;
+                      });
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  ChamferButton(
+                    text: 'CREAR COMBO PERSONALIZADO',
+                    variant: ChamferButtonVariant.ghost,
                     onPressed: () {
                       Navigator.pop(ctx);
                       context.push('/combos/new');
