@@ -34,9 +34,17 @@ Future<void> bootstrap() async {
 
   await configureDependencies(database: db);
 
+  // Ensure Supabase user authentication
+  if (Env.hasSupabaseConfig) {
+    try {
+      await getIt<SupabaseSyncService>().ensureAuthenticated();
+    } catch (_) {}
+  }
+
   // Seed catalog from bundled JSON
   await CatalogSeeder(db).seedIfNeeded(currentVersion: 0);
 
-  // Start background sync engine
-  getIt<SyncEngine>().start();
+  // Start background sync engine & perform initial pull
+  final syncEngine = getIt<SyncEngine>()..start();
+  unawaited(syncEngine.syncNow());
 }

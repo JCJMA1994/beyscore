@@ -1,0 +1,317 @@
+{
+  "_meta": {
+    "source": "WBO Official Tournament Results & BBXHub Meta Database",
+    "source_url": "https://worldbeyblade.org",
+    "updated": "2026-08-23",
+    "window": "Last 4 weeks of WBO official tournaments (3,844 tournaments / 39,092 combos analyzed)",
+    "methodology": "Podium Power Score: score normalizado 0-100 basato sulla frequenza di utilizzo nelle ultime 4 settimane di tornei WBO ufficiali. 100 = pezzo più usato nel periodo.",
+    "disclaimer": "Dati estratti dai risultati ufficiali WBO e BBXHub. Aggiornati regolarmente. BeyScore non è affiliato a WBO."
+  },
+  "blades": [
+    {
+      "name": "Shark Scale",
+      "score": 100,
+      "rank": 1,
+      "trend": "stable",
+      "tier": "S+"
+    },
+    {
+      "name": "Wizard Rod",
+      "score": 91,
+      "rank": 2,
+      "trend": "stable",
+      "tier": "S+"
+    },
+    {
+      "name": "Aero Pegasus",
+      "score": 36,
+      "rank": 3,
+      "trend": "stable",
+      "tier": "S"
+    },
+    {
+      "name": "Meteor Dragoon",
+      "score": 21,
+      "rank": 4,
+      "trend": "up",
+      "tier": "S"
+    },
+    {
+      "name": "Cobalt Dragoon",
+      "score": 21,
+      "rank": 5,
+      "trend": "up",
+      "tier": "A+"
+    },
+    {
+      "name": "Silver Wolf",
+      "score": 20,
+      "rank": 6,
+      "trend": "stable",
+      "tier": "A"
+    },
+    {
+      "name": "Dran Strike",
+      "score": 18,
+      "rank": 7,
+      "trend": "stable",
+      "tier": "A"
+    },
+    {
+      "name": "Wyvern Hover",
+      "score": 10,
+      "rank": 8,
+      "trend": "stable",
+      "tier": "A"
+    },
+    {
+      "name": "Phoenix Wing",
+      "score": 10,
+      "rank": 9,
+      "trend": "up",
+      "tier": "A"
+    },
+    {
+      "name": "Golem Rock",
+      "score": 7,
+      "rank": 10,
+      "trend": "stable",
+      "tier": "B+"
+    },
+    {
+      "name": "Samurai Saber",
+      "score": 6,
+      "rank": 11,
+      "trend": "up",
+      "tier": "B+"
+    },
+    {
+      "name": "Whale Wave",
+      "score": 6,
+      "rank": 12,
+      "trend": "up",
+      "tier": "B+"
+    },
+    {
+      "name": "Tyranno Beat",
+      "score": 5,
+      "rank": 13,
+      "trend": "down",
+      "tier": "B"
+    },
+    {
+      "name": "Scorpio Spear",
+      "score": 5,
+      "rank": 14,
+      "trend": "up",
+      "tier": "B"
+    },
+    {
+      "name": "Clock Mirage",
+      "score": 4,
+      "rank": 15,
+      "trend": "stable",
+      "tier": "B"
+    }
+  ],
+  "ratchets": [
+    {
+      "name": "1-60",
+      "score": 100,
+      "rank": 1,
+      "trend": "stable",
+      "tier": "S+"
+    },
+    {
+      "name": "9-60",
+      "score": 72,
+      "rank": 2,
+      "trend": "stable",
+      "tier": "S"
+    },
+    {
+      "name": "3-60",
+      "score": 39,
+      "rank": 3,
+      "trend": "stable",
+      "tier": "S"
+    },
+    {
+      "name": "1-70",
+      "score": 28,
+      "rank": 4,
+      "trend": "stable",
+      "tier": "A+"
+    },
+    {
+      "name": "7-60",
+      "score": 28,
+      "rank": 5,
+      "trend": "stable",
+      "tier": "A+"
+    },
+    {
+      "name": "1-50",
+      "score": 24,
+      "rank": 6,
+      "trend": "stable",
+      "tier": "A"
+    },
+    {
+      "name": "5-60",
+      "score": 14,
+      "rank": 7,
+      "trend": "up",
+      "tier": "A"
+    },
+    {
+      "name": "7-70",
+      "score": 7,
+      "rank": 8,
+      "trend": "down",
+      "tier": "B"
+    },
+    {
+      "name": "6-60",
+      "score": 6,
+      "rank": 9,
+      "trend": "stable",
+      "tier": "B"
+    },
+    {
+      "name": "4-50",
+      "score": 4,
+      "rank": 10,
+      "trend": "up",
+      "tier": "B"
+    },
+    {
+      "name": "3-70",
+      "score": 4,
+      "rank": 11,
+      "trend": "stable",
+      "tier": "B"
+    },
+    {
+      "name": "9-70",
+      "score": 3,
+      "rank": 12,
+      "trend": "stable",
+      "tier": "C"
+    },
+    {
+      "name": "1-80",
+      "score": 2,
+      "rank": 13,
+      "trend": "stable",
+      "tier": "C"
+    }
+  ],
+  "bits": [
+    {
+      "name": "Rush",
+      "score": 100,
+      "rank": 1,
+      "trend": "up",
+      "tier": "S+"
+    },
+    {
+      "name": "Hexa",
+      "score": 97,
+      "rank": 2,
+      "trend": "down",
+      "tier": "S+"
+    },
+    {
+      "name": "Free Ball",
+      "score": 94,
+      "rank": 3,
+      "trend": "stable",
+      "tier": "S"
+    },
+    {
+      "name": "Low Rush",
+      "score": 78,
+      "rank": 4,
+      "trend": "stable",
+      "tier": "S"
+    },
+    {
+      "name": "Kick",
+      "score": 48,
+      "rank": 5,
+      "trend": "stable",
+      "tier": "A+"
+    },
+    {
+      "name": "Elevate",
+      "score": 47,
+      "rank": 6,
+      "trend": "stable",
+      "tier": "A+"
+    },
+    {
+      "name": "Level",
+      "score": 39,
+      "rank": 7,
+      "trend": "stable",
+      "tier": "A"
+    },
+    {
+      "name": "Narrow",
+      "score": 36,
+      "rank": 8,
+      "trend": "stable",
+      "tier": "A"
+    },
+    {
+      "name": "Low Orb",
+      "score": 17,
+      "rank": 9,
+      "trend": "up",
+      "tier": "B+"
+    },
+    {
+      "name": "Wedge",
+      "score": 13,
+      "rank": 10,
+      "trend": "up",
+      "tier": "B"
+    },
+    {
+      "name": "Ball",
+      "score": 12,
+      "rank": 11,
+      "trend": "down",
+      "tier": "B"
+    },
+    {
+      "name": "Point",
+      "score": 10,
+      "rank": 12,
+      "trend": "stable",
+      "tier": "B"
+    },
+    {
+      "name": "Jolt",
+      "score": 8,
+      "rank": 13,
+      "trend": "stable",
+      "tier": "C"
+    },
+    {
+      "name": "Unite",
+      "score": 7,
+      "rank": 14,
+      "trend": "stable",
+      "tier": "C"
+    },
+    {
+      "name": "Taper",
+      "score": 6,
+      "rank": 15,
+      "trend": "stable",
+      "tier": "C"
+    }
+  ]
+}

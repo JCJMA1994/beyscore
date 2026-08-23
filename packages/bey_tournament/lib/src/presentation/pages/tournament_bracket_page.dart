@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/tournament_bloc.dart';
+import '../dialogs/champion_card_dialog.dart';
 import '../../services/diploma_pdf_service.dart';
+import '../../services/rules_sheet_pdf_service.dart';
 
 class TournamentBracketPage extends StatefulWidget {
   const TournamentBracketPage({
@@ -635,25 +637,71 @@ class _TournamentBracketPageState extends State<TournamentBracketPage> {
                                   ),
                                 ],
                               ),
-                              OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(0xFFFFCC00),
-                                  side: const BorderSide(color: Color(0xFFFFCC00)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                ),
-                                icon: const Icon(Icons.picture_as_pdf, size: 14),
-                                label: const Text('DIPLOMAS PDF', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                                onPressed: () {
-                                  diplomaService.printOrShareDiploma(
-                                    context: context,
-                                    tournamentName: tournament.name,
-                                    tierLabel: tournament.tier.label,
-                                    divisionLabel: tournament.ageDivision.label,
-                                    bladerName: report.firstPlace,
-                                    placeTitle: '1ER LUGAR (CAMPEÓN)',
-                                    placeRank: 1,
-                                  );
-                                },
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 6,
+                                children: [
+                                  OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: const Color(0xFF00E5D0),
+                                      side: const BorderSide(color: Color(0xFF00E5D0)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    ),
+                                    icon: const Icon(Icons.badge, size: 14),
+                                    label: const Text('TARJETA 4:5', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                    onPressed: () {
+                                      ChampionCardDialog.show(
+                                        context,
+                                        tournamentName: tournament.name,
+                                        tierLabel: tournament.tier.label,
+                                        bladerName: report.firstPlace,
+                                        placeRank: 1,
+                                        deckEntries: const [
+                                          ChampionDeckEntry(
+                                            blade: Part(id: 'shark_scale', name: 'Shark Scale', type: PartType.blade, system: BeySystem.bx, productCode: 'BX-34'),
+                                            ratchet: Part(id: '9-60', name: '9-60', code: '9-60', type: PartType.ratchet, system: BeySystem.bx),
+                                            bit: Part(id: 'elevate', name: 'Elevate', code: 'E', type: PartType.bit, system: BeySystem.bx),
+                                            archetype: 'Ataque',
+                                          ),
+                                        ],
+                                        eventDate: tournament.createdAt,
+                                      );
+                                    },
+                                  ),
+                                  OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: const Color(0xFFFFCC00),
+                                      side: const BorderSide(color: Color(0xFFFFCC00)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    ),
+                                    icon: const Icon(Icons.picture_as_pdf, size: 14),
+                                    label: const Text('DIPLOMA PDF', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                    onPressed: () {
+                                      diplomaService.printOrShareDiploma(
+                                        context: context,
+                                        tournamentName: tournament.name,
+                                        tierLabel: tournament.tier.label,
+                                        divisionLabel: tournament.ageDivision.label,
+                                        bladerName: report.firstPlace,
+                                        placeTitle: '1ER LUGAR (CAMPEÓN)',
+                                        placeRank: 1,
+                                        totalParticipants: tournament.participants.length,
+                                      );
+                                    },
+                                  ),
+                                  OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: const Color(0xFF38BDF8),
+                                      side: const BorderSide(color: Color(0xFF38BDF8)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    ),
+                                    icon: const Icon(Icons.rule, size: 14),
+                                    label: const Text('REGLAS V12', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                    onPressed: () {
+                                      const RulesSheetPdfService().printOrShareRulesSheet();
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -679,6 +727,28 @@ class _TournamentBracketPageState extends State<TournamentBracketPage> {
                                       Text(report.firstPlace, style: AppTypography.displayMedium.copyWith(fontSize: 15, color: AppColors.text)),
                                     ],
                                   ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.badge, size: 18, color: Color(0xFF00E5D0)),
+                                  tooltip: 'Ver Tarjeta Social 4:5',
+                                  onPressed: () {
+                                    ChampionCardDialog.show(
+                                      context,
+                                      tournamentName: tournament.name,
+                                      tierLabel: tournament.tier.label,
+                                      bladerName: report.firstPlace,
+                                      placeRank: 1,
+                                      deckEntries: const [
+                                        ChampionDeckEntry(
+                                          blade: Part(id: 'shark_scale', name: 'Shark Scale', type: PartType.blade, system: BeySystem.bx, productCode: 'BX-34'),
+                                          ratchet: Part(id: '9-60', name: '9-60', code: '9-60', type: PartType.ratchet, system: BeySystem.bx),
+                                          bit: Part(id: 'elevate', name: 'Elevate', code: 'E', type: PartType.bit, system: BeySystem.bx),
+                                          archetype: 'Ataque',
+                                        ),
+                                      ],
+                                      eventDate: tournament.createdAt,
+                                    );
+                                  },
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.print, size: 18, color: Color(0xFFFFCC00)),

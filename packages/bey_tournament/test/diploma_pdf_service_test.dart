@@ -53,5 +53,58 @@ void main() {
       expect(thirdPlaceBytes.isNotEmpty, isTrue);
       expect(thirdPlaceBytes.sublist(0, 5), equals([0x25, 0x50, 0x44, 0x46, 0x2D]));
     });
+
+    test('generates valid PDF bytes for official rules sheet v12', () async {
+      const rulesService = RulesSheetPdfService();
+      final bytes = await rulesService.generateOfficialRulesSheetPdf();
+
+      expect(bytes, isA<Uint8List>());
+      expect(bytes.isNotEmpty, isTrue);
+      expect(bytes.sublist(0, 5), equals([0x25, 0x50, 0x44, 0x46, 0x2D]));
+    });
+
+    test('generates valid PDF bytes for 3on3 Champion Card format (style BeybladeHub)', () async {
+      final bytes = await service.generateChampionCardPdf(
+        tournamentName: 'Chimbote League X 2026',
+        tierLabel: 'G2',
+        divisionLabel: 'Open',
+        bladerName: 'Kamen X',
+        placeRank: 1,
+        deckCombos: [
+          {'blade': 'Wizard Rod', 'ratchet': '9-60', 'bit': 'Ball', 'type': 'Resistencia', 'weight': '38.5'},
+          {'blade': 'Phoenix Wing', 'ratchet': '5-60', 'bit': 'Point', 'type': 'Ataque', 'weight': '39.0'},
+          {'blade': 'Shark Scale', 'ratchet': '3-60', 'bit': 'Flat', 'type': 'Ataque', 'weight': '37.8'},
+        ],
+        storeOrVenue: 'Coliseo BeyScore',
+      );
+
+      expect(bytes, isA<Uint8List>());
+      expect(bytes.isNotEmpty, isTrue);
+      expect(bytes.sublist(0, 5), equals([0x25, 0x50, 0x44, 0x46, 0x2D]));
+    });
+
+    test('generates valid PDF bytes for Official Podium & Standings Report', () async {
+      final bytes = await service.generatePodiumReportPdf(
+        tournamentName: 'Torneo Oficial BeyScore Chimbote',
+        tierLabel: 'G1',
+        divisionLabel: 'Open',
+        championName: 'Tyson Granger',
+        runnerUpName: 'Kai Hiwatari',
+        thirdPlaceName: 'Ray Kon',
+        championDeck: [
+          {'blade': 'Wizard Rod', 'ratchet': '1-60', 'bit': 'Hexa', 'type': 'Stamina'},
+          {'blade': 'Shark Scale', 'ratchet': '1-70', 'bit': 'Low Rush', 'type': 'Attack'},
+          {'blade': 'Silver Wolf', 'ratchet': '9-60', 'bit': 'Free Ball', 'type': 'Balance'},
+        ],
+        totalParticipants: 16,
+        totalMatches: 15,
+        totalPoints: 48,
+        organizerName: 'Organizador Oficial',
+      );
+
+      expect(bytes, isA<Uint8List>());
+      expect(bytes.isNotEmpty, isTrue);
+      expect(bytes.sublist(0, 5), equals([0x25, 0x50, 0x44, 0x46, 0x2D]));
+    });
   });
 }

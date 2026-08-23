@@ -43,6 +43,7 @@ export 'src/catalog/part_type.dart';
 // Combo
 export 'src/combo/combo.dart';
 export 'src/combo/combo_repository.dart';
+export 'src/combo/combo_stats_calculator.dart';
 
 // Deck
 export 'src/deck/deck.dart';
@@ -51,7 +52,9 @@ export 'src/deck/deck_validator.dart';
 
 // Meta & Analytics
 export 'src/meta/buildability_service.dart';
+export 'src/meta/meta_advisor_service.dart';
 export 'src/meta/meta_preset_service.dart';
+export 'src/meta/meta_ranking_models.dart';
 export 'src/meta/meta_repository.dart';
 export 'src/meta/tier_entry.dart';
 export 'src/analytics/meta_analytics_service.dart';

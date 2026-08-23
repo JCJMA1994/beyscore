@@ -21,12 +21,22 @@ class DeckRepositoryImpl implements DeckRepository {
   Future<void> save(Deck deck) async {
     await _dataSource.insertOrUpdateDeck(deck);
     final service = _syncService;
-    if (service != null) {
+    if (service != null && service.isAvailable) {
       final active = await _identitySource?.getActiveProfile();
-      unawaited(service.pushDecks([deck], userId: active?.id));
+      try {
+        await service.pushDecks([deck], userId: active?.id);
+      } catch (_) {}
     }
   }
 
   @override
-  Future<void> delete(String id) => _dataSource.deleteDeck(id);
+  Future<void> delete(String id) async {
+    await _dataSource.deleteDeck(id);
+    final service = _syncService;
+    if (service != null && service.isAvailable) {
+      try {
+        await service.deleteDeck(id);
+      } catch (_) {}
+    }
+  }
 }

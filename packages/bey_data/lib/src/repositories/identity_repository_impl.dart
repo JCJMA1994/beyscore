@@ -40,21 +40,30 @@ class IdentityRepositoryImpl implements IdentityRepository {
       nickname: nickname,
       existingDeviceId: existing?.deviceId,
     );
-    await _localDataSource.saveActiveProfile(result.profile);
+
+    var finalProfile = result.profile;
 
     // Sync profile with Supabase cloud
     final service = _syncService;
     if (service != null && service.isAvailable) {
-      unawaited(
-        service.syncProfile(
-          id: result.profile.id,
-          nickname: result.profile.nickname,
-          recoveryCodeHash: result.profile.recoveryCodeHash,
-        ),
-      );
+      try {
+        final authUserId = await service.ensureAuthenticated();
+        if (authUserId != null && authUserId.isNotEmpty) {
+          finalProfile = finalProfile.copyWith(id: authUserId);
+        }
+        await service.syncProfile(
+          id: finalProfile.id,
+          nickname: finalProfile.nickname,
+          recoveryCodeHash: finalProfile.recoveryCodeHash,
+        );
+      } catch (_) {
+        // Safe offline fallback: SyncEngine will retry when connection is restored
+      }
     }
 
-    return result;
+    await _localDataSource.saveActiveProfile(finalProfile);
+
+    return (profile: finalProfile, formattedRecoveryCode: result.formattedRecoveryCode);
   }
 
   @override
@@ -63,13 +72,15 @@ class IdentityRepositoryImpl implements IdentityRepository {
 
     final service = _syncService;
     if (service != null && service.isAvailable) {
-      unawaited(
-        service.syncProfile(
+      try {
+        await service.syncProfile(
           id: profile.id,
           nickname: profile.nickname,
           recoveryCodeHash: profile.recoveryCodeHash,
-        ),
-      );
+        );
+      } catch (_) {
+        // Safe offline fallback
+      }
     }
   }
 

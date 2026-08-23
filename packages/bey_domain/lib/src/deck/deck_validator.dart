@@ -43,7 +43,16 @@ class DeckValidator {
   static const _duplicateExceptions = {
     'lockchip-ares',
     'lockchip-emperor',
+    'lock-chip-ares',
+    'lock-chip-emperor',
+    'ares',
+    'emperor',
   };
+
+  /// Normalizes part identity keys for consistent duplicate detection.
+  static String normalizeIdentityKey(String key) {
+    return key.toLowerCase().trim().replaceAll(' ', '-').replaceAll('_', '-');
+  }
 
   /// Validates a deck. [beys] is the lineup in combat order.
   Either<List<DeckViolation>, ValidDeck> validate(
@@ -66,7 +75,7 @@ class DeckValidator {
       if (!beys[i].isComplete) {
         violations.add(DeckViolation(
           kind: DeckViolationKind.incompleteBey,
-          message: 'El Bey ${i + 1} está incompleto (falta Blade, Ratchet o Bit).',
+          message: 'El Bey ${i + 1} está incompleto (falta Blade/MainBlade, Ratchet o Bit).',
           beyIndexes: [i],
         ));
       }
@@ -77,26 +86,28 @@ class DeckValidator {
     final appearances = <String, List<int>>{};
     for (var i = 0; i < beys.length; i++) {
       for (final p in beys[i].parts) {
-        appearances.putIfAbsent(p.identityKey, () => []).add(i);
+        final normKey = normalizeIdentityKey(p.identityKey);
+        appearances.putIfAbsent(normKey, () => []).add(i);
       }
     }
 
     appearances.forEach((key, indices) {
       if (indices.length <= 1) return;
-      if (_duplicateExceptions.contains(key) && indices.length == 2) return;
+      // Exception: Ares and Emperor lock chips can appear up to twice across the 3 beys
+      final isException = _duplicateExceptions.any((ex) => key.contains(ex));
+      if (isException && indices.length == 2) return;
 
-      final name = beys[indices.first]
+      final matchingPart = beys[indices.first]
           .parts
-          .firstWhere((p) => p.identityKey == key)
-          .name;
+          .firstWhere((p) => normalizeIdentityKey(p.identityKey) == key);
 
       violations.add(DeckViolation(
         kind: DeckViolationKind.duplicatePart,
         message:
-            '$name se repite en los Beys ${indices.map((i) => i + 1).join(" y ")}. '
-            'Las piezas no pueden repetirse entre los 3 Beys, incluso en distinto color.',
+            '${matchingPart.name} se repite en los Beys ${indices.map((i) => i + 1).join(" y ")}. '
+            'Las reglas oficiales v12 prohíben repetir piezas entre los 3 Beys (incluso en distinto color).',
         partId: key,
-        partName: name,
+        partName: matchingPart.name,
         beyIndexes: indices,
       ));
     });
@@ -105,7 +116,8 @@ class DeckValidator {
     if (isSingles) {
       for (var i = 0; i < beys.length; i++) {
         for (final p in beys[i].parts) {
-          if (hallOfFamePartIds.contains(p.identityKey)) {
+          final normKey = normalizeIdentityKey(p.identityKey);
+          if (hallOfFamePartIds.map(normalizeIdentityKey).contains(normKey)) {
             violations.add(DeckViolation(
               kind: DeckViolationKind.hallOfFameInSingles,
               message:
@@ -121,8 +133,6 @@ class DeckValidator {
     }
 
     // --- left launcher check ---
-    // Legitimate derivation: spinDirection == LEFT requires L launcher.
-    // This is a physical definition, not an inference. (CLAUDE.md section 12)
     if (!ownsLeftLauncher) {
       for (var i = 0; i < beys.length; i++) {
         if (beys[i].spinsLeft) {
@@ -153,9 +163,16 @@ class BeyBuild {
   final List<PartRef> parts;
   final bool spinsLeft;
 
+  /// A Bey is complete if it has either a standard Blade (BX/UX) OR
+  /// a modular CX structure (LockChip + MainBlade + AssistBlade), plus Ratchet and Bit.
   bool get isComplete {
     final kinds = parts.map((p) => p.type).toSet();
-    return kinds.contains(PartKind.blade) &&
+    final hasBladeStructure = kinds.contains(PartKind.blade) ||
+        (kinds.contains(PartKind.mainBlade) &&
+            kinds.contains(PartKind.lockChip) &&
+            kinds.contains(PartKind.assistBlade));
+
+    return hasBladeStructure &&
         kinds.contains(PartKind.ratchet) &&
         kinds.contains(PartKind.bit);
   }

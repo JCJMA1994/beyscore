@@ -215,6 +215,93 @@ void main() {
       );
     });
 
+    test('allows official v12 exception for CX LockChips Ares and Emperor up to twice', () {
+      const bey1 = BeyBuild(
+        spinsLeft: false,
+        parts: [
+          PartRef(identityKey: 'lockchip-ares', name: 'LockChip Ares', type: PartKind.lockChip),
+          PartRef(identityKey: 'mainblade-dran', name: 'MainBlade Dran', type: PartKind.mainBlade),
+          PartRef(identityKey: 'assistblade-jaggy', name: 'AssistBlade Jaggy', type: PartKind.assistBlade),
+          PartRef(identityKey: 'ratchet-3-60', name: '3-60', type: PartKind.ratchet),
+          PartRef(identityKey: 'bit-flat', name: 'Flat', type: PartKind.bit),
+        ],
+      );
+
+      // Bey 2 repeats LockChip Ares (allowed by official v12 rule!)
+      const bey2 = BeyBuild(
+        spinsLeft: false,
+        parts: [
+          PartRef(identityKey: 'lockchip-ares', name: 'LockChip Ares', type: PartKind.lockChip),
+          PartRef(identityKey: 'mainblade-hells', name: 'MainBlade Hells', type: PartKind.mainBlade),
+          PartRef(identityKey: 'assistblade-bumper', name: 'AssistBlade Bumper', type: PartKind.assistBlade),
+          PartRef(identityKey: 'ratchet-4-60', name: '4-60', type: PartKind.ratchet),
+          PartRef(identityKey: 'bit-ball', name: 'Ball', type: PartKind.bit),
+        ],
+      );
+
+      const bey3 = BeyBuild(
+        spinsLeft: false,
+        parts: [
+          PartRef(identityKey: 'blade-wizardrod', name: 'WizardRod', type: PartKind.blade),
+          PartRef(identityKey: 'ratchet-5-60', name: '5-60', type: PartKind.ratchet),
+          PartRef(identityKey: 'bit-point', name: 'Point', type: PartKind.bit),
+        ],
+      );
+
+      final result = validator.validate(
+        [bey1, bey2, bey3],
+        isSingles: false,
+        hallOfFamePartIds: {},
+        ownsLeftLauncher: true,
+      );
+
+      expect(result.isRight(), isTrue);
+    });
+
+    test('rejects 3 repetitions of Ares lockchip (max allowed is 2)', () {
+      const bey1 = BeyBuild(
+        spinsLeft: false,
+        parts: [
+          PartRef(identityKey: 'lockchip-ares', name: 'LockChip Ares', type: PartKind.lockChip),
+          PartRef(identityKey: 'mainblade-dran', name: 'MainBlade Dran', type: PartKind.mainBlade),
+          PartRef(identityKey: 'assistblade-jaggy', name: 'AssistBlade Jaggy', type: PartKind.assistBlade),
+          PartRef(identityKey: 'ratchet-3-60', name: '3-60', type: PartKind.ratchet),
+          PartRef(identityKey: 'bit-flat', name: 'Flat', type: PartKind.bit),
+        ],
+      );
+
+      const bey2 = BeyBuild(
+        spinsLeft: false,
+        parts: [
+          PartRef(identityKey: 'lockchip-ares', name: 'LockChip Ares', type: PartKind.lockChip),
+          PartRef(identityKey: 'mainblade-hells', name: 'MainBlade Hells', type: PartKind.mainBlade),
+          PartRef(identityKey: 'assistblade-bumper', name: 'AssistBlade Bumper', type: PartKind.assistBlade),
+          PartRef(identityKey: 'ratchet-4-60', name: '4-60', type: PartKind.ratchet),
+          PartRef(identityKey: 'bit-ball', name: 'Ball', type: PartKind.bit),
+        ],
+      );
+
+      const bey3 = BeyBuild(
+        spinsLeft: false,
+        parts: [
+          PartRef(identityKey: 'lockchip-ares', name: 'LockChip Ares', type: PartKind.lockChip),
+          PartRef(identityKey: 'mainblade-wizard', name: 'MainBlade Wizard', type: PartKind.mainBlade),
+          PartRef(identityKey: 'assistblade-wheel', name: 'AssistBlade Wheel', type: PartKind.assistBlade),
+          PartRef(identityKey: 'ratchet-5-60', name: '5-60', type: PartKind.ratchet),
+          PartRef(identityKey: 'bit-point', name: 'Point', type: PartKind.bit),
+        ],
+      );
+
+      final result = validator.validate(
+        [bey1, bey2, bey3],
+        isSingles: false,
+        hallOfFamePartIds: {},
+        ownsLeftLauncher: true,
+      );
+
+      expect(result.isLeft(), isTrue);
+    });
+
     test('detects Hall of Fame banned part in singles format', () {
       const bey = BeyBuild(
         spinsLeft: false,

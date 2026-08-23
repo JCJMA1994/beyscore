@@ -691,6 +691,40 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
               textAlign: TextAlign.center,
               style: AppTypography.bodySmall.copyWith(color: AppColors.mute),
             ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: qrData));
+                HapticFeedback.lightImpact();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.x,
+                    content: Text('¡Token de Mesa $tableNumber copiado al portapapeles!'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.steel,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: AppColors.line),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.copy, size: 14, color: AppColors.x),
+                    const SizedBox(width: 8),
+                    Text(
+                      'COPIAR TOKEN DE MESA $tableNumber',
+                      style: AppTypography.mono.copyWith(fontSize: 10.5, color: AppColors.x, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -743,15 +777,37 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
               style: AppTypography.bodySmall.copyWith(color: AppColors.mute, fontSize: 11.5),
             ),
             const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.steel,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                'HOST IP: $cleanIp:$port',
-                style: AppTypography.mono.copyWith(fontSize: 11, color: AppColors.x, fontWeight: FontWeight.bold),
+            InkWell(
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: '$cleanIp:$port'));
+                HapticFeedback.lightImpact();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    backgroundColor: AppColors.x,
+                    content: Text('¡Host IP y Puerto copiados al portapapeles!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.steel,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: AppColors.line),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.copy, size: 14, color: AppColors.x),
+                    const SizedBox(width: 8),
+                    Text(
+                      'HOST IP: $cleanIp:$port',
+                      style: AppTypography.mono.copyWith(fontSize: 11, color: AppColors.x, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -1099,8 +1155,53 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
                       ),
                     ),
                     IconButton(
+                      icon: const Icon(Icons.badge, color: AppColors.pegasus, size: 22),
+                      tooltip: 'Tarjeta de Campeón 4:5 y Diploma 3on3',
+                      onPressed: () {
+                        final payload = _hubServer.getDeckForBlader(report.firstPlace);
+                        final rawCombos = (payload?['combos'] as List<dynamic>?) ?? <dynamic>[];
+                        final entries = <ChampionDeckEntry>[];
+                        for (final item in rawCombos) {
+                          if (item is Map) {
+                            final bladeName = (item['blade'] as String? ?? item['name'] as String? ?? 'Shark Scale').trim();
+                            final ratchetName = (item['ratchet'] as String? ?? '9-60').trim();
+                            final bitName = (item['bit'] as String? ?? 'Elevate').trim();
+                            entries.add(
+                              ChampionDeckEntry(
+                                blade: Part(id: 'blade-${bladeName.toLowerCase()}', name: bladeName, type: PartType.blade, system: BeySystem.bx),
+                                ratchet: Part(id: 'ratchet-${ratchetName.toLowerCase()}', name: ratchetName, code: ratchetName, type: PartType.ratchet, system: BeySystem.bx),
+                                bit: Part(id: 'bit-${bitName.toLowerCase()}', name: bitName, code: bitName, type: PartType.bit, system: BeySystem.bx),
+                                archetype: item['type'] as String? ?? 'Ataque',
+                              ),
+                            );
+                          }
+                        }
+                        if (entries.isEmpty) {
+                          entries.add(
+                            const ChampionDeckEntry(
+                              blade: Part(id: 'shark_scale', name: 'Shark Scale', type: PartType.blade, system: BeySystem.bx),
+                              ratchet: Part(id: '9-60', name: '9-60', code: '9-60', type: PartType.ratchet, system: BeySystem.bx),
+                              bit: Part(id: 'elevate', name: 'Elevate', code: 'E', type: PartType.bit, system: BeySystem.bx),
+                              archetype: 'Ataque',
+                            ),
+                          );
+                        }
+
+                        ChampionCardDialog.show(
+                          context,
+                          tournamentName: _currentTournament.name,
+                          tierLabel: _currentTournament.tier.label,
+                          bladerName: report.firstPlace,
+                          placeRank: 1,
+                          deckEntries: entries,
+                          eventDate: _currentTournament.createdAt,
+                          storeOrVenue: 'Sede Oficial BeyScore',
+                        );
+                      },
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.picture_as_pdf, color: AppColors.pegasus, size: 20),
-                      tooltip: 'Generar Diploma PDF (Horizontal)',
+                      tooltip: 'Generar Diploma Clásico PDF (Horizontal)',
                       onPressed: () {
                         final payload = _hubServer.getDeckForBlader(report.firstPlace);
                         final rawCombos = (payload?['combos'] as List<dynamic>?) ?? <dynamic>[];
@@ -1152,8 +1253,30 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
                         ),
                       ),
                       IconButton(
+                        icon: const Icon(Icons.badge, color: AppColors.mute, size: 22),
+                        tooltip: 'Tarjeta de Subcampeón 4:5 y Diploma 3on3',
+                        onPressed: () {
+                          ChampionCardDialog.show(
+                            context,
+                            tournamentName: _currentTournament.name,
+                            tierLabel: _currentTournament.tier.label,
+                            bladerName: report.secondPlace!,
+                            placeRank: 2,
+                            deckEntries: const [
+                              ChampionDeckEntry(
+                                blade: Part(id: 'wizard_rod', name: 'Wizard Rod', type: PartType.blade, system: BeySystem.bx),
+                                ratchet: Part(id: '1-60', name: '1-60', code: '1-60', type: PartType.ratchet, system: BeySystem.bx),
+                                bit: Part(id: 'hexa', name: 'Hexa', code: 'H', type: PartType.bit, system: BeySystem.bx),
+                                archetype: 'Resistencia',
+                              ),
+                            ],
+                            eventDate: _currentTournament.createdAt,
+                          );
+                        },
+                      ),
+                      IconButton(
                         icon: const Icon(Icons.picture_as_pdf, color: AppColors.mute, size: 20),
-                        tooltip: 'Generar Diploma PDF (Horizontal)',
+                        tooltip: 'Generar Diploma Clásico PDF (Horizontal)',
                         onPressed: () {
                           final payload = _hubServer.getDeckForBlader(report.secondPlace!);
                           final rawCombos = (payload?['combos'] as List<dynamic>?) ?? <dynamic>[];
@@ -1205,8 +1328,30 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
                         ),
                       ),
                       IconButton(
+                        icon: const Icon(Icons.badge, color: AppColors.dranzer, size: 22),
+                        tooltip: 'Tarjeta de Bronce 4:5 y Diploma 3on3',
+                        onPressed: () {
+                          ChampionCardDialog.show(
+                            context,
+                            tournamentName: _currentTournament.name,
+                            tierLabel: _currentTournament.tier.label,
+                            bladerName: report.thirdPlace!,
+                            placeRank: 3,
+                            deckEntries: const [
+                              ChampionDeckEntry(
+                                blade: Part(id: 'phoenix_wing', name: 'Phoenix Wing', type: PartType.blade, system: BeySystem.bx),
+                                ratchet: Part(id: '5-60', name: '5-60', code: '5-60', type: PartType.ratchet, system: BeySystem.bx),
+                                bit: Part(id: 'point', name: 'Point', code: 'P', type: PartType.bit, system: BeySystem.bx),
+                                archetype: 'Ataque',
+                              ),
+                            ],
+                            eventDate: _currentTournament.createdAt,
+                          );
+                        },
+                      ),
+                      IconButton(
                         icon: const Icon(Icons.picture_as_pdf, color: AppColors.dranzer, size: 20),
-                        tooltip: 'Generar Diploma PDF (Horizontal)',
+                        tooltip: 'Generar Diploma Clásico PDF (Horizontal)',
                         onPressed: () {
                           final payload = _hubServer.getDeckForBlader(report.thirdPlace!);
                           final rawCombos = (payload?['combos'] as List<dynamic>?) ?? <dynamic>[];
@@ -1325,6 +1470,43 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
                 context,
                 title: 'Reporte Copiado al Portapapeles',
                 message: 'Pega este reporte oficial en WhatsApp, Telegram o Discord.',
+              );
+            },
+          ),
+          TextButton.icon(
+            icon: const Icon(Icons.picture_as_pdf, size: 16, color: AppColors.x),
+            label: const Text('ACTA DE PODIO PDF', style: TextStyle(color: AppColors.x, fontWeight: FontWeight.bold)),
+            onPressed: () {
+              final payload1 = _hubServer.getDeckForBlader(report.firstPlace);
+              final payload2 = report.secondPlace != null ? _hubServer.getDeckForBlader(report.secondPlace!) : null;
+              final payload3 = report.thirdPlace != null ? _hubServer.getDeckForBlader(report.thirdPlace!) : null;
+
+              List<Map<String, String>> parseDeck(Map<String, dynamic>? p) {
+                final list = (p?['combos'] as List<dynamic>?) ?? <dynamic>[];
+                return list.whereType<Map<String, dynamic>>().map((m) => {
+                  'blade': m['blade'] as String? ?? m['name'] as String? ?? '',
+                  'ratchet': m['ratchet'] as String? ?? '',
+                  'bit': m['bit'] as String? ?? '',
+                  'type': m['type'] as String? ?? 'Ataque',
+                }).toList();
+              }
+
+              const DiplomaPdfService().printOrSharePodiumReportPdf(
+                context: context,
+                tournamentName: _currentTournament.name,
+                tierLabel: _currentTournament.tier.label,
+                divisionLabel: _currentTournament.ageDivision.label,
+                championName: report.firstPlace,
+                runnerUpName: report.secondPlace ?? 'N/A',
+                thirdPlaceName: report.thirdPlace,
+                championDeck: parseDeck(payload1),
+                runnerUpDeck: parseDeck(payload2),
+                thirdPlaceDeck: parseDeck(payload3),
+                totalParticipants: _currentTournament.participants.length,
+                totalMatches: report.totalMatches,
+                totalPoints: report.totalPointsScored,
+                organizerName: _currentUserId,
+                eventDate: _currentTournament.createdAt,
               );
             },
           ),

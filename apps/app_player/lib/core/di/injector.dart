@@ -106,6 +106,12 @@ Future<void> configureDependencies({AppDatabase? database}) async {
   if (!getIt.isRegistered<DeckValidator>()) {
     getIt.registerLazySingleton<DeckValidator>(DeckValidator.new);
   }
+  if (!getIt.isRegistered<ComboStatsCalculator>()) {
+    getIt.registerLazySingleton<ComboStatsCalculator>(ComboStatsCalculator.new);
+  }
+  if (!getIt.isRegistered<MetaAdvisorService>()) {
+    getIt.registerLazySingleton<MetaAdvisorService>(MetaAdvisorService.new);
+  }
   if (!getIt.isRegistered<BuildabilityService>()) {
     getIt.registerLazySingleton<BuildabilityService>(BuildabilityService.new);
   }

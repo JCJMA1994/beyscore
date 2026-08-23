@@ -73,17 +73,29 @@ class SyncEngine {
     _isRunning.add(true);
 
     try {
-      // 1. Sync User Profile if exists
+      // 1. Ensure authenticated session with Supabase
+      final authUserId = await _supabaseSync.ensureAuthenticated();
+
+      // 2. Sync User Profile if exists, and resolve cloud auth ID
       final profile = await _identityDataSource.getActiveProfile();
       if (profile != null) {
         await _supabaseSync.syncProfile(
-          id: profile.id,
+          id: authUserId ?? profile.id,
           nickname: profile.nickname,
           recoveryCodeHash: profile.recoveryCodeHash,
         );
 
+        // If local profile ID differed from cloud auth ID, update local profile
+        if (authUserId != null && authUserId != profile.id) {
+          final updated = profile.copyWith(id: authUserId);
+          await _identityDataSource.saveActiveProfile(updated);
+        }
+      }
+
+      final activeUserId = authUserId ?? profile?.id;
+      if (activeUserId != null) {
         // 2. Bidirectional Sync Combos: Pull from cloud first, merge to SQLite, then push
-        final cloudCombos = await _supabaseSync.pullCombos(profile.id);
+        final cloudCombos = await _supabaseSync.pullCombos(activeUserId);
         final localCombos = await _comboDataSource.getCombos();
         final localCombosMap = {for (final c in localCombos) c.id: c};
 
@@ -111,11 +123,11 @@ class SyncEngine {
 
         final allCombos = await _comboDataSource.getCombos();
         if (allCombos.isNotEmpty) {
-          await _supabaseSync.pushCombos(allCombos, userId: profile.id);
+          await _supabaseSync.pushCombos(allCombos, userId: activeUserId);
         }
 
         // 3. Bidirectional Sync Decks: Pull from cloud first, merge to SQLite, then push
-        final cloudDecks = await _supabaseSync.pullDecks(profile.id);
+        final cloudDecks = await _supabaseSync.pullDecks(activeUserId);
         final localDecks = await _deckDataSource.getDecks();
         final localDecksMap = {for (final d in localDecks) d.id: d};
 
@@ -138,27 +150,28 @@ class SyncEngine {
 
         final allDecks = await _deckDataSource.getDecks();
         if (allDecks.isNotEmpty) {
-          await _supabaseSync.pushDecks(allDecks, userId: profile.id);
-        }
-      } else {
-        // Guest mode fallback: push whatever is local if client authenticated
-        final combos = await _comboDataSource.getCombos();
-        if (combos.isNotEmpty) {
-          await _supabaseSync.pushCombos(combos);
-        }
-        final decks = await _deckDataSource.getDecks();
-        if (decks.isNotEmpty) {
-          await _supabaseSync.pushDecks(decks);
+          await _supabaseSync.pushDecks(allDecks, userId: activeUserId);
         }
       }
 
-      // 4. Sync Tournaments: ONLY completed tournaments sync with the cloud
+      // 4. Bidirectional Sync Tournaments: Pull from cloud first, then push local
       final tournamentSource = _tournamentDataSource;
       if (tournamentSource != null) {
-        final tournaments = await tournamentSource.getTournaments();
-        final completedTournaments = tournaments.where((t) => t.status == TournamentStatus.completed).toList();
-        if (completedTournaments.isNotEmpty) {
-          await _supabaseSync.pushTournaments(completedTournaments, userId: profile?.id);
+        // Pull active & completed cloud tournaments
+        final cloudTournaments = await _supabaseSync.pullActiveTournaments();
+        final localTournaments = await tournamentSource.getTournaments();
+        final localMap = {for (final t in localTournaments) t.id: t};
+
+        for (final cloud in cloudTournaments) {
+          final local = localMap[cloud.id];
+          if (local == null || cloud.status == TournamentStatus.completed || cloud.rounds.length >= local.rounds.length) {
+            await tournamentSource.saveTournament(cloud);
+          }
+        }
+
+        final allLocal = await tournamentSource.getTournaments();
+        if (allLocal.isNotEmpty) {
+          await _supabaseSync.pushTournaments(allLocal, userId: activeUserId);
         }
       }
     } catch (_) {

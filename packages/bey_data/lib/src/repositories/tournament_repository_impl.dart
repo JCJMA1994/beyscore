@@ -42,8 +42,10 @@ class TournamentRepositoryImpl implements TournamentRepository {
     }
 
     final service = _syncService;
-    if (service != null && service.isAvailable && tournament.status == TournamentStatus.completed) {
-      unawaited(service.pushTournaments([tournament]));
+    if (service != null && service.isAvailable) {
+      try {
+        unawaited(service.pushTournaments([tournament]));
+      } catch (_) {}
     }
   }
 

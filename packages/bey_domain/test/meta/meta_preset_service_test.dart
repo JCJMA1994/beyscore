@@ -11,9 +11,9 @@ void main() {
       expect(presets.length, greaterThanOrEqualTo(3));
 
       final wizardRod = presets.firstWhere((p) => p.bladeId == 'wizard_rod');
-      expect(wizardRod.ratchetId, '9-60');
-      expect(wizardRod.bitId, 'ball');
-      expect(wizardRod.tier, 'S');
+      expect(wizardRod.ratchetId, '1-60');
+      expect(wizardRod.bitId, 'hexa');
+      expect(wizardRod.tier, 'S+');
       expect(wizardRod.archetype, 'Resistencia');
     });
 

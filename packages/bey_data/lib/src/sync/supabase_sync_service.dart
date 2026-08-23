@@ -42,7 +42,7 @@ class SupabaseSyncService {
     }
   }
 
-  /// Syncs user profile in Supabase, preserving original profile ID to avoid duplicate accounts.
+  /// Syncs user profile in Supabase, ensuring it is tied to auth.users.
   Future<bool> syncProfile({
     String? id,
     required String nickname,
@@ -52,39 +52,42 @@ class SupabaseSyncService {
     final client = _client;
     if (client == null) return false;
 
-    // 1. If recovery code hash exists, check if account already exists in Supabase
-    var targetId = id;
-    if (recoveryCodeHash != null && recoveryCodeHash.isNotEmpty) {
-      try {
-        final existing = await client
-            .from('profiles')
-            .select('id')
-            .eq('recovery_code_hash', recoveryCodeHash)
-            .maybeSingle();
-
-        if (existing != null && existing['id'] != null) {
-          targetId = existing['id'] as String;
-          debugPrint('[SupabaseSync] Reusing existing cloud profile ID: $targetId');
-        }
-      } catch (_) {}
+    final authUserId = await ensureAuthenticated();
+    if (authUserId == null) {
+      debugPrint('[SupabaseSync] Cannot sync profile: not authenticated in Supabase.');
+      return false;
     }
-
-    targetId ??= await ensureAuthenticated();
-    if (targetId == null) return false;
 
     try {
       await client.from('profiles').upsert({
-        'id': targetId,
+        'id': authUserId,
         'nickname': nickname,
         'recovery_code_hash': recoveryCodeHash,
         'avatar_url': avatarUrl,
         'updated_at': DateTime.now().toIso8601String(),
       });
-      debugPrint('[SupabaseSync] Profile synced OK: $nickname ($targetId)');
+      debugPrint('[SupabaseSync] Profile synced OK: $nickname ($authUserId)');
       return true;
     } catch (e) {
       debugPrint('[SupabaseSync] Error syncing profile: $e');
       return false;
+    }
+  }
+
+  Future<void> _ensureProfileExists(String userId, {String? defaultNickname}) async {
+    final client = _client;
+    if (client == null) return;
+    try {
+      final existing = await client.from('profiles').select('id, nickname').eq('id', userId).maybeSingle();
+      if (existing == null) {
+        await client.from('profiles').insert({
+          'id': userId,
+          'nickname': defaultNickname ?? 'Blader',
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+      }
+    } catch (e) {
+      debugPrint('[SupabaseSync] Warning ensuring profile exists: $e');
     }
   }
 
@@ -96,10 +99,14 @@ class SupabaseSyncService {
     var targetUserId = userId ?? client.auth.currentSession?.user.id;
     targetUserId ??= await ensureAuthenticated();
 
+    if (targetUserId == null) return false;
+
     try {
+      await _ensureProfileExists(targetUserId);
+
       final rows = combos.map((c) => {
             'id': c.id,
-            'user_id': targetUserId ?? 'anon',
+            'user_id': targetUserId,
             'name': c.name,
             'blade_id': c.bladeId,
             'ratchet_id': c.ratchetId,
@@ -128,10 +135,14 @@ class SupabaseSyncService {
     var targetUserId = userId ?? client.auth.currentSession?.user.id;
     targetUserId ??= await ensureAuthenticated();
 
+    if (targetUserId == null) return false;
+
     try {
+      await _ensureProfileExists(targetUserId);
+
       final rows = decks.map((d) => {
             'id': d.id,
-            'user_id': targetUserId ?? 'anon',
+            'user_id': targetUserId,
             'name': d.name,
             'combo_ids': d.comboIds,
             'updated_at': DateTime.now().toIso8601String(),
@@ -142,6 +153,36 @@ class SupabaseSyncService {
       return true;
     } catch (e) {
       debugPrint('[SupabaseSync] Error pushing decks: $e');
+      return false;
+    }
+  }
+
+  /// Deletes a combo from Supabase.
+  Future<bool> deleteCombo(String id) async {
+    final client = _client;
+    if (client == null) return false;
+
+    try {
+      await client.from('combos').delete().eq('id', id);
+      debugPrint('[SupabaseSync] Deleted combo $id from Supabase.');
+      return true;
+    } catch (e) {
+      debugPrint('[SupabaseSync] Error deleting combo: $e');
+      return false;
+    }
+  }
+
+  /// Deletes a deck from Supabase.
+  Future<bool> deleteDeck(String id) async {
+    final client = _client;
+    if (client == null) return false;
+
+    try {
+      await client.from('decks').delete().eq('id', id);
+      debugPrint('[SupabaseSync] Deleted deck $id from Supabase.');
+      return true;
+    } catch (e) {
+      debugPrint('[SupabaseSync] Error deleting deck: $e');
       return false;
     }
   }
@@ -195,36 +236,51 @@ class SupabaseSyncService {
     }
   }
 
-  /// Pushes local tournaments to Supabase.
+  /// Pushes local tournaments to Supabase (supporting all tournament phases).
   Future<bool> pushTournaments(List<Tournament> tournaments, {String? userId}) async {
-    final completedTournaments = tournaments.where((t) => t.status == TournamentStatus.completed).toList();
-    if (completedTournaments.isEmpty) return true;
+    if (tournaments.isEmpty) return true;
 
     final client = _client;
     if (client == null) return false;
 
     try {
-      final rows = completedTournaments.map((t) {
+      final authUserId = await ensureAuthenticated();
+      final targetUserId = userId ?? authUserId;
+
+      if (targetUserId == null) {
+        debugPrint('[SupabaseSync] Cannot push tournaments: unauthenticated.');
+        return false;
+      }
+
+      await _ensureProfileExists(targetUserId, defaultNickname: 'Organizador');
+
+      final rows = tournaments.map((t) {
+        final code = 'BEY-${t.id.replaceAll('-', '').padRight(6, '0').substring(0, 6).toUpperCase()}';
+
         return {
           'id': t.id,
           'name': t.name,
-          'organizer_id': userId ?? (t.organizerIds.isNotEmpty ? t.organizerIds.first : null),
+          'code': code,
+          'organizer_id': targetUserId,
           'tier': t.tier.name.toUpperCase(),
-          'age_division': t.ageDivision.name,
-          'status': t.status.name,
+          'age_division': t.ageDivision.name.toUpperCase(),
+          'status': t.status.index.toString(),
           'participants': t.participants,
-          'seed': t.seed,
+          'champion_name': t.championName,
+          'seed': t.seed ?? 0,
           'rounds': t.rounds
               .map((r) => {
-                    'roundNumber': r.roundIndex,
+                    'roundIndex': r.roundIndex,
                     'name': r.name,
                     'matchups': r.matchups
                         .map((m) => {
-                              'id': m.matchId,
+                              'matchId': m.matchId,
+                              'playerAId': m.playerAId,
+                              'playerAName': m.playerAName,
+                              'playerBId': m.playerBId,
+                              'playerBName': m.playerBName,
                               'tableNumber': m.tableNumber,
-                              'playerA': m.playerAName,
-                              'playerB': m.playerBName,
-                              'winner': m.winnerId,
+                              'winnerId': m.winnerId,
                               'scoreA': m.scoreA,
                               'scoreB': m.scoreB,
                               'isCompleted': m.isCompleted,
@@ -238,7 +294,7 @@ class SupabaseSyncService {
       }).toList();
 
       await client.from('tournaments').upsert(rows);
-      debugPrint('[SupabaseSync] Pushed ${rows.length} completed tournaments to Supabase.');
+      debugPrint('[SupabaseSync] Pushed ${rows.length} tournaments to Supabase.');
       return true;
     } catch (e) {
       debugPrint('[SupabaseSync] Error pushing tournaments: $e');
@@ -261,7 +317,7 @@ class SupabaseSyncService {
     }
   }
 
-  /// Pulls completed tournaments for a user / organizer from Supabase.
+  /// Pulls tournaments for a user / organizer from Supabase.
   Future<List<Tournament>> pullTournaments(String userId) async {
     final client = _client;
     if (client == null) return [];
@@ -271,7 +327,7 @@ class SupabaseSyncService {
           .from('tournaments')
           .select()
           .eq('organizer_id', userId)
-          .eq('status', 'completed');
+          .order('updated_at', ascending: false);
 
       final rows = (res as List).cast<Map<String, dynamic>>();
       return rows.map((r) => _mapRowToTournament(r, fallbackUserId: userId)).toList();
@@ -280,7 +336,7 @@ class SupabaseSyncService {
     }
   }
 
-  /// Pulls completed tournaments from Supabase (for match history and global rankings).
+  /// Pulls active and completed tournaments from Supabase.
   Future<List<Tournament>> pullActiveTournaments() async {
     final client = _client;
     if (client == null) return [];
@@ -289,8 +345,7 @@ class SupabaseSyncService {
       final res = await client
           .from('tournaments')
           .select()
-          .eq('status', 'completed')
-          .order('created_at', ascending: false)
+          .order('updated_at', ascending: false)
           .limit(50);
 
       final rows = (res as List).cast<Map<String, dynamic>>();

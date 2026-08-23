@@ -15,11 +15,15 @@ class ComboBuilderPage extends StatefulWidget {
 class _ComboBuilderPageState extends State<ComboBuilderPage> {
   final _catalogRepo = getIt<CatalogRepository>();
   final _comboRepo = getIt<ComboRepository>();
+  final _metaAdvisor = getIt<MetaAdvisorService>();
 
   BeySystem _selectedSystem = BeySystem.bx;
   Part? _selectedBlade;
   Part? _selectedRatchet;
   Part? _selectedBit;
+  Part? _selectedLockChip;
+  Part? _selectedAssistBlade;
+  Part? _selectedOverBlade;
 
   final _nameController = TextEditingController();
   bool _isSaving = false;
@@ -32,12 +36,15 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
   }
 
   double? get _totalWeight {
-    final b = _selectedBlade?.weightG;
-    final r = _selectedRatchet?.weightG;
-    final bit = _selectedBit?.weightG;
+    final b = _selectedBlade?.weightG ?? 32.0;
+    final r = _selectedRatchet?.weightG ?? 6.5;
+    final bit = _selectedBit?.weightG ?? 2.3;
+    final lock = _selectedLockChip?.weightG ?? (_selectedLockChip != null ? 1.8 : 0.0);
+    final assist = _selectedAssistBlade?.weightG ?? (_selectedAssistBlade != null ? 4.8 : 0.0);
+    final over = _selectedOverBlade?.weightG ?? (_selectedOverBlade != null ? 3.5 : 0.0);
 
-    if (b == null || r == null || bit == null) return null;
-    return double.parse((b + r + bit).toStringAsFixed(2));
+    if (_selectedBlade == null || _selectedRatchet == null || _selectedBit == null) return null;
+    return double.parse((b + r + bit + lock + assist + over).toStringAsFixed(1));
   }
 
   void _updateAutoName() {
@@ -46,10 +53,11 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
     final bladeName = _selectedBlade?.name ?? '';
     final ratchetName = _selectedRatchet?.name ?? '';
     final bitName = _selectedBit?.code ?? _selectedBit?.name ?? '';
+    final assistName = _selectedAssistBlade != null ? ' (${_selectedAssistBlade!.name})' : '';
 
     if (bladeName.isNotEmpty || ratchetName.isNotEmpty || bitName.isNotEmpty) {
       final parts = [bladeName, ratchetName, bitName].where((s) => s.isNotEmpty).join(' ');
-      _nameController.text = parts;
+      _nameController.text = '$parts$assistName';
     }
   }
 
@@ -109,6 +117,15 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
                     const Expanded(
                       child: Center(child: CircularProgressIndicator(color: AppColors.x)),
                     )
+                  else if (filteredParts.isEmpty)
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'No hay piezas disponibles en esta categoría.',
+                          style: AppTypography.bodyMedium.copyWith(color: AppColors.mute),
+                        ),
+                      ),
+                    )
                   else
                     Expanded(
                       child: ListView.separated(
@@ -135,6 +152,12 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
                                   _selectedRatchet = part;
                                 } else if (type == PartType.bit) {
                                   _selectedBit = part;
+                                } else if (type == PartType.lockChip) {
+                                  _selectedLockChip = part;
+                                } else if (type == PartType.assistBlade) {
+                                  _selectedAssistBlade = part;
+                                } else if (type == PartType.overBlade) {
+                                  _selectedOverBlade = part;
                                 }
                                 _updateAutoName();
                               });
@@ -204,6 +227,43 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
     );
   }
 
+  Future<void> _applyMetaAdvice(MetaAdvice advice) async {
+    final allRatchets = await _catalogRepo.watchByType(PartType.ratchet).first;
+    final allBits = await _catalogRepo.watchByType(PartType.bit).first;
+
+    if (advice.recommendedRatchets.isNotEmpty) {
+      final recR = advice.recommendedRatchets.first.partCode.toLowerCase();
+      final matchedR = allRatchets.firstWhere(
+        (r) => (r.code ?? r.name).toLowerCase() == recR || r.name.toLowerCase().contains(recR),
+        orElse: () => allRatchets.first,
+      );
+      _selectedRatchet = matchedR;
+    }
+
+    if (advice.recommendedBits.isNotEmpty) {
+      final recB = advice.recommendedBits.first.partCode.toLowerCase();
+      final matchedB = allBits.firstWhere(
+        (b) => (b.code ?? b.name).toLowerCase() == recB || b.name.toLowerCase().contains(recB),
+        orElse: () => allBits.first,
+      );
+      _selectedBit = matchedB;
+    }
+
+    setState(_updateAutoName);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.steel,
+          content: Text(
+            '¡Combo Meta WBO aplicado: ${_selectedBlade?.name} ${_selectedRatchet?.name} ${_selectedBit?.name}!',
+            style: AppTypography.mono.copyWith(fontSize: 11, color: AppColors.x),
+          ),
+        ),
+      );
+    }
+  }
+
   Future<void> _saveCombo() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
@@ -239,6 +299,9 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
       bladeId: _selectedBlade!.id,
       ratchetId: _selectedRatchet!.id,
       bitId: _selectedBit!.id,
+      lockChipId: _selectedLockChip?.id,
+      assistBladeId: _selectedAssistBlade?.id,
+      overBladeId: _selectedOverBlade?.id,
       system: _selectedBlade!.system,
       calculatedWeight: _totalWeight,
       createdAt: DateTime.now(),
@@ -254,7 +317,9 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isCx = _selectedSystem == BeySystem.cx;
     final isComplete = _selectedBlade != null && _selectedRatchet != null && _selectedBit != null;
+    final metaAdvice = _selectedBlade != null ? _metaAdvisor.adviseForBlade(_selectedBlade!) : null;
 
     return Scaffold(
       backgroundColor: AppColors.void_,
@@ -282,6 +347,9 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
                         setState(() {
                           _selectedSystem = sys;
                           _selectedBlade = null;
+                          _selectedLockChip = null;
+                          _selectedAssistBlade = null;
+                          _selectedOverBlade = null;
                           _updateAutoName();
                         });
                       },
@@ -293,14 +361,33 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
                           border: Border.all(color: isSelected ? AppColors.x : AppColors.line),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: Text(
-                          sys.name.toUpperCase(),
-                          textAlign: TextAlign.center,
-                          style: AppTypography.mono.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? AppColors.x : AppColors.mute,
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              sys.name.toUpperCase(),
+                              textAlign: TextAlign.center,
+                              style: AppTypography.mono.copyWith(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? AppColors.x : AppColors.mute,
+                              ),
+                            ),
+                            if (sys == BeySystem.cx) ...[
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: AppColors.dranzer.withValues(alpha: 0.3),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                                child: Text(
+                                  'MODULAR',
+                                  style: AppTypography.mono.copyWith(fontSize: 8, color: AppColors.dranzer, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ),
@@ -310,14 +397,70 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
             ),
             const SizedBox(height: 16),
 
-            // Stacking Slots (Blade -> Ratchet -> Bit)
+            // CX Modular Parts Picker (Lock Chip, Over Blade, Assist Blade)
+            if (isCx) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.panel,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.line),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.extension, size: 16, color: AppColors.x),
+                        const SizedBox(width: 8),
+                        Text(
+                          'MÓDULOS DEL SISTEMA CX (CROSS X)',
+                          style: AppTypography.mono.copyWith(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.x),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildSlotCard(
+                      type: PartType.lockChip,
+                      part: _selectedLockChip,
+                      label: 'LOCK CHIP (EMBLEMA)',
+                      onTap: () => _openPartPicker(PartType.lockChip, 'LOCK CHIP'),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildSlotCard(
+                      type: PartType.assistBlade,
+                      part: _selectedAssistBlade,
+                      label: 'ASSIST BLADE (J, B, T, W, H...)',
+                      onTap: () => _openPartPicker(PartType.assistBlade, 'ASSIST BLADE'),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildSlotCard(
+                      type: PartType.overBlade,
+                      part: _selectedOverBlade,
+                      label: 'OVER BLADE (MODO PEAK / BREAK / GUARD)',
+                      onTap: () => _openPartPicker(PartType.overBlade, 'OVER BLADE'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+            ],
+
+            // Core Stacking Slots (Blade -> Ratchet -> Bit)
             _buildSlotCard(
               type: PartType.blade,
               part: _selectedBlade,
-              label: 'BLADE',
-              onTap: () => _openPartPicker(PartType.blade, 'BLADE'),
+              label: isCx ? 'MAIN BLADE (CUERPO CENTRAL)' : 'BLADE',
+              onTap: () => _openPartPicker(PartType.blade, isCx ? 'MAIN BLADE' : 'BLADE'),
             ),
             const SizedBox(height: 8),
+
+            // Meta Advisor Intelligence Card
+            if (metaAdvice != null) ...[
+              _buildMetaAdvisorCard(metaAdvice),
+              const SizedBox(height: 10),
+            ],
+
             _buildSlotCard(
               type: PartType.ratchet,
               part: _selectedRatchet,
@@ -333,7 +476,21 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
             ),
             const SizedBox(height: 18),
 
-            // Live Combo Notation Preview Card
+            // Rich Live Combo Preview Card
+            if (isComplete)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: ComboPreviewCard(
+                  blade: _selectedBlade!,
+                  ratchet: _selectedRatchet!,
+                  bit: _selectedBit!,
+                  lockChip: _selectedLockChip,
+                  assistBlade: _selectedAssistBlade,
+                  overBlade: _selectedOverBlade,
+                ),
+              ),
+
+            // Name & Code Editor Card
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
@@ -345,14 +502,14 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'NOTACIÓN Y CÓDIGO DEL COMBO',
+                    'NOMBRE DEL BEYBLADE ARMADO',
                     style: AppTypography.mono.copyWith(fontSize: 10, color: AppColors.mute, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 6),
                   TextField(
                     controller: _nameController,
                     onChanged: (_) => _userEditedName = true,
-                    style: AppTypography.displayMedium.copyWith(fontSize: 18, color: AppColors.text),
+                    style: AppTypography.displaySmall.copyWith(fontSize: 16, color: AppColors.text),
                     decoration: const InputDecoration(
                       hintText: 'Ej: DranSword 3-60F',
                       isDense: true,
@@ -360,41 +517,6 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
                       border: InputBorder.none,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  const Divider(color: AppColors.line),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'PESO CALCULADO',
-                        style: AppTypography.mono.copyWith(fontSize: 10, color: AppColors.mute),
-                      ),
-                      Text(
-                        _totalWeight != null ? '${_totalWeight}g' : 'Sin datos suficientes',
-                        style: AppTypography.mono.copyWith(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: _totalWeight != null ? AppColors.x : AppColors.mute,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (_selectedBlade?.metaTier != null) ...[
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Icon(Icons.info_outline, size: 14, color: AppColors.pegasus),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            'Blade calificado en Tier ${_selectedBlade!.metaTier} del meta oficial WBO.',
-                            style: AppTypography.bodySmall.copyWith(fontSize: 10.5, color: AppColors.pegasus),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -402,12 +524,108 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
 
             // Save Button
             ChamferButton(
-              text: _isSaving ? 'GUARDANDO...' : (isComplete ? 'GUARDAR BEY EN ARSENAL' : 'COMPLETA LAS 3 PIEZAS'),
+              text: _isSaving ? 'GUARDANDO...' : (isComplete ? 'GUARDAR BEY EN ARSENAL' : 'COMPLETA LAS PIEZAS'),
               variant: isComplete ? ChamferButtonVariant.go : ChamferButtonVariant.ghost,
               onPressed: isComplete && !_isSaving ? _saveCombo : null,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMetaAdvisorCard(MetaAdvice advice) {
+    final typeColor = switch (advice.archetype) {
+      BeyType.attack => AppColors.dranzer,
+      BeyType.defense => AppColors.dragoon,
+      BeyType.stamina => AppColors.pegasus,
+      BeyType.balance => AppColors.burst,
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.panel2,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.x.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.lightbulb_outline, size: 16, color: AppColors.x),
+                  const SizedBox(width: 6),
+                  Text(
+                    'ASESOR DEL META WBO',
+                    style: AppTypography.mono.copyWith(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.x),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: typeColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '${advice.estimatedTier} · ${advice.estimatedWinrate}% WIN',
+                  style: AppTypography.mono.copyWith(fontSize: 9.5, fontWeight: FontWeight.bold, color: typeColor),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            advice.tacticalOverview,
+            style: AppTypography.bodySmall.copyWith(fontSize: 10.5, color: AppColors.text),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            children: [
+              ...advice.recommendedRatchets.take(2).map((r) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(color: AppColors.steel, borderRadius: BorderRadius.circular(4)),
+                    child: Text(
+                      'Ratchet: ${r.partName}',
+                      style: AppTypography.mono.copyWith(fontSize: 9, color: AppColors.x),
+                    ),
+                  )),
+              ...advice.recommendedBits.take(2).map((b) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(color: AppColors.steel, borderRadius: BorderRadius.circular(4)),
+                    child: Text(
+                      'Bit: ${b.partName}',
+                      style: AppTypography.mono.copyWith(fontSize: 9, color: AppColors.x),
+                    ),
+                  )),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              onTap: () => _applyMetaAdvice(advice),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppColors.x.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: AppColors.x),
+                ),
+                child: Text(
+                  'APLICAR SUGERENCIA META',
+                  style: AppTypography.mono.copyWith(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.x),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -7,3 +7,4 @@ export 'src/datasources/catalog_remote_datasource.dart';
 export 'src/datasources/catalog_seeder.dart';
 export 'src/datasources/catalog_updater.dart';
 export 'src/repositories/catalog_repository_impl.dart';
+export 'src/services/meta_rankings_service.dart';

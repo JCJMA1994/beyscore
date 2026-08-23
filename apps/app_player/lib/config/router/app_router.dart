@@ -15,6 +15,7 @@ import '../../features/home/presentation/pages/home_dashboard_page.dart';
 import '../../features/home/presentation/pages/phone_shell.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/rankings/presentation/pages/rankings_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/stats/presentation/pages/stats_page.dart';
 import '../../features/tournament/presentation/pages/player_tournament_pass_page.dart';
@@ -134,6 +135,11 @@ final appRouter = GoRouter(
               builder: (context, state) => const DeckBuilderPage(),
             ),
           ],
+        ),
+        GoRoute(
+          path: '/rankings',
+          name: 'rankings',
+          builder: (context, state) => const RankingsPage(),
         ),
         GoRoute(
           path: '/stats',

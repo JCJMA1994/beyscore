@@ -1,6 +1,9 @@
+import 'dart:async';
+import 'package:bey_data/bey_data.dart';
 import 'package:bey_domain/bey_domain.dart';
 import 'package:bey_ui/bey_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injector.dart';
@@ -35,6 +38,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
     final identityRepo = getIt<IdentityRepository>();
     final result = await identityRepo.createProfile(nickname);
+    unawaited(getIt<SyncEngine>().syncNow());
 
     if (!mounted) return;
 
@@ -220,21 +224,86 @@ class _OnboardingPageState extends State<OnboardingPage> {
         ),
         const SizedBox(height: 20),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           decoration: BoxDecoration(
             color: AppColors.panel,
-            border: Border.all(color: AppColors.x),
-            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: AppColors.x, width: 1.5),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.x.withValues(alpha: 0.15),
+                blurRadius: 12,
+                spreadRadius: 1,
+              ),
+            ],
           ),
-          child: Text(
-            _generatedRecoveryCode ?? '',
-            textAlign: TextAlign.center,
-            style: AppTypography.mono.copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
-              color: AppColors.x,
-            ),
+          child: Column(
+            children: [
+              Text(
+                _generatedRecoveryCode ?? '',
+                textAlign: TextAlign.center,
+                style: AppTypography.mono.copyWith(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 3,
+                  color: AppColors.x,
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () {
+                  final code = _generatedRecoveryCode;
+                  if (code != null && code.isNotEmpty) {
+                    Clipboard.setData(ClipboardData(text: code));
+                    HapticFeedback.mediumImpact();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: AppColors.x,
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle_outline, color: AppColors.void_),
+                            const SizedBox(width: 8),
+                            Text(
+                              '¡CÓDIGO COPIADO AL PORTAPAPELES!',
+                              style: AppTypography.mono.copyWith(
+                                color: AppColors.void_,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                },
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.steel,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.copy, size: 14, color: AppColors.x),
+                      const SizedBox(width: 6),
+                      Text(
+                        'TOCAR PARA COPIAR CÓDIGO',
+                        style: AppTypography.mono.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 28),

@@ -12,16 +12,19 @@ class TournamentPage extends StatelessWidget {
     super.key,
     this.onLaunchBattle,
     this.onOpenHub,
+    this.onRefresh,
   });
 
   final void Function(BuildContext context, Matchup matchup)? onLaunchBattle;
   final void Function(BuildContext context, Tournament tournament)? onOpenHub;
+  final Future<void> Function()? onRefresh;
 
   @override
   Widget build(BuildContext context) {
     return _TournamentView(
       onLaunchBattle: onLaunchBattle,
       onOpenHub: onOpenHub,
+      onRefresh: onRefresh,
     );
   }
 }
@@ -30,10 +33,12 @@ class _TournamentView extends StatelessWidget {
   const _TournamentView({
     this.onLaunchBattle,
     this.onOpenHub,
+    this.onRefresh,
   });
 
   final void Function(BuildContext context, Matchup matchup)? onLaunchBattle;
   final void Function(BuildContext context, Tournament tournament)? onOpenHub;
+  final Future<void> Function()? onRefresh;
 
   Future<void> _openCreatePage(BuildContext context) async {
     final tournament = await Navigator.of(context).push<Tournament>(
@@ -66,100 +71,109 @@ class _TournamentView extends StatelessWidget {
       builder: (context, state) {
         final tournaments = state is TournamentLoaded ? state.tournaments : <Tournament>[];
 
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header & Organize Button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'TORNEOS Y LLAVES',
-                    style: AppTypography.displaySmall.copyWith(
-                      color: AppColors.text,
-                      fontSize: 20,
-                    ),
-                  ),
-                  FilledButton.icon(
-                    onPressed: () => _openCreatePage(context),
-                    icon: const Icon(Icons.add, size: 16),
-                    label: const Text('ORGANIZAR'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF00FF66),
-                      foregroundColor: Colors.black,
-                      textStyle: AppTypography.mono.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Official Tiers Guide
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.steel,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColors.line),
-                ),
-                child: Row(
+        return RefreshIndicator(
+          color: AppColors.x,
+          backgroundColor: AppColors.panel,
+          onRefresh: onRefresh ?? () async {},
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header & Organize Button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.shield_outlined, size: 16, color: AppColors.pegasus),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Categorías oficiales: G3 Local • G2 Regional • G1 Nacional • GP Mundial',
-                        style: AppTypography.mono.copyWith(fontSize: 10, color: AppColors.mute),
+                    Text(
+                      'TORNEOS Y LLAVES',
+                      style: AppTypography.displaySmall.copyWith(
+                        color: AppColors.text,
+                        fontSize: 20,
+                      ),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () => _openCreatePage(context),
+                      icon: const Icon(Icons.add, size: 16),
+                      label: const Text('ORGANIZAR'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF00FF66),
+                        foregroundColor: Colors.black,
+                        textStyle: AppTypography.mono.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
-              // List of Tournaments or Empty State
-              Expanded(
-                child: tournaments.isEmpty
-                    ? Center(
-                        child: Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: AppColors.panel,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.line),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.emoji_events_outlined, size: 48, color: AppColors.mute),
-                              const SizedBox(height: 12),
-                              Text(
-                                'No hay torneos activos',
-                                style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Crea una competencia con sorteo determinista, mesas de combate y avance automático de llaves.',
-                                textAlign: TextAlign.center,
-                                style: AppTypography.bodyMedium.copyWith(color: AppColors.mute),
-                              ),
-                              const SizedBox(height: 16),
-                              FilledButton.icon(
-                                onPressed: () => _openCreatePage(context),
-                                icon: const Icon(Icons.add, size: 16),
-                                label: const Text('CREAR PRIMER TORNEO'),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: AppColors.pegasus,
-                                  foregroundColor: Colors.black,
+                // Official Tiers Guide
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.steel,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.shield_outlined, size: 16, color: AppColors.pegasus),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Categorías oficiales: G3 Local • G2 Regional • G1 Nacional • GP Mundial',
+                          style: AppTypography.mono.copyWith(fontSize: 10, color: AppColors.mute),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // List of Tournaments or Empty State
+                Expanded(
+                  child: tournaments.isEmpty
+                      ? ListView(
+                          children: [
+                            const SizedBox(height: 40),
+                            Center(
+                              child: Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: AppColors.panel,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.line),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.emoji_events_outlined, size: 48, color: AppColors.mute),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'No hay torneos activos',
+                                      style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Crea una competencia con sorteo determinista, mesas de combate y avance automático de llaves.',
+                                      textAlign: TextAlign.center,
+                                      style: AppTypography.bodyMedium.copyWith(color: AppColors.mute),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    FilledButton.icon(
+                                      onPressed: () => _openCreatePage(context),
+                                      icon: const Icon(Icons.add, size: 16),
+                                      label: const Text('CREAR PRIMER TORNEO'),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: AppColors.pegasus,
+                                        foregroundColor: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
+                            ),
+                          ],
+                        )
+                      : ListView.builder(
                         itemCount: tournaments.length,
                         itemBuilder: (context, index) {
                           final t = tournaments[index];
@@ -295,8 +309,9 @@ class _TournamentView extends StatelessWidget {
                           );
                         },
                       ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },

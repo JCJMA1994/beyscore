@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "generatedAt": "2026-08-15",
+  "generatedAt": "2026-08-20",
   "sources": [
     {
       "name": "BeybladeHub",
@@ -22,6 +22,21 @@
       "name": "Reglas oficiales Beyblade X v12 (marzo 2026)",
       "url": "https://beybladehub.app/guide/rules",
       "used": "puntuacion, formato 3on3, piezas no repetibles, lanzamiento, niveles y categorias"
+    },
+    {
+      "name": "BBXHub",
+      "url": "https://bbxhub.net",
+      "used": "meta de 3.844 torneos WBO, tier list, decks reales"
+    },
+    {
+      "name": "WBO Winning Combinations",
+      "url": "https://worldbeyblade.org/Thread-Winning-Combinations-at-WBO-Organized-Events-Beyblade-X-BBX",
+      "used": "fuente primaria de los combos"
+    },
+    {
+      "name": "BeybladeHub Taiwan",
+      "url": "https://beybladehub.app",
+      "used": "tier list de opinion experta"
     }
   ],
   "attribution": "BEYBLADE X es marca de Takara Tomy / Hasbro. Datos factuales, uso no comercial.",
@@ -165,32 +180,38 @@
     ]
   },
   "meta": {
-    "source": "beyxhub.org / torneos WBO",
-    "updated": "2026-07",
+    "source": "bbxhub.net / beybladehub.app / beyxhub.org / torneos WBO (3.844 torneos)",
+    "updated": "2026-08",
     "comboTiers": {
       "S": [
-        "PhoenixWing 9-60GF",
         "WizardRod 1-60H",
-        "Cobalt Dragoon 5-60C",
-        "Impact Drake 9-60LR",
-        "TyrannoBeat 4-70Q",
-        "KnightShield 3-80B"
+        "SharkScale 1-70LR",
+        "SharkScale 4-50K",
+        "SilverWolf 9-60FB",
+        "AeroPegasus 3-60R",
+        "CobaltDragoon 1-60LR",
+        "MeteorDragoon 3-70K"
       ],
       "A": [
-        "WizardArrow 3-80B",
-        "KnightLance 4-60B",
-        "DranSword 3-60F",
+        "PhoenixWing 5-60P",
+        "DranStrike 1-60LR",
+        "WyvernHover 9-60B",
+        "SamuraiSaber 9-60LR",
+        "WhaleWave 5-60F",
+        "KnightShield 3-80B",
         "DranBuster 1-60F",
         "HellsScythe 4-60T"
       ],
       "B": [
-        "Cobalt Drake 5-60F",
-        "LeonClaw 4-60T",
-        "SharkEdge 3-60LF",
-        "UnicornSting 9-80GP"
+        "GolemRock 9-60LR",
+        "TyrannoBeat 4-70Q",
+        "ScorpioSpear 7-60T",
+        "ClockMirage 7-60T",
+        "UnicornSting 9-80GP",
+        "SharkEdge 3-60LF"
       ]
     },
-    "aviso": "La meta cambia. Semilla, no verdad permanente."
+    "aviso": "La meta cambia con cada torneo. Semilla, no verdad permanente."
   },
   "counts": {
     "BLADE": 68,

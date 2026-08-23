@@ -38,13 +38,24 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     }
 
     final beys = [_combo1!, _combo2!, _combo3!].map((c) {
+      final parts = <PartRef>[
+        PartRef(identityKey: c.bladeId, name: c.bladeId, type: PartKind.blade),
+        PartRef(identityKey: c.ratchetId, name: c.ratchetId, type: PartKind.ratchet),
+        PartRef(identityKey: c.bitId, name: c.bitId, type: PartKind.bit),
+      ];
+      if (c.lockChipId != null && c.lockChipId!.isNotEmpty) {
+        parts.add(PartRef(identityKey: c.lockChipId!, name: c.lockChipId!, type: PartKind.lockChip));
+      }
+      if (c.assistBladeId != null && c.assistBladeId!.isNotEmpty) {
+        parts.add(PartRef(identityKey: c.assistBladeId!, name: c.assistBladeId!, type: PartKind.assistBlade));
+      }
+      if (c.overBladeId != null && c.overBladeId!.isNotEmpty) {
+        parts.add(PartRef(identityKey: c.overBladeId!, name: c.overBladeId!, type: PartKind.overBlade));
+      }
+      final isLeft = c.bladeId.toLowerCase().contains('dragoon') || c.bladeId.toLowerCase().contains('l-');
       return BeyBuild(
-        spinsLeft: false,
-        parts: [
-          PartRef(identityKey: c.bladeId, name: c.bladeId, type: PartKind.blade),
-          PartRef(identityKey: c.ratchetId, name: c.ratchetId, type: PartKind.ratchet),
-          PartRef(identityKey: c.bitId, name: c.bitId, type: PartKind.bit),
-        ],
+        spinsLeft: isLeft,
+        parts: parts,
       );
     }).toList();
 
@@ -488,7 +499,20 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
 
   bool _hasPartConflict(Combo? a, Combo? b) {
     if (a == null || b == null) return false;
-    return a.bladeId == b.bladeId || a.ratchetId == b.ratchetId || a.bitId == b.bitId;
+    const normA = DeckValidator.normalizeIdentityKey;
+    if (normA(a.bladeId) == normA(b.bladeId)) return true;
+    if (normA(a.ratchetId) == normA(b.ratchetId)) return true;
+    if (normA(a.bitId) == normA(b.bitId)) return true;
+    if (a.assistBladeId != null && b.assistBladeId != null && normA(a.assistBladeId!) == normA(b.assistBladeId!)) return true;
+    if (a.overBladeId != null && b.overBladeId != null && normA(a.overBladeId!) == normA(b.overBladeId!)) return true;
+    if (a.lockChipId != null && b.lockChipId != null) {
+      final chipA = normA(a.lockChipId!);
+      final chipB = normA(b.lockChipId!);
+      // Ares and Emperor are allowed to repeat once (2 across deck)
+      final isException = chipA.contains('ares') || chipA.contains('emperor');
+      if (!isException && chipA == chipB) return true;
+    }
+    return false;
   }
 
   Widget _buildConflictLink(String message) {

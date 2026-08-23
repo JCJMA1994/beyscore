@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:bey_data/bey_data.dart';
 import 'package:bey_domain/bey_domain.dart';
 import 'package:bey_ui/bey_ui.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +38,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
     final identityRepo = getIt<IdentityRepository>();
     final result = await identityRepo.createProfile(nickname);
+    unawaited(getIt<SyncEngine>().syncNow());
 
     if (!mounted) return;
 

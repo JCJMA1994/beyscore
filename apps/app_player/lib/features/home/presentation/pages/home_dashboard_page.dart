@@ -403,6 +403,16 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                     onTap: () => context.push('/catalog'),
                   ),
                 ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildActionCard(
+                    title: 'RANKINGS',
+                    subtitle: 'Meta WBO',
+                    icon: Icons.leaderboard_rounded,
+                    color: const Color(0xFFFFD700),
+                    onTap: () => context.push('/rankings'),
+                  ),
+                ),
               ],
             ),
 

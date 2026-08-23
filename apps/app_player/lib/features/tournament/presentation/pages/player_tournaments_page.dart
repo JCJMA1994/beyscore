@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bey_data/bey_data.dart';
 import 'package:bey_domain/bey_domain.dart';
 import 'package:bey_tournament/bey_tournament.dart';
 import 'package:bey_ui/bey_ui.dart';
@@ -25,11 +26,13 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
   String? _currentUserNickname;
   bool _isSyncing = false;
   int _filterIndex = 0; // 0 = Todos, 1 = Activos/En Curso, 2 = Historial/Finalizados
+  final Set<String> _activeHubTournamentIds = {};
 
   @override
   void initState() {
     super.initState();
     _loadUser();
+    getIt<SyncEngine>().syncNow();
     _autoProbeLanHub();
   }
 
@@ -142,6 +145,7 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
         );
 
         PlayerTournamentsPage.lastHubHost = cleanHost;
+        _activeHubTournamentIds.add(tournament.id);
         await _tournamentRepo.save(tournament);
 
         if (mounted) {
@@ -282,8 +286,13 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.x),
                         )
                       : const Icon(Icons.sync, color: AppColors.x),
-                  tooltip: 'Sincronizar con Hub LAN',
-                  onPressed: _autoProbeLanHub,
+                  tooltip: 'Sincronizar con Nube / Hub LAN',
+                  onPressed: () async {
+                    setState(() => _isSyncing = true);
+                    await getIt<SyncEngine>().syncNow();
+                    await _autoProbeLanHub();
+                    if (mounted) setState(() => _isSyncing = false);
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.hub_outlined, color: AppColors.pegasus),
@@ -296,6 +305,7 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
               color: AppColors.x,
               backgroundColor: AppColors.panel,
               onRefresh: () async {
+                await getIt<SyncEngine>().syncNow();
                 await _autoProbeLanHub();
                 if (context.mounted) {
                   context.read<TournamentBloc>().add(TournamentStarted());
@@ -469,6 +479,13 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
                 ),
                 Row(
                   children: [
+                    if (t.status != TournamentStatus.completed) ...[
+                      BeyBadge(
+                        label: _activeHubTournamentIds.contains(t.id) ? 'HUB ACTIVO' : 'HUB OFFLINE',
+                        color: _activeHubTournamentIds.contains(t.id) ? AppColors.x : AppColors.dranzer,
+                      ),
+                      const SizedBox(width: 6),
+                    ],
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
@@ -582,15 +599,71 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
                 ],
               )
             else if (isOpen)
-              ChamferButton(
-                text: 'INSCRIBIRME A ESTE TORNEO',
-                variant: ChamferButtonVariant.go,
-                onPressed: () async {
-                  await context.push('/tournaments/${t.id}/register');
-                  if (context.mounted) {
-                    context.read<TournamentBloc>().add(TournamentStarted());
-                  }
-                },
+              _activeHubTournamentIds.contains(t.id)
+                  ? ChamferButton(
+                      text: 'INSCRIBIRME A ESTE TORNEO',
+                      variant: ChamferButtonVariant.go,
+                      onPressed: () async {
+                        await context.push('/tournaments/${t.id}/register');
+                        if (context.mounted) {
+                          context.read<TournamentBloc>().add(TournamentStarted());
+                        }
+                      },
+                    )
+                  : ChamferButton(
+                      text: 'HUB INACTIVO · CONECTAR CON ORGANIZADOR',
+                      variant: ChamferButtonVariant.ghost,
+                      icon: const Icon(Icons.wifi_find_rounded, size: 16, color: AppColors.mute),
+                      onPressed: () => _showConnectHubDialog(context),
+                    )
+            else if (t.status == TournamentStatus.completed)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFFCC00),
+                        side: const BorderSide(color: Color(0xFFFFCC00)),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      icon: const Icon(Icons.badge, size: 16),
+                      label: const Text('DIPLOMA / TARJETA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        ChampionCardDialog.show(
+                          context,
+                          tournamentName: t.name,
+                          tierLabel: t.tier.label,
+                          bladerName: t.championName ?? 'Campeón',
+                          placeRank: 1,
+                          deckEntries: const [
+                            ChampionDeckEntry(
+                              blade: Part(id: 'shark_scale', name: 'Shark Scale', type: PartType.blade, system: BeySystem.bx, productCode: 'BX-34'),
+                              ratchet: Part(id: '9-60', name: '9-60', code: '9-60', type: PartType.ratchet, system: BeySystem.bx),
+                              bit: Part(id: 'elevate', name: 'Elevate', code: 'E', type: PartType.bit, system: BeySystem.bx),
+                              archetype: 'Ataque',
+                            ),
+                          ],
+                          eventDate: t.createdAt,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.panel2,
+                        foregroundColor: AppColors.text,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      ),
+                      icon: const Icon(Icons.account_tree_outlined, size: 16),
+                      label: const Text('VER CUADRO', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        context.push('/tournaments/${t.id}/bracket');
+                      },
+                    ),
+                  ),
+                ],
               )
             else
               ElevatedButton.icon(

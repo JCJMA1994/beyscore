@@ -1,6 +1,6 @@
 import '../catalog/part_type.dart';
 
-/// A user-assembled combo: blade + ratchet + bit (or CX parts).
+/// A user-assembled combo: blade + ratchet + bit (or modular CX parts).
 ///
 /// Pure Dart domain entity. The combo weight is a calculation that
 /// returns null if any piece is missing weight data — never sums zeros.
@@ -13,6 +13,7 @@ class Combo {
     required this.bitId,
     this.lockChipId,
     this.assistBladeId,
+    this.overBladeId,
     this.system = BeySystem.bx,
     this.calculatedWeight,
     this.createdAt,
@@ -24,12 +25,15 @@ class Combo {
   final String bladeId;
   final String ratchetId;
   final String bitId;
-  final String? lockChipId; // CX combos have lock chips
-  final String? assistBladeId; // CX assist blades
+  final String? lockChipId; // CX combos have lock chips (Emblem)
+  final String? assistBladeId; // CX assist blades (J/B/T/W/H...)
+  final String? overBladeId; // CX over blades (Peak/Break/Guard/Flow)
   final BeySystem system;
   final double? calculatedWeight;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+
+  bool get isCx => system == BeySystem.cx || lockChipId != null || assistBladeId != null;
 
   Combo copyWith({
     String? id,
@@ -39,6 +43,7 @@ class Combo {
     String? bitId,
     String? lockChipId,
     String? assistBladeId,
+    String? overBladeId,
     BeySystem? system,
     double? calculatedWeight,
     DateTime? createdAt,
@@ -52,6 +57,7 @@ class Combo {
       bitId: bitId ?? this.bitId,
       lockChipId: lockChipId ?? this.lockChipId,
       assistBladeId: assistBladeId ?? this.assistBladeId,
+      overBladeId: overBladeId ?? this.overBladeId,
       system: system ?? this.system,
       calculatedWeight: calculatedWeight ?? this.calculatedWeight,
       createdAt: createdAt ?? this.createdAt,

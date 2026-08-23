@@ -21,4 +21,7 @@ export 'src/widgets/sync_status_indicator.dart';
 export 'src/widgets/bey_logo.dart';
 export 'src/widgets/bey_feedback_dialog.dart';
 export 'src/widgets/bey_voice_selector_dialog.dart';
+export 'src/widgets/champion_card_widget.dart';
+export 'src/widgets/combo_preview_card.dart';
+export 'src/pages/meta_rankings_page.dart';
 export 'src/audio/bey_audio_service.dart';

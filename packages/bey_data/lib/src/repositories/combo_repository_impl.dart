@@ -21,12 +21,22 @@ class ComboRepositoryImpl implements ComboRepository {
   Future<void> save(Combo combo) async {
     await _dataSource.insertOrUpdateCombo(combo);
     final service = _syncService;
-    if (service != null) {
+    if (service != null && service.isAvailable) {
       final active = await _identitySource?.getActiveProfile();
-      unawaited(service.pushCombos([combo], userId: active?.id));
+      try {
+        await service.pushCombos([combo], userId: active?.id);
+      } catch (_) {}
     }
   }
 
   @override
-  Future<void> delete(String id) => _dataSource.deleteCombo(id);
+  Future<void> delete(String id) async {
+    await _dataSource.deleteCombo(id);
+    final service = _syncService;
+    if (service != null && service.isAvailable) {
+      try {
+        await service.deleteCombo(id);
+      } catch (_) {}
+    }
+  }
 }

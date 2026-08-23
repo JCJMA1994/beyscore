@@ -148,6 +148,16 @@ class _HomeDashboardPageState extends State<HomeDashboardPage> {
                     onTap: () => context.push('/decks'),
                   ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildActionCard(
+                    title: 'RANKINGS',
+                    subtitle: 'Meta WBO & Tiers',
+                    icon: Icons.leaderboard_rounded,
+                    color: const Color(0xFFFFD700),
+                    onTap: () => context.push('/rankings'),
+                  ),
+                ),
               ],
             ),
 
