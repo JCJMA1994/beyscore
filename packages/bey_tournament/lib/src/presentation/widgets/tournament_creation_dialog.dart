@@ -130,7 +130,7 @@ class _TournamentCreationDialogState extends State<TournamentCreationDialog> {
     );
 
     final tournament = Tournament(
-      id: const UuidV7Generator().generate(),
+      id: UuidV7Generator.v7(),
       name: name,
       organizerIds: [widget.organizerId],
       tier: _selectedTier,

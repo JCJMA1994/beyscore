@@ -105,7 +105,7 @@ class SupabaseSyncService {
       await _ensureProfileExists(targetUserId);
 
       final rows = combos.map((c) => {
-            'id': c.id,
+            'id': UuidV7Generator.ensureValidUuid(c.id),
             'user_id': targetUserId,
             'name': c.name,
             'blade_id': c.bladeId,
@@ -141,10 +141,10 @@ class SupabaseSyncService {
       await _ensureProfileExists(targetUserId);
 
       final rows = decks.map((d) => {
-            'id': d.id,
+            'id': UuidV7Generator.ensureValidUuid(d.id),
             'user_id': targetUserId,
             'name': d.name,
-            'combo_ids': d.comboIds,
+            'combo_ids': d.comboIds.map(UuidV7Generator.ensureValidUuid).toList(),
             'updated_at': DateTime.now().toIso8601String(),
           }).toList();
 
@@ -163,8 +163,9 @@ class SupabaseSyncService {
     if (client == null) return false;
 
     try {
-      await client.from('combos').delete().eq('id', id);
-      debugPrint('[SupabaseSync] Deleted combo $id from Supabase.');
+      final validId = UuidV7Generator.ensureValidUuid(id);
+      await client.from('combos').delete().eq('id', validId);
+      debugPrint('[SupabaseSync] Deleted combo $validId from Supabase.');
       return true;
     } catch (e) {
       debugPrint('[SupabaseSync] Error deleting combo: $e');
@@ -178,8 +179,9 @@ class SupabaseSyncService {
     if (client == null) return false;
 
     try {
-      await client.from('decks').delete().eq('id', id);
-      debugPrint('[SupabaseSync] Deleted deck $id from Supabase.');
+      final validId = UuidV7Generator.ensureValidUuid(id);
+      await client.from('decks').delete().eq('id', validId);
+      debugPrint('[SupabaseSync] Deleted deck $validId from Supabase.');
       return true;
     } catch (e) {
       debugPrint('[SupabaseSync] Error deleting deck: $e');
@@ -255,10 +257,11 @@ class SupabaseSyncService {
       await _ensureProfileExists(targetUserId, defaultNickname: 'Organizador');
 
       final rows = tournaments.map((t) {
-        final code = 'BEY-${t.id.replaceAll('-', '').padRight(6, '0').substring(0, 6).toUpperCase()}';
+        final validId = UuidV7Generator.ensureValidUuid(t.id);
+        final code = 'BEY-${validId.replaceAll('-', '').padRight(6, '0').substring(0, 6).toUpperCase()}';
 
         return {
-          'id': t.id,
+          'id': validId,
           'name': t.name,
           'code': code,
           'organizer_id': targetUserId,
@@ -308,8 +311,9 @@ class SupabaseSyncService {
     if (client == null) return false;
 
     try {
-      await client.from('tournaments').delete().eq('id', id);
-      debugPrint('[SupabaseSync] Deleted tournament $id from Supabase.');
+      final validId = UuidV7Generator.ensureValidUuid(id);
+      await client.from('tournaments').delete().eq('id', validId);
+      debugPrint('[SupabaseSync] Deleted tournament $validId from Supabase.');
       return true;
     } catch (e) {
       debugPrint('[SupabaseSync] Error deleting tournament: $e');

@@ -259,7 +259,7 @@ class _DeckBuilderPageState extends State<DeckBuilderPage> {
     setState(() => _isSaving = true);
 
     final deck = Deck(
-      id: 'deck-${DateTime.now().millisecondsSinceEpoch}',
+      id: UuidV7Generator.v7(),
       name: name,
       comboIds: [_combo1!.id, _combo2!.id, _combo3!.id],
       createdAt: DateTime.now(),

@@ -144,7 +144,7 @@ class _TournamentCreatePageState extends State<TournamentCreatePage> {
     }
 
     final tournament = Tournament(
-      id: const UuidV7Generator().generate(),
+      id: UuidV7Generator.v7(),
       name: name,
       organizerIds: [widget.organizerId],
       tier: _selectedTier,

@@ -1,5 +1,6 @@
 import '../catalog/part_type.dart';
 import '../combo/combo.dart';
+import '../id/uuid_v7_generator.dart';
 
 /// Pre-configured meta combo template with tactical description.
 class MetaPreset {
@@ -25,7 +26,7 @@ class MetaPreset {
 
   Combo toCombo({String? id}) {
     return Combo(
-      id: id ?? name.toLowerCase().replaceAll(' ', '_'),
+      id: id ?? UuidV7Generator.v7(),
       name: name,
       bladeId: bladeId,
       ratchetId: ratchetId,

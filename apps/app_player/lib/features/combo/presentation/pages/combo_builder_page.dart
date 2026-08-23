@@ -294,7 +294,7 @@ class _ComboBuilderPageState extends State<ComboBuilderPage> {
     setState(() => _isSaving = true);
 
     final combo = Combo(
-      id: 'combo-${DateTime.now().millisecondsSinceEpoch}',
+      id: UuidV7Generator.v7(),
       name: name,
       bladeId: _selectedBlade!.id,
       ratchetId: _selectedRatchet!.id,
