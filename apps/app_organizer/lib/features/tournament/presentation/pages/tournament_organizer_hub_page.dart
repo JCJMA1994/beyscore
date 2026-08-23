@@ -47,6 +47,7 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
     super.initState();
     _currentTournament = widget.tournament;
     _tabController = TabController(length: 2, vsync: this);
+    _verifiedCheckIns.addAll(_hubServer.verifiedBladers);
     _checkHubState();
     _loadUser();
     _listenToTournamentUpdates();
@@ -171,7 +172,10 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
     _syncTournamentToHub();
     _assignCurrentRoundMatchesToHub();
     if (mounted) {
-      setState(() => _isHubRunning = _hubServer.isRunning);
+      setState(() {
+        _isHubRunning = _hubServer.isRunning;
+        _verifiedCheckIns.addAll(_hubServer.verifiedBladers);
+      });
     }
   }
 
@@ -632,8 +636,12 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
                                 : 'APROBACIÓN EXCEPCIONAL POR JUEZ'),
                         variant: isDeckValid ? ChamferButtonVariant.go : ChamferButtonVariant.ghost,
                         onPressed: () {
-                          setState(() => _verifiedCheckIns.add(bladerName));
                           _hubServer.verifyBladerCheckIn(bladerName);
+                          setState(() {
+                            _verifiedCheckIns
+                              ..addAll(_hubServer.verifiedBladers)
+                              ..add(bladerName);
+                          });
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -2190,22 +2198,22 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: _verifiedCheckIns.length == participants.length && participants.isNotEmpty
+                      color: participants.every((p) => _verifiedCheckIns.contains(p) || _hubServer.verifiedBladers.contains(p)) && participants.isNotEmpty
                           ? const Color(0xFF00FF66).withValues(alpha: 0.12)
                           : AppColors.dranzer.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(
-                        color: _verifiedCheckIns.length == participants.length && participants.isNotEmpty
+                        color: participants.every((p) => _verifiedCheckIns.contains(p) || _hubServer.verifiedBladers.contains(p)) && participants.isNotEmpty
                             ? const Color(0xFF00FF66)
                             : AppColors.dranzer,
                       ),
                     ),
                     child: Text(
-                      'LISTOS: ${_verifiedCheckIns.length}/${participants.length}',
+                      'LISTOS: ${participants.where((p) => _verifiedCheckIns.contains(p) || _hubServer.verifiedBladers.contains(p)).length}/${participants.length}',
                       style: AppTypography.mono.copyWith(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: _verifiedCheckIns.length == participants.length && participants.isNotEmpty
+                        color: participants.every((p) => _verifiedCheckIns.contains(p) || _hubServer.verifiedBladers.contains(p)) && participants.isNotEmpty
                             ? const Color(0xFF00FF66)
                             : AppColors.dranzer,
                       ),
@@ -2217,7 +2225,9 @@ class _TournamentOrganizerHubPageState extends State<TournamentOrganizerHubPage>
             ...participants.asMap().entries.map((entry) {
               final index = entry.key + 1;
               final name = entry.value;
-              final isVerified = _verifiedCheckIns.contains(name);
+              final isVerified = _verifiedCheckIns.contains(name) ||
+                  _hubServer.verifiedBladers.contains(name) ||
+                  _hubServer.verifiedBladers.any((v) => v.toLowerCase() == name.toLowerCase());
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),

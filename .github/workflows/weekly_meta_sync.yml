@@ -2,8 +2,8 @@ name: Weekly WBO Meta Sync
 
 on:
   schedule:
-    # Runs every Friday at 18:00 UTC (after weekly WBO tournaments settle)
-    - cron: '0 18 * * 5'
+    # Runs every Saturday at 06:00 UTC (the day after Friday WBO updates settle)
+    - cron: '0 6 * * 6'
   workflow_dispatch: # Allows manual trigger from GitHub Actions UI
 
 permissions:
