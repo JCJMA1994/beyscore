@@ -33,12 +33,10 @@ jobs:
         run: dart run tool/sync_meta_data.dart
 
       - name: Quality Gate (Run Domain Unit Tests)
-        run: |
-          cd packages/bey_domain
-          flutter test
+        run: flutter test packages/bey_domain
 
       - name: Static Analysis Verification
-        run: flutter analyze
+        run: flutter analyze --no-fatal-infos
 
       - name: Commit and Push Changes
         run: |

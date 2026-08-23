@@ -598,24 +598,24 @@ class _PlayerTournamentsPageState extends State<PlayerTournamentsPage> {
                   ),
                 ],
               )
+            else if (isOpen && _activeHubTournamentIds.contains(t.id))
+              ChamferButton(
+                text: 'INSCRIBIRME A ESTE TORNEO',
+                variant: ChamferButtonVariant.go,
+                onPressed: () async {
+                  await context.push('/tournaments/${t.id}/register');
+                  if (context.mounted) {
+                    context.read<TournamentBloc>().add(TournamentStarted());
+                  }
+                },
+              )
             else if (isOpen)
-              _activeHubTournamentIds.contains(t.id)
-                  ? ChamferButton(
-                      text: 'INSCRIBIRME A ESTE TORNEO',
-                      variant: ChamferButtonVariant.go,
-                      onPressed: () async {
-                        await context.push('/tournaments/${t.id}/register');
-                        if (context.mounted) {
-                          context.read<TournamentBloc>().add(TournamentStarted());
-                        }
-                      },
-                    )
-                  : ChamferButton(
-                      text: 'HUB INACTIVO · CONECTAR CON ORGANIZADOR',
-                      variant: ChamferButtonVariant.ghost,
-                      icon: const Icon(Icons.wifi_find_rounded, size: 16, color: AppColors.mute),
-                      onPressed: () => _showConnectHubDialog(context),
-                    )
+              ChamferButton(
+                text: 'HUB INACTIVO · CONECTAR CON ORGANIZADOR',
+                variant: ChamferButtonVariant.ghost,
+                icon: const Icon(Icons.wifi_find_rounded, size: 16, color: AppColors.mute),
+                onPressed: () => _showConnectHubDialog(context),
+              )
             else if (t.status == TournamentStatus.completed)
               Row(
                 children: [

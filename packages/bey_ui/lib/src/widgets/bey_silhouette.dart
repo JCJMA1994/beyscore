@@ -59,17 +59,20 @@ class _SilhouettePainter extends CustomPainter {
             path.lineTo(center.dx + r * 0.9, center.dy + r * 0.9);
           }
         }
-        canvas.drawCircle(center, radius, paint);
-        canvas.drawCircle(center, radius * 0.4, paint);
+        canvas
+          ..drawCircle(center, radius, paint)
+          ..drawCircle(center, radius * 0.4, paint);
       case PartType.ratchet:
         // Ratchet circular ring with 3 or 4 notches
-        canvas.drawCircle(center, radius * 0.75, paint);
-        canvas.drawCircle(center, radius * 0.35, paint);
+        canvas
+          ..drawCircle(center, radius * 0.75, paint)
+          ..drawCircle(center, radius * 0.35, paint);
       case PartType.bit:
         // Bit shaft and tip shape
         final rect = Rect.fromCenter(center: center, width: radius * 0.6, height: radius * 1.2);
-        canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(4)), paint);
-        canvas.drawCircle(Offset(center.dx, center.dy + radius * 0.5), radius * 0.2, paint);
+        canvas
+          ..drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(4)), paint)
+          ..drawCircle(Offset(center.dx, center.dy + radius * 0.5), radius * 0.2, paint);
       case PartType.lockChip:
       case PartType.assistBlade:
       case PartType.accessory:
